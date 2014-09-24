@@ -8,7 +8,7 @@ $this->beginWidget('bootstrap.widgets.TbModal', array(
 
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>
-    <h4>Modal header</h4>
+    <h4>Sessão de Treino</h4>
 </div>
 
 <div class="modal-body">    

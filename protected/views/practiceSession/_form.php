@@ -17,7 +17,7 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
         ));
 ?>
 
-<p class="note">Fields with <span class="required">*</span> are required.</p>
+<p class="note">Os campos com <span class="required">*</span> são obrigatórios.</p>
 
 <?php echo $form->errorSummary($model); ?>
 
@@ -30,9 +30,11 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 
 <?php echo CHelper::select2Row($form, $model, 'groupLevel', PlayerLevel::model()->getListData()); ?>
 
+<?php echo $form->textFieldRow($model, 'startTime'); ?>    
+
+<?php echo $form->textFieldRow($model, 'endTime'); ?>
+
 <div class="well" style="display: none">
-    <?php echo $form->textFieldRow($model, 'startTime'); ?>    
-    <?php echo $form->textFieldRow($model, 'endTime'); ?>
     <?php echo $form->textFieldRow($model, 'dayOfWeek'); ?>
     <?php echo $form->textFieldRow($model, 'clubID', array('class' => 'ignoreField')); ?>
 </div>
