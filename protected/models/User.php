@@ -712,7 +712,7 @@ class User extends CExtendedActiveRecord {
             $mail->setView('activation');
             $mail->setData(array('message' => $message,
                 'name' => $this->name, 'description' => $subject));
-            $mail->setFrom(Yii::app()->params['adminEmail']);
+            $mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
             $mail->setTo($userEmailAddress);
             $mail->setSubject($subject);
             if ($mail->send()) {

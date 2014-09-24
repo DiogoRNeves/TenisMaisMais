@@ -35,7 +35,7 @@ class MailActivation extends CApplicationComponent {
             $subject = 'Ativação do seu perfil na ' . Yii::app()->name;
             $mail->setData(array('message' => $this->generateActivationMailMessage(),
                 'name' => $this->user->name, 'description' => $subject));
-            $mail->setFrom(Yii::app()->params['adminEmail']);
+            $mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
             $mail->setTo($userEmailAddress);
             $mail->setSubject($subject);
             if ($mail->send()) {

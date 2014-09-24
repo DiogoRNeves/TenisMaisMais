@@ -29,12 +29,5 @@ return array(
         'variable_set' => Yii::t('YiiMailer', 'Cannot set or reset variable: ')
     ),
     'savePath' => 'webroot.assets.mail',
-    'testMode' => false,
-    'Mailer' => 'smtp',
-    'Host' => 'mx1.hostinger.pt',
-    'Port' => 2525,
-    'SMTPSecure' => 'ssl',
-    'SMTPAuth' => true,
-    'Username' => Yii::app()->params['adminMail'],
-    'Password' => 't++123!"#',
+    'testMode' => true,
 );
