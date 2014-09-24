@@ -36,7 +36,7 @@ class MailActivation extends CApplicationComponent {
             $mail->setData(array('message' => $this->generateActivationMailMessage(),
                 'name' => $this->user->name, 'description' => $subject));
             $mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
-            $mail->setTo($userEmailAddress);
+            $mail->setTo(array($userEmailAddress => $this->user->name));
             $mail->setSubject($subject);
             if ($mail->send()) {
                 Yii::app()->user->setFlash('mailSent', array(true, "E-mail de confirmação enviado!"));

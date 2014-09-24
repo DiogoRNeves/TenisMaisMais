@@ -713,7 +713,7 @@ class User extends CExtendedActiveRecord {
             $mail->setData(array('message' => $message,
                 'name' => $this->name, 'description' => $subject));
             $mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
-            $mail->setTo($userEmailAddress);
+            $mail->setTo(array($userEmailAddress => $this->name));
             $mail->setSubject($subject);
             if ($mail->send()) {
                 Yii::app()->user->setFlash('mailSent', array(true, "E-mail de enviado para $this->name!"));
