@@ -67,7 +67,7 @@
                             ),
                             array(
                                 'label' => 'Horário',
-                                'url' => array('/practicesession/index', 
+                                'url' => array('/practiceSession/index', 
                                     'userID' => $isGuest ? "" : $user->primaryKey),
                                 'visible' => !$isGuest,
                             ),
