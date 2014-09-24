@@ -4,7 +4,7 @@ Yii::app()->clientScript->registerCss("carousselCenterImage", '
   .carousel-inner a img {
     margin-left: auto;
     margin-right: auto;
-    min-height: 400px;
+    height: 400px;
 }');
 ?>
 <div id="rss">
