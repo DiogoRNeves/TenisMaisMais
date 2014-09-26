@@ -11,7 +11,7 @@ $this->beginWidget('bootstrap.widgets.TbModal', array(
     <h4>Sessão de Treino</h4>
 </div>
 
-<div class="modal-body">    
+<div class="modal-body" style="max-height: 150px">    
     <?php $this->renderPartial('_form', array('model' => $user->getSamplePracticeSession())); ?>
 </div>
 

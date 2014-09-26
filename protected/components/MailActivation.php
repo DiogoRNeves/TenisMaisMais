@@ -35,7 +35,9 @@ class MailActivation extends CApplicationComponent {
             $subject = 'Ativação do seu perfil na ' . Yii::app()->name;
             $mail->setData(array('message' => $this->generateActivationMailMessage(),
                 'name' => $this->user->name, 'description' => $subject));
-            $mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
+            $mail->setFrom(
+                    Yii::app()->params['adminEmail'], $this->user->clubs == null ? Yii::app()->name : $this->user->clubs[0]->name
+            );
             $mail->setTo(array($userEmailAddress => $this->user->name));
             $mail->setSubject($subject);
             if ($mail->send()) {
@@ -58,7 +60,8 @@ class MailActivation extends CApplicationComponent {
             'userID' => $this->user->primaryKey,
         ));
         $htmlLink = CHtml::link($link, $link, array('target' => '_blank'));
-        return "Para ativar o seu perfil, por favor visite " . CHtml::tag('p', array(), $htmlLink);
+        return "Para ativar o seu perfil no nosso sistema de gestão de atletas, por favor visite "
+                . CHtml::tag('p', array(), $htmlLink);
     }
 
 }

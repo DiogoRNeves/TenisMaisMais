@@ -680,39 +680,38 @@ class User extends CExtendedActiveRecord {
         return $this->canUpdateUser($user->primaryKey) && !$this->isUser($user) && !$this->isSponsorOf($user);
     }
 
-    public function sendAthleteChangesToPracticeMail() {
-        return $this->sendAthletePracticeSessionMail("Alterações no horário de treinos");
+    public function sendAthleteChangesToPracticeMail($fromName = null) {
+        return $this->sendAthletePracticeSessionMail("Alterações no horário de treinos", $fromName);
     }
 
-    public function sendAthletAddedToPracticeMail() {
-        return $this->sendAthletePracticeSessionMail("Novo treino adicionado");
+    public function sendAthletAddedToPracticeMail($fromName = null) {
+        return $this->sendAthletePracticeSessionMail("Novo treino adicionado", $fromName);
     }
 
-    public function sendAthletRemovedFromPracticeMail() {
-        return $this->sendAthletePracticeSessionMail("Treino removido");
+    public function sendAthletRemovedFromPracticeMail($fromName = null) {
+        return $this->sendAthletePracticeSessionMail("Treino removido", $fromName);
     }
 
-    private function sendAthletePracticeSessionMail($subject) {
+    private function sendAthletePracticeSessionMail($subject, $fromName = null) {
         $message = $this->getAthleteScheduleMailBody();
-        if ($this->sendMail($message, $subject)) {
+        if ($this->sendMail($message, $subject, $fromName)) {
             foreach ($this->sponsors as $sponsor) {
-                $sponsor->sendMail($message, $subject . " ($this->name)");
+                $sponsor->sendMail($message, $subject . " ($this->name)", $fromName);
             }
         }
         return false;
     }
 
-    public function sendMail($message, $subject) {
-        if (!isset($this->contact)) {
-            return true;
-        }
+    public function sendMail($message, $subject, $fromName = null) {
+        if (!isset($this->contact)) { return true; }
+        if ($fromName == null) { $fromName = Yii::app()->name; }
         $userEmailAddress = $this->contact->email;
         if ($userEmailAddress !== NULL) {
             $mail = new YiiMailer();
             $mail->setView('activation');
             $mail->setData(array('message' => $message,
                 'name' => $this->name, 'description' => $subject));
-            $mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
+            $mail->setFrom(Yii::app()->params['adminEmail'], $fromName);
             $mail->setTo(array($userEmailAddress => $this->name));
             $mail->setSubject($subject);
             if ($mail->send()) {
@@ -773,15 +772,6 @@ class User extends CExtendedActiveRecord {
             }
         }
         return $actions;
-//        return array(
-//            array('label' => 'Editar Clube', 'url' => array('update', 'id' => $model->clubID)),
-//            array('label' => 'Novo Atleta', 'url' => array('user/create',
-//                    'ClubHasUser' => $clubHasUserAthlete)
-//            ),
-//            array('label' => 'Novo Treinador', 'url' => array('user/create',
-//                    'ClubHasUser' => $clubHasUserCoach)
-//            ),
-//        );
     }
 
 }

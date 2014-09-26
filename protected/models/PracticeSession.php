@@ -160,20 +160,20 @@ class PracticeSession extends CExtendedActiveRecord {
     }
 
     private function notifyRemainingAthletes() {
+        $fromName = $this->club->name;
         if ($this->hasAttributesChanged()) {
             foreach ($this->athletesToNotify as $athlete) {
-                $athlete->sendAthleteChangesToPracticeMail();
+                $athlete->sendAthleteChangesToPracticeMail($fromName);
                 $this->removeFromAthletesToNotify($athlete);
             }
         }
     }
-    
+
     private function notifyClubAdmin() {
         /* @var $loggedUser User */
         $loggedUser = User::model()->findByPk(Yii::app()->user->id);
         if (!$loggedUser->isUser($this->club->adminUser)) {
-            $this->club->adminUser->sendMail($this->getPracticeSessionChangedAdminMailText(), 
-                    "Alteração em horário de " . $this->coach->name . " (" . $this->club->name . ")");
+            $this->club->adminUser->sendMail($this->getPracticeSessionChangedAdminMailText(), "Alteração em horário de " . $this->coach->name . " (" . $this->club->name . ")");
         }
     }
 
@@ -196,7 +196,7 @@ class PracticeSession extends CExtendedActiveRecord {
         $practiceSessionHasAthlete->practiceSessionID = $this->primaryKey;
         $practiceSessionHasAthlete->athleteID = $athlete->primaryKey;
         if ($practiceSessionHasAthlete->save()) {
-            $athlete->sendAthletAddedToPracticeMail();
+            $athlete->sendAthletAddedToPracticeMail($this->club->name);
             $this->removeFromAthletesToNotify($athlete);
             return true;
         }
@@ -216,7 +216,7 @@ class PracticeSession extends CExtendedActiveRecord {
         /* @var $practiceSessionHasAthlete PracticeSessionHasAthlete */
         $practiceSessionHasAthlete = PracticeSessionHasAthlete::model()->find($criteria);
         if ($practiceSessionHasAthlete->delete()) {
-            $athlete->sendAthletRemovedFromPracticeMail();
+            $athlete->sendAthletRemovedFromPracticeMail($this->club->name);
             $this->removeFromAthletesToNotify($athlete);
             return true;
         }
@@ -305,26 +305,28 @@ class PracticeSession extends CExtendedActiveRecord {
         $rowHtml = CHtml::tag('td', array(), $this->getDayOfWeekString()) .
                 CHtml::tag('td', array(), CHelper::timeToString($this->startTime)) .
                 CHtml::tag('td', array(), CHelper::timeToString($this->endTime)) .
-                CHtml::tag('td', array(), $this->coach->name);
+                CHtml::tag('td', array(), $this->coach->name) .
+                CHtml::tag('td', array(), $this->club->name);
         return CHtml::tag('tr', array(), $rowHtml);
     }
-    
+
     public function getMailTableHeader() {
         $rowHtml = CHtml::tag('td', array(), $this->getAttributeLabel('dayOfWeek')) .
                 CHtml::tag('td', array(), $this->getAttributeLabel('startTime')) .
                 CHtml::tag('td', array(), $this->getAttributeLabel('endTime')) .
-                CHtml::tag('td', array(), $this->getAttributeLabel('coachID'));
+                CHtml::tag('td', array(), $this->getAttributeLabel('coachID')) .
+                CHtml::tag('td', array(), $this->getAttributeLabel('clubID'));
         return CHtml::tag('tr', array(), $rowHtml);
     }
-    
+
     private function getPracticeSessionChangedAdminMailText() {
         $link = Yii::app()->createAbsoluteUrl("practiceSession/index", array(
             'userID' => $this->coach->primaryKey,
         ));
         $htmlLink = CHtml::link($link, $link, array('target' => '_blank'));
-        return CHtml::tag('p', array(), 
-                "Foi efetuada uma alteração no treino de " . $this->getDayOfWeekString() . 
-                " que começava às " . CHelper::timeToString($this->startTime) .
-                ". Para ver o novo horário visite") . CHtml::tag('p', array(), $htmlLink);
+        return CHtml::tag('p', array(), "Foi efetuada uma alteração no treino de " . $this->getDayOfWeekString() .
+                        " que começava às " . CHelper::timeToString($this->startTime) .
+                        ". Para ver o novo horário visite") . CHtml::tag('p', array(), $htmlLink);
     }
+
 }
