@@ -341,6 +341,9 @@ class User extends CExtendedActiveRecord {
      * @return boolean
      */
     public function isClubAdminOf($club) {
+        if ($club->adminUser == null) {
+            return false;
+        }
         return $club->adminUser->isUser($this);
     }
 

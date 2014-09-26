@@ -5,13 +5,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema mytennisapp
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `u899625820_cert` DEFAULT CHARACTER SET utf8 ;
-USE `u899625820_cert` ;
+CREATE SCHEMA IF NOT EXISTS `u899625820_prod` DEFAULT CHARACTER SET utf8 ;
+USE `u899625820_prod` ;
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`Home`
+-- Table `u899625820_prod`.`Home`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`Home` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`Home` (
   `homeID` INT NOT NULL AUTO_INCREMENT,
   `phoneNumber` VARCHAR(45) NULL,
   `address` VARCHAR(45) NULL,
@@ -22,9 +22,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`Contact`
+-- Table `u899625820_prod`.`Contact`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`Contact` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`Contact` (
   `contactID` INT NOT NULL AUTO_INCREMENT,
   `cellularPhone` VARCHAR(45) NULL,
   `workPhone` VARCHAR(45) NULL,
@@ -38,9 +38,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`PlayerLevel`
+-- Table `u899625820_prod`.`PlayerLevel`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PlayerLevel` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`PlayerLevel` (
   `playerLevelID` INT NOT NULL,
   `generalReference` VARCHAR(45) NOT NULL,
   `levelWithinReference` VARCHAR(45) NOT NULL,
@@ -49,9 +49,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`CoachLevel`
+-- Table `u899625820_prod`.`CoachLevel`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`CoachLevel` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`CoachLevel` (
   `coachLevelID` INT NOT NULL,
   `description` VARCHAR(45) NULL,
   `group` VARCHAR(45) NULL,
@@ -60,9 +60,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`User`
+-- Table `u899625820_prod`.`User`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`User` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`User` (
   `userID` INT NOT NULL AUTO_INCREMENT,
   `contactID` INT NULL,
   `homeID` INT NULL,
@@ -83,31 +83,31 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`User` (
   INDEX `fk_User_CoachLevel_idx` (`coachLevelID` ASC),
   CONSTRAINT `fk_User_Home1`
     FOREIGN KEY (`homeID`)
-    REFERENCES `u899625820_cert`.`Home` (`homeID`)
+    REFERENCES `u899625820_prod`.`Home` (`homeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_User_Contact1`
     FOREIGN KEY (`contactID`)
-    REFERENCES `u899625820_cert`.`Contact` (`contactID`)
+    REFERENCES `u899625820_prod`.`Contact` (`contactID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_User_PlayerLevel`
     FOREIGN KEY (`playerLevelID`)
-    REFERENCES `u899625820_cert`.`PlayerLevel` (`playerLevelID`)
+    REFERENCES `u899625820_prod`.`PlayerLevel` (`playerLevelID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_User_CoachLevel`
     FOREIGN KEY (`coachLevelID`)
-    REFERENCES `u899625820_cert`.`CoachLevel` (`coachLevelID`)
+    REFERENCES `u899625820_prod`.`CoachLevel` (`coachLevelID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`SponsorAthleteRelationshipType`
+-- Table `u899625820_prod`.`SponsorAthleteRelationshipType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`SponsorAthleteRelationshipType` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`SponsorAthleteRelationshipType` (
   `relationshipTypeId` INT NOT NULL AUTO_INCREMENT,
   `label` VARCHAR(25) NOT NULL,
   `description` VARCHAR(100) NULL,
@@ -117,9 +117,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`Sponsor`
+-- Table `u899625820_prod`.`Sponsor`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`Sponsor` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`Sponsor` (
   `sponsorID` INT NOT NULL,
   `athleteID` INT NOT NULL,
   `startDate` DATE NOT NULL,
@@ -130,26 +130,26 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`Sponsor` (
   INDEX `fk_Sponsor_relationshipType_idx` (`relationshipType` ASC),
   CONSTRAINT `fk_Sponsor_User1`
     FOREIGN KEY (`sponsorID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Sponsor_User2`
     FOREIGN KEY (`athleteID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Sponsor_relationshipType`
     FOREIGN KEY (`relationshipType`)
-    REFERENCES `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`)
+    REFERENCES `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`Club`
+-- Table `u899625820_prod`.`Club`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`Club` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`Club` (
   `clubID` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `homeID` INT NOT NULL,
@@ -162,26 +162,26 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`Club` (
   INDEX `fk_Club_User1_idx` (`adminUserID` ASC),
   CONSTRAINT `fk_Club_Home1`
     FOREIGN KEY (`homeID`)
-    REFERENCES `u899625820_cert`.`Home` (`homeID`)
+    REFERENCES `u899625820_prod`.`Home` (`homeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Club_Contact1`
     FOREIGN KEY (`contactID`)
-    REFERENCES `u899625820_cert`.`Contact` (`contactID`)
+    REFERENCES `u899625820_prod`.`Contact` (`contactID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Club_User1`
     FOREIGN KEY (`adminUserID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`UserType`
+-- Table `u899625820_prod`.`UserType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`UserType` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`UserType` (
   `userTypeID` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(15) NOT NULL,
   `description` VARCHAR(150) NULL,
@@ -190,9 +190,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`ClubHasUser`
+-- Table `u899625820_prod`.`ClubHasUser`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`ClubHasUser` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`ClubHasUser` (
   `clubHasUserID` INT NOT NULL AUTO_INCREMENT,
   `clubID` INT NOT NULL,
   `userID` INT NOT NULL,
@@ -206,26 +206,26 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`ClubHasUser` (
   INDEX `fk_UserType1_idx` (`userTypeID` ASC),
   CONSTRAINT `fk_Club_has_User_Club1`
     FOREIGN KEY (`clubID`)
-    REFERENCES `u899625820_cert`.`Club` (`clubID`)
+    REFERENCES `u899625820_prod`.`Club` (`clubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Club_has_User_User1`
     FOREIGN KEY (`userID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_UserType1`
     FOREIGN KEY (`userTypeID`)
-    REFERENCES `u899625820_cert`.`UserType` (`userTypeID`)
+    REFERENCES `u899625820_prod`.`UserType` (`userTypeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`MainCoach`
+-- Table `u899625820_prod`.`MainCoach`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`MainCoach` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`MainCoach` (
   `coachID` INT NOT NULL,
   `athleteID` INT NOT NULL,
   `startDate` DATE NOT NULL,
@@ -236,26 +236,26 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`MainCoach` (
   INDEX `fk_MainCoach_Club1_idx` (`clubID` ASC),
   CONSTRAINT `fk_MainCoach_User1`
     FOREIGN KEY (`coachID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_MainCoach_User2`
     FOREIGN KEY (`athleteID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_MainCoach_Club1`
     FOREIGN KEY (`clubID`)
-    REFERENCES `u899625820_cert`.`Club` (`clubID`)
+    REFERENCES `u899625820_prod`.`Club` (`clubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`PracticeSession`
+-- Table `u899625820_prod`.`PracticeSession`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSession` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`PracticeSession` (
   `practiceSessionID` INT NOT NULL AUTO_INCREMENT,
   `coachID` INT NOT NULL,
   `clubID` INT NOT NULL,
@@ -270,26 +270,26 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSession` (
   INDEX `fk_PraticeSession_PlayerLevel_idx` (`groupLevel` ASC),
   CONSTRAINT `fk_PracticeSession_Club1`
     FOREIGN KEY (`clubID`)
-    REFERENCES `u899625820_cert`.`Club` (`clubID`)
+    REFERENCES `u899625820_prod`.`Club` (`clubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PraticeSession_Club2`
     FOREIGN KEY (`coachID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PraticeSession_PlayerLevel`
     FOREIGN KEY (`groupLevel`)
-    REFERENCES `u899625820_cert`.`PlayerLevel` (`playerLevelID`)
+    REFERENCES `u899625820_prod`.`PlayerLevel` (`playerLevelID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`PracticeSessionHasAthlete`
+-- Table `u899625820_prod`.`PracticeSessionHasAthlete`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSessionHasAthlete` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`PracticeSessionHasAthlete` (
   `practiceSessionID` INT NOT NULL,
   `athleteID` INT NOT NULL,
   PRIMARY KEY (`practiceSessionID`, `athleteID`),
@@ -297,21 +297,21 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSessionHasAthlete` (
   INDEX `fk_PracticeSession_has_User_PracticeSession1_idx` (`practiceSessionID` ASC),
   CONSTRAINT `fk_PracticeSession_has_User_PracticeSession1`
     FOREIGN KEY (`practiceSessionID`)
-    REFERENCES `u899625820_cert`.`PracticeSession` (`practiceSessionID`)
+    REFERENCES `u899625820_prod`.`PracticeSession` (`practiceSessionID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PracticeSession_has_User_User1`
     FOREIGN KEY (`athleteID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`PracticeSessionHistory`
+-- Table `u899625820_prod`.`PracticeSessionHistory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSessionHistory` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`PracticeSessionHistory` (
   `practiceSessionHistoryID` INT NOT NULL,
   `startTime` TIME NOT NULL,
   `endTime` TIME NOT NULL,
@@ -323,21 +323,21 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSessionHistory` (
   INDEX `fk_PracticeSessionHistory_Club1_idx` (`clubID` ASC),
   CONSTRAINT `fk_PracticeSessionHistory_User1`
     FOREIGN KEY (`coachID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PracticeSessionHistory_Club1`
     FOREIGN KEY (`clubID`)
-    REFERENCES `u899625820_cert`.`Club` (`clubID`)
+    REFERENCES `u899625820_prod`.`Club` (`clubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`PracticeSessionHistoryHasAthlete`
+-- Table `u899625820_prod`.`PracticeSessionHistoryHasAthlete`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSessionHistoryHasAthlete` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`PracticeSessionHistoryHasAthlete` (
   `practiceSessionHistoryID` INT NOT NULL,
   `athleteID` INT NOT NULL,
   `attendanceType` INT NOT NULL,
@@ -346,21 +346,21 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`PracticeSessionHistoryHasAthlete` 
   INDEX `fk_PracticeSessionHistory_has_User_PracticeSessionHistory1_idx` (`practiceSessionHistoryID` ASC),
   CONSTRAINT `fk_PracticeSessionHistory_has_User_PracticeSessionHistory1`
     FOREIGN KEY (`practiceSessionHistoryID`)
-    REFERENCES `u899625820_cert`.`PracticeSessionHistory` (`practiceSessionHistoryID`)
+    REFERENCES `u899625820_prod`.`PracticeSessionHistory` (`practiceSessionHistoryID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PracticeSessionHistory_has_User_User1`
     FOREIGN KEY (`athleteID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`FederationClub`
+-- Table `u899625820_prod`.`FederationClub`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`FederationClub` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`FederationClub` (
   `federationClubID` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `phoneNumber` VARCHAR(45) NULL,
@@ -371,9 +371,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`FederationTournament`
+-- Table `u899625820_prod`.`FederationTournament`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`FederationTournament` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`FederationTournament` (
   `federationTournamentID` INT NOT NULL,
   `level` VARCHAR(2) NOT NULL,
   `qualyStartDate` DATE NULL,
@@ -391,16 +391,16 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`FederationTournament` (
   INDEX `fk_FederationTournament_FederationClub1_idx` (`federationClubID` ASC),
   CONSTRAINT `fk_FederationTournament_FederationClub1`
     FOREIGN KEY (`federationClubID`)
-    REFERENCES `u899625820_cert`.`FederationClub` (`federationClubID`)
+    REFERENCES `u899625820_prod`.`FederationClub` (`federationClubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`AgeBand`
+-- Table `u899625820_prod`.`AgeBand`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`AgeBand` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`AgeBand` (
   `ageBandID` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `maxAge` VARCHAR(45) NOT NULL,
@@ -410,9 +410,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`TournamentType`
+-- Table `u899625820_prod`.`TournamentType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`TournamentType` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`TournamentType` (
   `variation` VARCHAR(45) NOT NULL,
   `gender` VARCHAR(45) NOT NULL,
   `federationTournamentID` INT NOT NULL,
@@ -420,16 +420,16 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`TournamentType` (
   PRIMARY KEY (`variation`, `gender`, `federationTournamentID`),
   CONSTRAINT `fk_TournamentType_FederationTournament1`
     FOREIGN KEY (`federationTournamentID`)
-    REFERENCES `u899625820_cert`.`FederationTournament` (`federationTournamentID`)
+    REFERENCES `u899625820_prod`.`FederationTournament` (`federationTournamentID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`FederationTournamentHasAgeBand`
+-- Table `u899625820_prod`.`FederationTournamentHasAgeBand`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`FederationTournamentHasAgeBand` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`FederationTournamentHasAgeBand` (
   `federationTournamentID` INT NOT NULL,
   `ageBandID` INT NOT NULL,
   PRIMARY KEY (`federationTournamentID`, `ageBandID`),
@@ -437,21 +437,21 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`FederationTournamentHasAgeBand` (
   INDEX `fk_FederationTournament_has_AgeBand_FederationTournament1_idx` (`federationTournamentID` ASC),
   CONSTRAINT `fk_FederationTournament_has_AgeBand_FederationTournament1`
     FOREIGN KEY (`federationTournamentID`)
-    REFERENCES `u899625820_cert`.`FederationTournament` (`federationTournamentID`)
+    REFERENCES `u899625820_prod`.`FederationTournament` (`federationTournamentID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_FederationTournament_has_AgeBand_AgeBand1`
     FOREIGN KEY (`ageBandID`)
-    REFERENCES `u899625820_cert`.`AgeBand` (`ageBandID`)
+    REFERENCES `u899625820_prod`.`AgeBand` (`ageBandID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`AthleteGroup`
+-- Table `u899625820_prod`.`AthleteGroup`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`AthleteGroup` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`AthleteGroup` (
   `athleteGroupID` INT NOT NULL,
   `minAge` INT NULL,
   `maxAge` INT NULL,
@@ -462,16 +462,16 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`AthleteGroup` (
   INDEX `fk_AthleteGroup_Club1_idx` (`clubID` ASC),
   CONSTRAINT `fk_AthleteGroup_Club1`
     FOREIGN KEY (`clubID`)
-    REFERENCES `u899625820_cert`.`Club` (`clubID`)
+    REFERENCES `u899625820_prod`.`Club` (`clubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`CompetitivePlan`
+-- Table `u899625820_prod`.`CompetitivePlan`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`CompetitivePlan` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`CompetitivePlan` (
   `athleteGroupID` INT NOT NULL,
   `federationTournamentID` INT NOT NULL,
   INDEX `fk_CompetitivePlan_AthleteGroup1_idx` (`athleteGroupID` ASC),
@@ -479,21 +479,21 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`CompetitivePlan` (
   PRIMARY KEY (`athleteGroupID`, `federationTournamentID`),
   CONSTRAINT `fk_CompetitivePlan_AthleteGroup1`
     FOREIGN KEY (`athleteGroupID`)
-    REFERENCES `u899625820_cert`.`AthleteGroup` (`athleteGroupID`)
+    REFERENCES `u899625820_prod`.`AthleteGroup` (`athleteGroupID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_CompetitivePlan_FederationTournament1`
     FOREIGN KEY (`federationTournamentID`)
-    REFERENCES `u899625820_cert`.`FederationTournament` (`federationTournamentID`)
+    REFERENCES `u899625820_prod`.`FederationTournament` (`federationTournamentID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `u899625820_cert`.`CompetitiveResultHistory`
+-- Table `u899625820_prod`.`CompetitiveResultHistory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `u899625820_cert`.`CompetitiveResultHistory` (
+CREATE TABLE IF NOT EXISTS `u899625820_prod`.`CompetitiveResultHistory` (
   `competitiveResultHistoryID` INT NOT NULL,
   `winnerUserID` INT NOT NULL,
   `loserUserID` INT NOT NULL,
@@ -505,17 +505,17 @@ CREATE TABLE IF NOT EXISTS `u899625820_cert`.`CompetitiveResultHistory` (
   INDEX `fk_Loser_idx` (`loserUserID` ASC),
   CONSTRAINT `fk_CompetitiveResultHistory_FederationTournament1`
     FOREIGN KEY (`federationTournamentID`)
-    REFERENCES `u899625820_cert`.`FederationTournament` (`federationTournamentID`)
+    REFERENCES `u899625820_prod`.`FederationTournament` (`federationTournamentID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Winner`
     FOREIGN KEY (`winnerUserID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Loser`
     FOREIGN KEY (`loserUserID`)
-    REFERENCES `u899625820_cert`.`User` (`userID`)
+    REFERENCES `u899625820_prod`.`User` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -525,62 +525,62 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
--- Data for table `u899625820_cert`.`PlayerLevel`
+-- Data for table `u899625820_prod`.`PlayerLevel`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `u899625820_cert`;
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (1, 'Elite', 'Alto Desempenho');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (2, 'Avançado', 'Alto');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (3, 'Avançado', 'Médio');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (4, 'Avançado', 'Baixo');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (5, 'Intermédio', 'Alto');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (6, 'Intermédio', 'Médio');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (7, 'Intermédio', 'Baixo');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (8, 'Recreativo', 'Alto');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (9, 'Recreativo', 'Baixo');
-INSERT INTO `u899625820_cert`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (10, 'Iniciante', 'Iniciante');
+USE `u899625820_prod`;
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (1, 'Elite', 'Alto Desempenho');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (2, 'Avançado', 'Alto');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (3, 'Avançado', 'Médio');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (4, 'Avançado', 'Baixo');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (5, 'Intermédio', 'Alto');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (6, 'Intermédio', 'Médio');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (7, 'Intermédio', 'Baixo');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (8, 'Recreativo', 'Alto');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (9, 'Recreativo', 'Baixo');
+INSERT INTO `u899625820_prod`.`PlayerLevel` (`playerLevelID`, `generalReference`, `levelWithinReference`) VALUES (10, 'Iniciante', 'Iniciante');
 
 COMMIT;
 
 
 -- -----------------------------------------------------
--- Data for table `u899625820_cert`.`CoachLevel`
+-- Data for table `u899625820_prod`.`CoachLevel`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `u899625820_cert`;
-INSERT INTO `u899625820_cert`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (0, 'Sem certificado', 'Outro');
-INSERT INTO `u899625820_cert`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (1, 'Nível 1 FPT', 'FPT');
-INSERT INTO `u899625820_cert`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (2, 'Nível 2 FPT', 'FPT');
-INSERT INTO `u899625820_cert`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (3, 'Nível 3 FPT', 'FPT');
-INSERT INTO `u899625820_cert`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (4, 'Outro', 'Outro');
+USE `u899625820_prod`;
+INSERT INTO `u899625820_prod`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (0, 'Sem certificado', 'Outro');
+INSERT INTO `u899625820_prod`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (1, 'Nível 1 FPT', 'FPT');
+INSERT INTO `u899625820_prod`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (2, 'Nível 2 FPT', 'FPT');
+INSERT INTO `u899625820_prod`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (3, 'Nível 3 FPT', 'FPT');
+INSERT INTO `u899625820_prod`.`CoachLevel` (`coachLevelID`, `description`, `group`) VALUES (4, 'Outro', 'Outro');
 
 COMMIT;
 
 
 -- -----------------------------------------------------
--- Data for table `u899625820_cert`.`SponsorAthleteRelationshipType`
+-- Data for table `u899625820_prod`.`SponsorAthleteRelationshipType`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `u899625820_cert`;
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Pai/Mãe', NULL);
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Avô/Avó', NULL);
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Irmão/Irmã', NULL);
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Tio/Tia', NULL);
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Patrocinador', NULL);
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Outro (Familiar)', NULL);
-INSERT INTO `u899625820_cert`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Outro (Não Familiar)', NULL);
+USE `u899625820_prod`;
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Pai/Mãe', NULL);
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Avô/Avó', NULL);
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Irmão/Irmã', NULL);
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Tio/Tia', NULL);
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Patrocinador', NULL);
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Outro (Familiar)', NULL);
+INSERT INTO `u899625820_prod`.`SponsorAthleteRelationshipType` (`relationshipTypeId`, `label`, `description`) VALUES (NULL, 'Outro (Não Familiar)', NULL);
 
 COMMIT;
 
 
 -- -----------------------------------------------------
--- Data for table `u899625820_cert`.`UserType`
+-- Data for table `u899625820_prod`.`UserType`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `u899625820_cert`;
-INSERT INTO `u899625820_cert`.`UserType` (`userTypeID`, `name`, `description`) VALUES (NULL, 'treinador', 'treinador ou diretor técnico');
-INSERT INTO `u899625820_cert`.`UserType` (`userTypeID`, `name`, `description`) VALUES (NULL, 'atleta', NULL);
-INSERT INTO `u899625820_cert`.`UserType` (`userTypeID`, `name`, `description`) VALUES (NULL, 'patrocinador', 'patrocinador ou familiar do atleta');
+USE `u899625820_prod`;
+INSERT INTO `u899625820_prod`.`UserType` (`userTypeID`, `name`, `description`) VALUES (NULL, 'treinador', 'treinador ou diretor técnico');
+INSERT INTO `u899625820_prod`.`UserType` (`userTypeID`, `name`, `description`) VALUES (NULL, 'atleta', NULL);
+INSERT INTO `u899625820_prod`.`UserType` (`userTypeID`, `name`, `description`) VALUES (NULL, 'patrocinador', 'patrocinador ou familiar do atleta');
 
 COMMIT;
 
@@ -588,8 +588,8 @@ COMMIT;
 -- Data for table `mytennisapp`.`Contact`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `u899625820_cert`;
-INSERT INTO `u899625820_cert`.`Contact` (`contactID`, `cellularPhone`, `workPhone`, `email`, `fax`, `website`) VALUES (1, NULL, NULL, 'admin', NULL, NULL);
+USE `u899625820_prod`;
+INSERT INTO `u899625820_prod`.`Contact` (`contactID`, `cellularPhone`, `workPhone`, `email`, `fax`, `website`) VALUES (1, NULL, NULL, 'admin', NULL, NULL);
 
 COMMIT;
 
@@ -598,7 +598,7 @@ COMMIT;
 -- Password is admin
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `u899625820_cert`;
-INSERT INTO `u899625820_cert`.`User` (`userID`, `contactID`, `homeID`, `name`, `password`, `birthDate`, `federationNumber`, `coachLevelID`, `playerLevelID`, `activated`, `activationHash`, `activationMailSent`) VALUES (1, 1, NULL, 'admin', '$1$FOsjRjOg$qB12QZLUru9y9yNqc3nL9/', NULL, NULL, NULL, NULL, 1, NULL, 1);
+USE `u899625820_prod`;
+INSERT INTO `u899625820_prod`.`User` (`userID`, `contactID`, `homeID`, `name`, `password`, `birthDate`, `federationNumber`, `coachLevelID`, `playerLevelID`, `activated`, `activationHash`, `activationMailSent`) VALUES (1, 1, NULL, 'admin', '$1$FOsjRjOg$qB12QZLUru9y9yNqc3nL9/', NULL, NULL, NULL, NULL, 1, NULL, 1);
 
 COMMIT;
