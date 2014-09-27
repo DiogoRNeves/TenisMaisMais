@@ -250,7 +250,7 @@ class Club extends CExtendedActiveRecord {
                     'ClubHasUser' => $clubHasUserAthlete)
         ));
         $adminOnlyActions = array(
-            array('label' => 'Editar Clube', 'url' => array('update', 'id' => $this->clubID)),
+            array('label' => 'Editar Clube', 'url' => array('club/update', 'id' => $this->clubID)),
             array('label' => 'Novo Treinador', 'url' => array('user/create',
                     'ClubHasUser' => $clubHasUserCoach)
             ),
