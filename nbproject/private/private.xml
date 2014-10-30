@@ -3,11 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/models/CompetitivePlan.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/config/main.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/controllers/ClubController.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/views/competitivePlan/index.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/controllers/CompetitivePlanController.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/models/User.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/controllers/ClubController.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/models/Club.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/themes/booster/views/layouts/column2.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/controllers/UserController.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/views/site/pages/about.php</file>
         </group>
     </open-files>
 </project-private>
