@@ -11,6 +11,9 @@ $this->breadcrumbs = array(
 
 //Side menu populated by controller
 $this->menu = $this->getSideMenuItems($dataProvider);
+$dataProvider->setSort(array(
+    'defaultOrder' => 'name',
+    ));
 ?>
 
 <h1><?php echo $userTypeText; ?></h1>
