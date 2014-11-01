@@ -79,17 +79,27 @@ class CHelper extends CApplicationComponent {
      * @param bool $multiSelect whether this is a multiSelect. Defaults to false.
      * @param string $hint Hint to be rendered.
      * @param type $hintOptions The hint htmlOptions to be renderer into the wrapping tag
+     * @param bool $enabled Wether this selection is enabled or not
+     * @param array $defaultVal array indexed by id and text
      * @return string the HTML to be echoed.
      */
-    public static function select2Row($form, $model, $attribute, $data, $multiSelect = false, $hint = null, $hintOptions = null, $enabled = false) {
+    public static function select2Row($form, $model, $attribute, $data, $multiSelect = false, 
+            $hint = null, $hintOptions = null, $enabled = true, $defaultVal = null) {
         $widgetOptions = array(
             'data' => $data,
             'options' => array(
                 'placeholder' => 'Please Select a Value',
                 'allowClear' => true,
             ),
-            'htmlOptions' => array('select2-enabled' => $enabled ? 'true' : 'false'),
+            //'htmlOptions' => array('disabled' => !$enabled ? 'true' : 'false'),
         );
+        if (!$enabled) {
+            $widgetOptions['htmlOptions'] = array('disabled' => 'true');
+        }
+        if ($defaultVal !== null) {
+            //TODO: usar initSelection : function (element, callback) para inicializar
+            $widgetOptions['val'] = $defaultVal;
+        }
         if ($multiSelect) {
             $widgetOptions['htmlOptions'] = array(
                 'multiple' => 'multiple',
@@ -100,7 +110,7 @@ class CHelper extends CApplicationComponent {
             $rowOptions['hint'] = $hint;
         }
         if ($hintOptions !== null) {
-            $rowOptions['hint'] = $hintOptions;
+            $rowOptions['hintOptions'] = $hintOptions;
         }
         return $form->select2Row($model, $attribute, $widgetOptions, $rowOptions);
     }

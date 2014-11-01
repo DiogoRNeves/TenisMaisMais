@@ -159,6 +159,14 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
+     * 
+     * @return User
+     */
+    public static function getLoggedInUser() {
+        return User::model()->findByPk(Yii::app()->user->getId());
+    }
+
+    /**
      * Returns the user model that contains the contact info passed as an argument.
      * 
      * @param string $contactToSearch content of the contact to search
@@ -706,8 +714,12 @@ class User extends CExtendedActiveRecord {
     }
 
     public function sendMail($message, $subject, $fromName = null) {
-        if (!isset($this->contact)) { return true; }
-        if ($fromName == null) { $fromName = Yii::app()->name; }
+        if (!isset($this->contact)) {
+            return true;
+        }
+        if ($fromName == null) {
+            $fromName = Yii::app()->name;
+        }
         $userEmailAddress = $this->contact->email;
         if ($userEmailAddress !== NULL) {
             $mail = new YiiMailer();
@@ -760,6 +772,10 @@ class User extends CExtendedActiveRecord {
         return false;
     }
 
+    /**
+     * 
+     * @return array
+     */
     public function getQuickActions() {
         $actions = array();
         if ($this->isCoach()) {
@@ -775,6 +791,33 @@ class User extends CExtendedActiveRecord {
             }
         }
         return $actions;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public function getAdminedCoachesOptions() {
+        $adminedCoaches = $this->isClubAdmin() ? $this : $this->getAdminedCoaches();
+        return CHTML::listData($adminedCoaches, 'userID', 'name');
+    }
+
+    /**
+     * return User[]
+     */
+    public function getAdminedCoaches() {
+        /* @var $coaches User[] */
+        $coaches = array($this);
+        foreach ($this->getRelatedCoaches() as $coach) {
+            if ($this->isAdminOfCoach($coach)) {
+                $coaches[] = $coach;
+            }
+        }
+        return $coaches;
+    }
+    
+    public function getClubsCoachedOptions() {
+        return CHTML::listData($this->coachClubs, 'clubID', 'name');
     }
 
 }
