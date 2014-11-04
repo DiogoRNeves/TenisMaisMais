@@ -3,12 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/models/User.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/controllers/ClubController.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/models/Club.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/themes/booster/views/layouts/column2.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/controllers/UserController.php</file>
-            <file>file:/Users/diogoneves/Dropbox/Programming/www/myTennisApp/protected/views/site/pages/about.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/views/user/_form.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/controllers/PracticeSessionController.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/models/User.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/controllers/UserController.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/models/PracticeSession.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/views/practiceSession/index.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/models/Club.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/views/practiceSession/_form.php</file>
+            <file>file:/Users/diogoneves/Dropbox/Programming/www/tenisMaisMais/protected/components/CHelper.php</file>
         </group>
     </open-files>
 </project-private>

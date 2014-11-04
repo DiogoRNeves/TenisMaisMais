@@ -1,6 +1,6 @@
 <?php
 /* @var $this UserController */
-/* @var $dataProvider CActiveDataProvider */
+/* @var $dataProvider CArrayDataProvider */
 /* @var $userType UserType */
 
 $userTypeText = $userType == null ? 'Utilizador' : ucwords($userType->name);
@@ -8,12 +8,6 @@ $userTypeText = $userType == null ? 'Utilizador' : ucwords($userType->name);
 $this->breadcrumbs = array(
     $userTypeText,
 );
-
-//Side menu populated by controller
-$this->menu = $this->getSideMenuItems($dataProvider);
-$dataProvider->setSort(array(
-    'defaultOrder' => 'name',
-    ));
 ?>
 
 <h1><?php echo $userTypeText; ?></h1>
