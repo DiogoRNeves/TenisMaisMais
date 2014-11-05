@@ -426,21 +426,22 @@ class User extends CExtendedActiveRecord {
     /**
      * 
      * @param UserType $userType the user type to find
+     * @param array $filter array indexed by param array('name' => 'diogo')
      * @return User[]
      */
-    public function getRelatedUsers($userType) {
+    public function getRelatedUsers($userType, array $filter = null) {
         if ($userType == null) {
-            $result = $this->getRelatedAthletes();
+            $result = $this->getRelatedAthletes($filter);
         }
         switch ($userType->name) {
             case 'atleta':
-                $result = $this->getRelatedAthletes();
+                $result = $this->getRelatedAthletes($filter);
                 break;
             case 'treinador':
-                $result = $this->getRelatedCoaches();
+                $result = $this->getRelatedCoaches($filter);
                 break;
             case 'patrocinador':
-                $result = $this->getRelatedSponsors();
+                $result = $this->getRelatedSponsors($filter);
                 break;
             default:
                 $result = null;
@@ -451,39 +452,44 @@ class User extends CExtendedActiveRecord {
 
     /**
      * 
+     * @param array $filter array indexed by param array('name' => 'diogo')
      * @return User[] the related Athletes
      */
-    public function getRelatedAthletes() {
-        return array_unique(array_merge($this->getCoachedAthletes(), $this->sponsoredAthletes));
+    public function getRelatedAthletes(array $filter = null) {
+        $result = array_unique(array_merge($this->getCoachedAthletes(), $this->sponsoredAthletes));
+        return CHelper::searchArray($result, $filter);
     }
 
-    public function getCoachedAthletes() {
+    public function getCoachedAthletes(array $filter = null) {
         /* @var $club Club */
         $result = array();
         foreach ($this->coachClubs as $club) {
             $result = array_merge($result, $club->athletes);
         }
-        return $result;
+        return CHelper::searchArray($result, $filter);
     }
 
     /**
      * 
+     * @param array $filter array indexed by param array('name' => 'diogo')
      * @return User[] the related Coaches
      */
-    public function getRelatedCoaches() {
+    public function getRelatedCoaches(array $filter = null) {
         /* @var $club Club */
         $result = array();
         foreach ($this->coachClubs as $club) {
             $result = array_merge($result, $club->coaches);
         }
-        return $result;
+        return CHelper::searchArray($result, $filter);
     }
 
     /**
      * TODO
+     * 
+     * @param array $filter array indexed by param array('name' => 'diogo')
      * @return User[] the related Sponsors
      */
-    public function getRelatedSponsors() {
+    public function getRelatedSponsors(array $filter = null) {
         //TODO: write proper code
         return User::model()->findAll();
     }

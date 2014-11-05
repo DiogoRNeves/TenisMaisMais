@@ -65,7 +65,7 @@ class CHelper extends CApplicationComponent {
             'value' => self::getStringOfObjectLinks($models, $attributeName),
         );
     }
-    
+
     public static function getStringOfObjectLinks($models, $attributeName, $linkToObject = true) {
         return implode(", ", self::getArrayOfAttribute($models, $attributeName, $linkToObject));
     }
@@ -113,27 +113,71 @@ class CHelper extends CApplicationComponent {
             'label' => $model->isNewRecord ? 'Create' : 'Save',
         ));
     }
-    
+
     public static function timepickerRow($form, $model, $attribute) {
         return $form->timepickerRow(
-            $model,
-            $attribute,
-            array(
-                'htmlOptions' => array(
-                    'class' => 'input-small',
-                ),
-                'options' => array(
-                    'defaultTime' => false,
-                    'showMeridian' => false,
-                    'showInputs' => false,
-                ),
-                'noAppend' => true,
-            )
+                        $model, $attribute, array(
+                    'htmlOptions' => array(
+                        'class' => 'input-small',
+                    ),
+                    'options' => array(
+                        'defaultTime' => false,
+                        'showMeridian' => false,
+                        'showInputs' => false,
+                    ),
+                    'noAppend' => true,
+                        )
         );
     }
-    
+
     public static function timeToString($time) {
         return substr($time, 0, 5);
+    }
+
+    /**
+     * 
+     * @param CModel[] $data the array containing the models
+     * @param array $filter array indexed by param array('name' => 'diogo')
+     * @return User[] the related Coaches
+     */
+    public static function searchArray($data, $filter) {
+        if ($data == null) {
+            return null;
+        } else if ($filter == null) {
+            return $data;
+        }
+        $result = array();
+        foreach ($data as $model) {
+            foreach ($filter as $property => $searchValue) {
+                if (self::stringContains($model->$property, $searchValue, true)) {
+                    $result[] = $model;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 
+     * @param string $string
+     * @param string $searchValue
+     * @return bool wether $searchValue is in $string or not
+     */
+    public static function stringContains($string, $searchValue, $splitWords = false, $caseSensitive = false) {
+        if (!$caseSensitive) {
+            $string = strtolower($string);
+            $searchValue = strtolower($searchValue);
+        }
+        if ($splitWords) {
+            $searchValue = explode(" ", $searchValue);
+        } else {
+            $searchValue = array($searchValue);
+        }
+        $result = true;
+        foreach ($searchValue as $word) {
+            $result = $result && strpos($string, $word) !== false;
+        }
+        return $result;
     }
 
 }

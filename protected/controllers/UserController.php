@@ -261,7 +261,8 @@ class UserController extends Controller {
                 throw new CHttpException('403', 'Não pode listar treinadores');
             }
         }
-        $data = $currentUser->getRelatedUsers($userType);
+        $filter = isset($_GET['name']) ? array('name' => $_GET['name']) : null;
+        $data = $currentUser->getRelatedUsers($userType, $filter);
         $dataProvider = new CArrayDataProvider($data == null ? array() : $data);
         $this->render('index', array(
             'dataProvider' => $dataProvider,
