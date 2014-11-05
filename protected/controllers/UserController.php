@@ -261,7 +261,8 @@ class UserController extends Controller {
                 throw new CHttpException('403', 'Não pode listar treinadores');
             }
         }
-        $filter = isset($_GET['name']) ? array('name' => $_GET['name']) : null;
+        $filter = isset($_GET['name']) && $_GET['name'] !== "" ?
+                array('name' => filter_input(INPUT_GET, 'name', FILTER_SANITIZE_STRING)) : null;
         $data = $currentUser->getRelatedUsers($userType, $filter);
         $dataProvider = new CArrayDataProvider($data == null ? array() : $data);
         $this->render('index', array(
@@ -385,7 +386,7 @@ class UserController extends Controller {
                 'option' => array('label' => 'Editar Patrocinador', 'url' => array('update', 'id' => $user->userID, 'userTypeId' => $sponsor)),
                 'detailedView' => true,
                 'selectedUserTypesAllowed' => array($sponsor),
-                'loggedInUserTypesAllowed' => array($coach)),            
+                'loggedInUserTypesAllowed' => array($coach)),
             'viewPracticeSchedule' => array(
                 'option' => array('label' => 'Ver Horário', 'url' => array('practiceSession/index', 'userID' => $user->userID)),
                 'detailedView' => true,

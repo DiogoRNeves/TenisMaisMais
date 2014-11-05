@@ -99,8 +99,8 @@ class User extends CExtendedActiveRecord {
             'athletePracticeSessions' => array(self::MANY_MANY, 'PracticeSession', 'PracticeSessionHasAthlete(athleteID, practiceSessionID)'),
             'coachPracticeSessionsHistory' => array(self::HAS_MANY, 'PracticeSessionHistory', 'coachID'),
             'athletePracticeSessionsHistory' => array(self::MANY_MANY, 'PracticeSessionHistory', 'PracticeSessionHistoryHasAthlete(athleteID, practiceSessionHistoryID)'),
-            'sponsoredAthletes' => array(self::MANY_MANY, 'User', 'Sponsor(sponsorID, athleteID)', 'order'=>'name ASC'),
-            'sponsors' => array(self::MANY_MANY, 'User', 'Sponsor(athleteID, sponsorID)', 'order'=>'name ASC'),
+            'sponsoredAthletes' => array(self::MANY_MANY, 'User', 'Sponsor(sponsorID, athleteID)', 'order' => 'name ASC'),
+            'sponsors' => array(self::MANY_MANY, 'User', 'Sponsor(athleteID, sponsorID)', 'order' => 'name ASC'),
             'contact' => array(self::BELONGS_TO, 'Contact', 'contactID'),
             'home' => array(self::BELONGS_TO, 'Home', 'homeID'),
             'playerLevel' => array(self::BELONGS_TO, 'PlayerLevel', 'playerLevelID'),
@@ -247,13 +247,18 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * @param Club $club
+     * @param Club[] $clubs
      * @return boolean
      */
-    public function isCoachAt($club) {
-        foreach ($club->coaches as $coach) {
-            if ($this->isUser($coach)) {
-                return true;
+    public function isCoachAt($clubs) {
+        if (!is_array($clubs)) {
+            $clubs = array($clubs);
+        }
+        foreach ($clubs as $club) {
+            foreach ($club->coaches as $coach) {
+                if ($this->isUser($coach)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -337,14 +342,19 @@ class User extends CExtendedActiveRecord {
 
     /**
      * 
-     * @param Club $club
+     * @param Club[] $clubs
      * @return boolean
      */
-    public function isClubAdminOf($club) {
-        if ($club->adminUser == null) {
-            return false;
+    public function isClubAdminOf($clubs) {
+        if (!is_array($clubs)) {
+            $clubs = array($clubs);
         }
-        return $club->adminUser->isUser($this);
+        foreach ($clubs as $club) {
+            if ($club->adminUser !== null && $club->adminUser->isUser($this)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getDetailViewData() {
@@ -572,10 +582,15 @@ class User extends CExtendedActiveRecord {
      * @return boolean
      */
     public function canCreateUsers() {
-        if (!isset($_REQUEST['ClubHasUser'], $_REQUEST['ClubHasUser']['clubID'])) {
+        if (!isset($_REQUEST['ClubHasUser'], $_REQUEST['ClubHasUser']['clubID']) &&
+                !isset($_REQUEST['Sponsor'], $_REQUEST['Sponsor']['athleteID'])) {
             return false;
+        } elseif (isset($_REQUEST['ClubHasUser']['clubID'])) {
+            $club = Club::model()->findByPk($_REQUEST['ClubHasUser']['clubID']);
+        } elseif (isset($_REQUEST['Sponsor']['athleteID'])) {
+            $athlete = User::model()->findByPk($_REQUEST['Sponsor']['athleteID']);
+            $club = $athlete->athleteClubs;
         }
-        $club = Club::model()->findByPk($_REQUEST['ClubHasUser']['clubID']);
         return $this->isClubAdminOf($club) || $this->isCoachAt($club);
     }
 
@@ -712,8 +727,12 @@ class User extends CExtendedActiveRecord {
     }
 
     public function sendMail($message, $subject, $fromName = null) {
-        if (!isset($this->contact)) { return true; }
-        if ($fromName == null) { $fromName = Yii::app()->name; }
+        if (!isset($this->contact)) {
+            return true;
+        }
+        if ($fromName == null) {
+            $fromName = Yii::app()->name;
+        }
         $userEmailAddress = $this->contact->email;
         if ($userEmailAddress !== NULL) {
             $mail = new YiiMailer();
