@@ -574,7 +574,9 @@ class User extends CExtendedActiveRecord {
     public function canUpdateUser($userID = null) {
         $userID = $userID == null || $userID instanceof CWebUser ? $this->getSuperglobalUserID() : $userID;
         $user = User::model()->findByPk($userID);
-        return $this->isUser($user) || $this->isSponsorOf($user) || $this->isCoachOf($user) || $this->coachesInSameClubOf($user);
+        return $this->isUser($user) || $this->isSponsorOf($user) || 
+                $this->isCoachOf($user) || $this->coachesInSameClubOf($user) || 
+                $this->isCoachOfSponsoredAthlete($user);
     }
 
     /**
@@ -800,6 +802,20 @@ class User extends CExtendedActiveRecord {
             }
         }
         return $actions;
+    }
+    
+    /**
+     * 
+     * @param User $user
+     * @return boolean
+     */
+    public function isCoachOfSponsoredAthlete($user) {
+        foreach ($user->sponsoredAthletes as $sponsoredAthlete) {
+            if ($this->isCoachOf($sponsoredAthlete)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

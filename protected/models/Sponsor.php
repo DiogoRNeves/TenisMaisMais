@@ -58,11 +58,11 @@ class Sponsor extends CExtendedActiveRecord {
      */
     public function attributeLabels() {
         return array(
-            'sponsorID' => 'Sponsor',
-            'athleteID' => 'Athlete',
-            'startDate' => 'Start Date',
-            'relationshipType' => 'Relationship Type',
-            'endDate' => 'End Date',
+            'sponsorID' => 'Patrocinador',
+            'athleteID' => 'Atleta',
+            'startDate' => 'Data de Início',
+            'relationshipType' => 'Grau de Parentesco',
+            'endDate' => 'Data de Fim',
         );
     }
 
