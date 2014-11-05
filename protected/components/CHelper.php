@@ -142,7 +142,7 @@ class CHelper extends CApplicationComponent {
      */
     public static function searchArray($data, $filter) {
         if ($data == null) {
-            return null;
+            return array();
         } else if ($filter == null) {
             return $data;
         }
