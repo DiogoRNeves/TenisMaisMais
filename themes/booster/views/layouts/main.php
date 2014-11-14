@@ -120,6 +120,7 @@
                 <hr/>
                 <div id="footer">
                     Copyright &copy; <?php echo date('Y'); ?> by Diogo Neves.<br/>
+                    Contacto: <a href="mailto:#"><?php echo Yii::app()->params['adminEmail'] ?></a><br/>
                     Todos os direitos reservados.<br/>
                     <?php echo Yii::powered(); ?>
                 </div>
