@@ -48,6 +48,11 @@ class User extends CExtendedActiveRecord {
     //TODO: handle save for password changing
     public $newPassword, $oldPassword, $newPasswordRepeated;
 
+    public static function getLoggedInUser()
+    {
+        return User::model()->findByPk(Yii::app()->user->id);
+    }
+
     /**
      * @return string the associated database table name
      */
@@ -816,6 +821,37 @@ class User extends CExtendedActiveRecord {
             }
         }
         return false;
+    }
+
+    public function getCoachedAthletesOptions()
+    {
+        return CHtml::listData($this->getCoachedAthletes(), 'userID', 'name');
+    }
+
+    public function getClubsCoachedOptions()
+    {
+        return CHtml::listData($this->coachClubs, 'clubID', 'name');
+    }
+    /**
+     *
+     * @return array
+     */
+    public function getAdminedCoachesOptions() {
+        $adminedCoaches = $this->isClubAdmin() ? $this->getAdminedCoaches() : array($this);
+        return CHTML::listData($adminedCoaches, 'userID', 'name');
+    }
+    /**
+     * return User[]
+     */
+    public function getAdminedCoaches() {
+        /* @var $coaches User[] */
+        $coaches = array($this);
+        foreach ($this->getRelatedCoaches() as $coach) {
+            if ($this->isAdminOfCoach($coach)) {
+                $coaches[] = $coach;
+            }
+        }
+        return $coaches;
     }
 
 }
