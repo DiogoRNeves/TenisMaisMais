@@ -59,8 +59,9 @@ class PracticeSession extends CExtendedActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'club' => array(self::BELONGS_TO, 'Club', 'clubID'),
-            'coach' => array(self::BELONGS_TO, 'User', 'coachID'),
-            'athletes' => array(self::MANY_MANY, 'User', 'PracticeSessionHasAthlete(practiceSessionID, athleteID)'),
+            'coach' => array(self::BELONGS_TO, 'User', 'coachID', 'order' => 'name'),
+            'athletes' => array(self::MANY_MANY, 'User', 'PracticeSessionHasAthlete(practiceSessionID, athleteID)',
+                'order' => 'name'),
             'playerLevel' => array(self::BELONGS_TO, 'PlayerLevel', 'groupLevel'),
         );
     }

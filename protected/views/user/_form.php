@@ -72,6 +72,9 @@
             echo $form->passwordFieldRow($user, 'oldPassword', array('size' => 45, 'maxlength' => 45, 'class' => 'span5'));
         }
         ?>
+        <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>
+            As passswords têm que ter pelo menos uma minúscula, uma maiúscula, um número, 4 caracteres e não podem conter espaços.
+        </div>
         <?php echo $form->passwordFieldRow($user, 'newPassword', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
         <?php echo $form->passwordFieldRow($user, 'newPasswordRepeated', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
     <?php endif; ?>

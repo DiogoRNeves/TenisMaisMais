@@ -641,7 +641,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     *
+     * 
      * @param User $user
      * @return boolean
      */
@@ -699,7 +699,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     *
+     * 
      * @return boolean
      */
     public function canUpdateUserLevels($user) {
@@ -764,7 +764,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     *
+     * 
      * @param User $updater
      * @return boolean
      */
@@ -774,7 +774,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     *
+     * 
      * @param User $updater
      * @return boolean
      */
@@ -803,9 +803,9 @@ class User extends CExtendedActiveRecord {
         }
         return $actions;
     }
-
+    
     /**
-     *
+     * 
      * @param User $user
      * @return boolean
      */
