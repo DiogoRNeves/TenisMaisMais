@@ -72,6 +72,12 @@
                                 'visible' => !$isGuest,
                             ),
                             array(
+                                'label' => 'Assiduidade',
+                                'url' => array('/practiceSessionHistory/index',
+                                    'userID' => $isGuest ? "" : $user->primaryKey),
+                                'visible' => !$isGuest,
+                            ),
+                            array(
                                 'label' => 'Sobre',
                                 'url' => array('/site/page', 'view' => 'about')
                             ),

@@ -73,7 +73,7 @@ class CHelper extends CApplicationComponent {
     /**
      * select2Row wrapper for Booster TbActiveForm.
      * @param TbActiveForm $form the form where this is being rendered.
-     * @param CExtendedActiveRecord $model the model. 
+     * @param CModel $model the model.
      * @param string $attribute the attribute name.
      * @param string $data the data. 
      * @param bool $multiSelect whether this is a multiSelect. Defaults to false.

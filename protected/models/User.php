@@ -49,6 +49,40 @@ class User extends CExtendedActiveRecord {
     public $newPassword, $oldPassword, $newPasswordRepeated;
 
     /**
+     *
+     * @return User
+     */
+    public static function getLoggedInUser() {
+        return User::model()->findByPk(Yii::app()->user->getId());
+    }
+
+    /**
+     * Returns the static model of the specified AR class.
+     * Please note that you should have this exact method in all your CActiveRecord descendants!
+     * @param string $className active record class name.
+     * @return User the static model class
+     */
+    public static function model($className = __CLASS__) {
+        return parent::model($className);
+    }
+
+    /**
+     * Returns the user model that contains the contact info passed as an argument.
+     *
+     * @param string $contactToSearch content of the contact to search
+     * @return User the static model class of the user found. Null if none is found
+     */
+    public static function findByContactInfo($contactToSearch) {
+        /** @var $contact User[] Users found * */
+        $contact = Contact::model()->searchAllAttributes($contactToSearch);
+        return count($contact) == 0 ? null :
+                User::model()->findByAttributes(
+                        array(
+                            Contact::model()->tableSchema->primaryKey => $contact[0]->primaryKey
+        ));
+    }
+
+    /**
      * @return string the associated database table name
      */
     public function tableName() {
@@ -149,40 +183,6 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return User the static model class
-     */
-    public static function model($className = __CLASS__) {
-        return parent::model($className);
-    }
-
-    /**
-     * 
-     * @return User
-     */
-    public static function getLoggedInUser() {
-        return User::model()->findByPk(Yii::app()->user->getId());
-    }
-
-    /**
-     * Returns the user model that contains the contact info passed as an argument.
-     * 
-     * @param string $contactToSearch content of the contact to search
-     * @return User the static model class of the user found. Null if none is found
-     */
-    public static function findByContactInfo($contactToSearch) {
-        /** @var $contact User[] Users found * */
-        $contact = Contact::model()->searchAllAttributes($contactToSearch);
-        return count($contact) == 0 ? null :
-                User::model()->findByAttributes(
-                        array(
-                            Contact::model()->tableSchema->primaryKey => $contact[0]->primaryKey
-        ));
-    }
-
-    /**
      * Hashes the user password before saving it to persistance
      * @return boolean whether the model was saved successfully or not
      */
@@ -194,17 +194,17 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * Generates the activation hash and saves it into the model
-     */
-    public function generateActivationHash() {
-        $this->activationHash = CPasswordHelper::generateSalt();
-    }
-
-    /**
      * Hashes the password and saves into the model
      */
     protected function hashPassword() {
         $this->password = CPasswordHelper::hashPassword($this->newPassword);
+    }
+
+    /**
+     * Generates the activation hash and saves it into the model
+     */
+    public function generateActivationHash() {
+        $this->activationHash = CPasswordHelper::generateSalt();
     }
 
     /**
@@ -219,14 +219,6 @@ class User extends CExtendedActiveRecord {
      */
     public function deActivate() {
         $this->activated = 0;
-    }
-
-    /**
-     * Checks if an user is activated
-     * @return boolean Whether the user is active or not
-     */
-    public function isActivated() {
-        return $this->activated == 1;
     }
 
     /**
@@ -247,32 +239,21 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * Checks if this model is a coach
+     * Checks if this model is of the given UserType
+     * @param UserType $userType
      * @return boolean
      */
-    public function isCoach() {
-        return $this->isUserType(UserType::model()->getCoach());
-    }
-
-    /**
-     * @param Club $club
-     * @return boolean
-     */
-    public function isCoachAt($club) {
-        foreach ($club->coaches as $coach) {
-            if ($this->isUser($coach)) {
-                return true;
-            }
+    protected function isUserType($userType) {
+        $condition = new CDbCriteria();
+        if ($userType->name == 'patrocinador') {
+            $condition->compare('sponsorID', $this->userID);
+            $results = Sponsor::model()->find($condition);
+        } else {
+            $condition->compare('userID', $this->userID);
+            $condition->compare('UserTypeID', $userType->userTypeID);
+            $results = ClubHasUser::model()->find($condition);
         }
-        return false;
-    }
-
-    /**
-     * Checks if this model is a sponsor
-     * @return boolean
-     */
-    public function isSponsor() {
-        return $this->isUserType(UserType::model()->getSponsor());
+        return isset($results) ? $results->exists() : false;
     }
 
     /**
@@ -302,6 +283,10 @@ class User extends CExtendedActiveRecord {
         return $result;
     }
 
+    public function getDetailViewData() {
+        return array_merge_recursive($this->attributes, isset($this->contact) ? $this->contact->attributes : array(), array('userTypes' => $this->getUserTypeNames()));
+    }
+
     /**
      * Compiles a string with the usertype names
      * @return string a string with the user names separated by commas
@@ -317,50 +302,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * Checks if this model is of the given UserType
-     * @param UserType $userType
-     * @return boolean
-     */
-    protected function isUserType($userType) {
-        $condition = new CDbCriteria();
-        if ($userType->name == 'patrocinador') {
-            $condition->compare('sponsorID', $this->userID);
-            $results = Sponsor::model()->find($condition);
-        } else {
-            $condition->compare('userID', $this->userID);
-            $condition->compare('UserTypeID', $userType->userTypeID);
-            $results = ClubHasUser::model()->find($condition);
-        }
-        return isset($results) ? $results->exists() : false;
-    }
-
-    /**
-     * Checks if the user is a club admin.
-     * @return bool 
-     */
-    public function isClubAdmin() {
-        $clubs = $this->clubsManaged;
-        return count($clubs) > 0;
-    }
-
-    /**
-     * 
-     * @param Club $club
-     * @return boolean
-     */
-    public function isClubAdminOf($club) {
-        if ($club->adminUser == null) {
-            return false;
-        }
-        return $club->adminUser->isUser($this);
-    }
-
-    public function getDetailViewData() {
-        return array_merge_recursive($this->attributes, isset($this->contact) ? $this->contact->attributes : array(), array('userTypes' => $this->getUserTypeNames()));
-    }
-
-    /**
-     * 
+     *
      * @param string $hash the hash to validate
      * @return bool whether the user can be activated or not
      */
@@ -369,12 +311,20 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @param string $hash the hash to validate
      * @return bool
      */
     public function isActivationHash($hash) {
         return $this->activationHash === $hash;
+    }
+
+    /**
+     * Checks if an user is activated
+     * @return boolean Whether the user is active or not
+     */
+    public function isActivated() {
+        return $this->activated == 1;
     }
 
     /**
@@ -392,7 +342,7 @@ class User extends CExtendedActiveRecord {
      * Returns all practice session events related with this user to be fed to FullCalendar plugin
      * @param string $start
      * @param string $end
-     * @return PracticeSession[] 
+     * @return PracticeSession[]
      */
     public function getFullCalendarPracticeSessionEvents($start) {
         $results = array();
@@ -415,6 +365,67 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
+     *
+     * @param User $updater
+     * @return boolean
+     */
+    public function canScheduleBeUpdated($updater) {
+        return $updater->isAdminOfCoach($this) ||
+                ($this->isCoach() && ($this->isUser($updater) || $updater->isSystemAdmin()));
+    }
+
+    /**
+     *
+     * @param User $updater
+     * @return boolean
+     */
+    public function isAdminOfCoach($coach) {
+        foreach ($coach->coachClubs as $club) {
+            if ($this->isClubAdminOf($club)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param Club $club
+     * @return boolean
+     */
+    public function isClubAdminOf($club) {
+        if ($club->adminUser == null) {
+            return false;
+        }
+        return $club->adminUser->isUser($this);
+    }
+
+    /**
+     *
+     * @param User $user
+     * @return boolean
+     */
+    public function isUser($user) {
+        return $this->primaryKey == $user->primaryKey;
+    }
+
+    /**
+     * Checks if this model is a coach
+     * @return boolean
+     */
+    public function isCoach() {
+        return $this->isUserType(UserType::model()->getCoach());
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public function isSystemAdmin() {
+        return $this->primaryKey == 1;
+    }
+
+    /**
      * Returns a sample practice session for this user in order to generate the model form to the calendar
      * @return PracticeSession
      */
@@ -432,7 +443,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @param UserType $userType the user type to find
      * @return User[]
      */
@@ -458,7 +469,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @return User[] the related Athletes
      */
     public function getRelatedAthletes() {
@@ -475,7 +486,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @return User[] the related Coaches
      */
     public function getRelatedCoaches() {
@@ -528,20 +539,45 @@ class User extends CExtendedActiveRecord {
         return $result;
     }
 
+    /**
+     * Checks if this model is a sponsor
+     * @return boolean
+     */
+    public function isSponsor() {
+        return $this->isUserType(UserType::model()->getSponsor());
+    }
+
     public function generatePracticeLink() {
         return array('label' => $this->name, 'url' => array('index', 'userID' => $this->primaryKey));
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function canListUsers() {
         return $this->canListAthletes() || $this->canListCoaches();
     }
 
+    public function canListAthletes() {
+        return $this->isSystemAdmin() || $this->canListCoaches() || $this->isSponsor();
+    }
+
+    public function canListCoaches() {
+        return $this->isSystemAdmin() || $this->isCoach() || $this->isClubAdmin();
+    }
+
     /**
-     * 
+     * Checks if the user is a club admin.
+     * @return bool
+     */
+    public function isClubAdmin() {
+        $clubs = $this->clubsManaged;
+        return count($clubs) > 0;
+    }
+
+    /**
+     *
      * @return boolean
      */
     public function canViewUser() {
@@ -560,55 +596,13 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function canUpdateUser($userID = null) {
         $userID = $userID == null || $userID instanceof CWebUser ? $this->getSuperglobalUserID() : $userID;
         $user = User::model()->findByPk($userID);
         return $this->isUser($user) || $this->isSponsorOf($user) || $this->isCoachOf($user) || $this->coachesInSameClubOf($user);
-    }
-
-    /**
-     * 
-     * @return boolean
-     */
-    public function canCreateUsers() {
-        if (!isset($_REQUEST['ClubHasUser'], $_REQUEST['ClubHasUser']['clubID'])) {
-            return false;
-        }
-        $club = Club::model()->findByPk($_REQUEST['ClubHasUser']['clubID']);
-        return $this->isClubAdminOf($club) || $this->isCoachAt($club);
-    }
-
-    /**
-     * 
-     * @return boolean
-     */
-    public function isSystemAdmin() {
-        return $this->primaryKey == 1;
-    }
-
-    public function canListCoaches() {
-        return $this->isSystemAdmin() || $this->isCoach() || $this->isClubAdmin();
-    }
-
-    public function canListAthletes() {
-        return $this->isSystemAdmin() || $this->canListCoaches() || $this->isSponsor();
-    }
-
-    /**
-     * 
-     * @param User $user
-     * @return boolean
-     */
-    public function isCoachOf($user) {
-        foreach ($this->coachClubs as $club) {
-            if ($club->hasAthlete($user)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -626,12 +620,51 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @param User $user
      * @return boolean
      */
-    public function isUser($user) {
-        return $this->primaryKey == $user->primaryKey;
+    public function isCoachOf($user) {
+        foreach ($this->coachClubs as $club) {
+            if ($club->hasAthlete($user)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function coachesInSameClubOf($user) {
+        foreach ($this->coachClubs as $coachClub) {
+            if ($coachClub->hasCoach($user)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public function canCreateUsers() {
+        if (!isset($_REQUEST['ClubHasUser'], $_REQUEST['ClubHasUser']['clubID'])) {
+            return false;
+        }
+        $club = Club::model()->findByPk($_REQUEST['ClubHasUser']['clubID']);
+        return $this->isClubAdminOf($club) || $this->isCoachAt($club);
+    }
+
+    /**
+     * @param Club $club
+     * @return boolean
+     */
+    public function isCoachAt($club) {
+        foreach ($club->coaches as $coach) {
+            if ($this->isUser($coach)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function canListClubs() {
@@ -648,15 +681,6 @@ class User extends CExtendedActiveRecord {
         /* @var $club Club */
         $club = Club::model()->findByPk($_GET['id']);
         return $this->isSystemAdmin() || $club->hasCoach($this) || $club->isAdmin($this);
-    }
-
-    public function coachesInSameClubOf($user) {
-        foreach ($this->coachClubs as $coachClub) {
-            if ($coachClub->hasCoach($user)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public function canChangePassword() {
@@ -684,7 +708,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function canUpdateUserLevels($user) {
@@ -695,14 +719,6 @@ class User extends CExtendedActiveRecord {
         return $this->sendAthletePracticeSessionMail("Alterações no horário de treinos", $fromName);
     }
 
-    public function sendAthletAddedToPracticeMail($fromName = null) {
-        return $this->sendAthletePracticeSessionMail("Novo treino adicionado", $fromName);
-    }
-
-    public function sendAthletRemovedFromPracticeMail($fromName = null) {
-        return $this->sendAthletePracticeSessionMail("Treino removido", $fromName);
-    }
-
     private function sendAthletePracticeSessionMail($subject, $fromName = null) {
         $message = $this->getAthleteScheduleMailBody();
         if ($this->sendMail($message, $subject, $fromName)) {
@@ -711,6 +727,15 @@ class User extends CExtendedActiveRecord {
             }
         }
         return false;
+    }
+
+    public function getAthleteScheduleMailBody() {
+        $htmlText = "O novo horário é:" . CHtml::tag('br') . CHtml::tag('br');
+        $tableHtml = PracticeSession::model()->getMailTableHeader();
+        foreach ($this->activeAthletePracticeSessions as $practiceSession) {
+            $tableHtml .= $practiceSession->toMailTableRow();
+        }
+        return $htmlText . CHtml::tag('table', array('class' => 'schedule'), $tableHtml);
     }
 
     public function sendMail($message, $subject, $fromName = null) {
@@ -739,37 +764,12 @@ class User extends CExtendedActiveRecord {
         return true;
     }
 
-    public function getAthleteScheduleMailBody() {
-        $htmlText = "O novo horário é:" . CHtml::tag('br') . CHtml::tag('br');
-        $tableHtml = PracticeSession::model()->getMailTableHeader();
-        foreach ($this->activeAthletePracticeSessions as $practiceSession) {
-            $tableHtml .= $practiceSession->toMailTableRow();
-        }
-        return $htmlText . CHtml::tag('table', array('class' => 'schedule'), $tableHtml);
+    public function sendAthletAddedToPracticeMail($fromName = null) {
+        return $this->sendAthletePracticeSessionMail("Novo treino adicionado", $fromName);
     }
 
-    /**
-     * 
-     * @param User $updater
-     * @return boolean
-     */
-    public function canScheduleBeUpdated($updater) {
-        return $updater->isAdminOfCoach($this) ||
-                ($this->isCoach() && ($this->isUser($updater) || $updater->isSystemAdmin()));
-    }
-
-    /**
-     * 
-     * @param User $updater
-     * @return boolean
-     */
-    public function isAdminOfCoach($coach) {
-        foreach ($coach->coachClubs as $club) {
-            if ($this->isClubAdminOf($club)) {
-                return true;
-            }
-        }
-        return false;
+    public function sendAthletRemovedFromPracticeMail($fromName = null) {
+        return $this->sendAthletePracticeSessionMail("Treino removido", $fromName);
     }
 
     /**
@@ -798,7 +798,7 @@ class User extends CExtendedActiveRecord {
      * @return array
      */
     public function getAdminedCoachesOptions() {
-        $adminedCoaches = $this->isClubAdmin() ? $this : $this->getAdminedCoaches();
+        $adminedCoaches = $this->isClubAdmin() ? $this->getAdminedCoaches() : array($this);
         return CHTML::listData($adminedCoaches, 'userID', 'name');
     }
 
@@ -818,6 +818,21 @@ class User extends CExtendedActiveRecord {
     
     public function getClubsCoachedOptions() {
         return CHTML::listData($this->coachClubs, 'clubID', 'name');
+    }
+
+    /**
+     * @param $club
+     * @return array
+     */
+    public function getCoachedAthletesOptions($clubs = null) {
+        /*
+         *
+        if ($clubs !== null) {
+            if (!is_array($clubs)) {
+                $clubs = array($clubs);
+            }
+        } */
+        return CHTML::listData($this->getCoachedAthletes($clubs), 'userID', 'name');
     }
 
 }

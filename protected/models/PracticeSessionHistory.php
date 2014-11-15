@@ -58,12 +58,12 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
      */
     public function attributeLabels() {
         return array(
-            'practiceSessionHistoryID' => 'Practice Session History',
-            'startTime' => 'Start Time',
-            'endTime' => 'End Time',
-            'date' => 'Date',
-            'coachID' => 'Coach',
-            'clubID' => 'Club',
+            'practiceSessionHistoryID' => 'ID#',
+            'startTime' => PracticeSession::model()->getAttributeLabel('startTime'),
+            'endTime' => PracticeSession::model()->getAttributeLabel('endTime'),
+            'date' => 'Data',
+            'coachID' => PracticeSession::model()->getAttributeLabel('coachID'),
+            'clubID' => PracticeSession::model()->getAttributeLabel('clubID'),
         );
     }
 

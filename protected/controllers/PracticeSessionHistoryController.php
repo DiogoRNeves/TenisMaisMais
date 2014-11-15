@@ -100,7 +100,7 @@ class PracticeSessionHistoryController extends Controller {
         $model = new PracticeSessionHistory;
 
 // Uncomment the following line if AJAX validation is needed
-// $this->performAjaxValidation($model);
+    $this->performAjaxValidation($model);
 
         if (isset($_POST['PracticeSessionHistory'])) {
             $model->attributes = $_POST['PracticeSessionHistory'];

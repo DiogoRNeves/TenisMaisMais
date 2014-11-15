@@ -12,6 +12,6 @@ $this->breadcrumbs=array(
 	);
 	?>
 
-	<h1>Update PracticeSessionHistory <?php echo $model->practiceSessionHistoryID; ?></h1>
+	<h1>Registar assiduidade aos treinos</h1>
 
 <?php echo $this->renderPartial('_searchPracticeSession',array('model'=>$model)); ?>

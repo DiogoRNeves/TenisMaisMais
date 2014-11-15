@@ -1,15 +1,16 @@
 <?php
+/** @var TbActiveForm $form */
 $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
     'action' => Yii::app()->createUrl($this->route),
     'method' => 'get',
         ));
 ?>
 
-<?php echo $form->textFieldRow($model, 'practiceSessionHistoryID', array('class' => 'span5')); ?>
+<?php echo $form->textField($model, 'practiceSessionHistoryID', array('class' => 'span5')); ?>
 
-<?php echo $form->textFieldRow($model, 'startTime', array('class' => 'span5')); ?>
+<?php echo $form->timePickerRow($model, 'startTime'); ?>
 
-<?php echo $form->textFieldRow($model, 'endTime', array('class' => 'span5')); ?>
+<?php echo $form->timePickerRow($model, 'endTime'); ?>
 
 <?php echo $form->datepickerRow($model, 'date', array('options' => array(), 'htmlOptions' => array('class' => 'span5'))); ?>
 
