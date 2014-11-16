@@ -190,4 +190,31 @@ class CHelper extends CApplicationComponent {
         return $result;
     }
 
+    public static function IsNullOrEmptyString($variables)
+    {
+        $variables = CHelper::toArray($variables);
+        foreach ($variables as $variable) {
+            if (isset($variable) && trim($variable)!=='') {return false;}
+        }
+        return true;
+    }
+
+    private static function toArray($variables)
+    {
+        if (!is_array($variables)) {
+            return array($variables);
+        }
+        return $variables;
+    }
+
+    /**
+     * @param $date string
+     * @return int friday is 5
+     */
+    public static function getDayOfWeek($date)
+    {
+        $date = new DateTime($date);
+        return $date->format('w');
+    }
+
 }

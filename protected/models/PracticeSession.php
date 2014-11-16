@@ -11,7 +11,7 @@
  * @property string $startTime
  * @property string $endTime
  * @property integer $groupLevel
- * @property integer $dayOfWeek
+ * @property integer $dayOfWeek friday is 5
  *
  * The followings are the available model relations:
  * @property Club $club
@@ -123,6 +123,20 @@ class PracticeSession extends CExtendedActiveRecord {
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+
+    public function isHappen($date)
+    {
+        return CHelper::getDayOfWeek($date) == $this->dayOfWeek;
+    }
+
+    /**
+     * @param $coach User
+     * @return mixed
+     */
+    public function isCoachedBy($coach)
+    {
+        return $coach->isUser($this->coach);
     }
 
     /**
@@ -328,6 +342,10 @@ class PracticeSession extends CExtendedActiveRecord {
         return CHtml::tag('p', array(), "Foi efetuada uma alteração no treino de " . $this->getDayOfWeekString() .
                         " que começava às " . CHelper::timeToString($this->startTime) .
                         ". Para ver o novo horário visite") . CHtml::tag('p', array(), $htmlLink);
+    }
+
+    public function getListDataTextField() {
+        return $this->startTime . "-" . $this->endTime;
     }
 
 }

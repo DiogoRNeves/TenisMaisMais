@@ -6,8 +6,6 @@ $this->breadcrumbs=array(
 
 	$this->menu=array(
 	array('label'=>'List PracticeSessionHistory','url'=>array('index')),
-	array('label'=>'Create PracticeSessionHistory','url'=>array('create')),
-	array('label'=>'View PracticeSessionHistory','url'=>array('view','id'=>$model->practiceSessionHistoryID)),
 	array('label'=>'Manage PracticeSessionHistory','url'=>array('admin')),
 	);
 	?>

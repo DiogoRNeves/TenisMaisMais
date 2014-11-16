@@ -1,4 +1,18 @@
 <?php
+
+$notification = Yii::app()->user->getFlash('savedPracticeSessionAttendance', null);
+if ($notification !== NULL) {
+    Yii::app()->clientScript->registerScript(
+        'savedToDbNotification',
+        '$(".breadcrumb").notify("' . $notification[1] . '", '
+        . '{position: "bottom center", className: "' .
+        ($notification[0] ? "success" : "error" ) . '", arrowShow: false});',
+        CClientScript::POS_READY
+    );
+}
+
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/practiceSessionAttendance.js');
+
 /* @var $form TbActiveForm */
 $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
     'action' => Yii::app()->createUrl($this->route),
@@ -7,7 +21,18 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 ?>
 
 <?php /** @var PracticeSessionHistory $model */
-echo $form->datePickerRow($model, 'date', array('options' => array('endDate' => 'today'))); ?>
+echo $form->datePickerRow($model, 'date', array(
+    'options' => array(
+        'format' => "yyyy-mm-dd",
+        'endDate' => 'today',
+    ),
+    'events' => array(
+        'change' => 'js:function($el, status, e){afterValChange();}',
+    ),
+    'htmlOptions' => array(
+        'class' => 'auto-submit-item',
+    )
+)); ?>
 
 <?php
 /* @var $loggedInUser User */
@@ -18,30 +43,98 @@ $coachInOneClub = count($loggedInUser->coachClubs) === 1;
 
 
 <?php
-echo CHelper::select2Row($form, $model, 'clubID', $loggedInUser->getClubsCoachedOptions(),
-    false, null, null, !$coachInOneClub, $loggedInUser->clubs[0]->primaryKey);
+/** @var PracticeSessionHistoryRegistryForm $model */
+//Club
+echo $form->select2Row($model, 'clubID', array(
+    'data' => $loggedInUser->getClubsCoachedOptions(),
+    'options' => array('enabled' => false),
+    'htmlOptions' => array('class' => 'auto-submit-item'),
+));
 ?>
 
 <?php
-/* TODO: when the coach is an administrator in more than one club this should make an ajax call to the
-get the coaches of the selected club it can still default to the logged in user */
-echo CHelper::select2Row($form, $model, 'coachID', $loggedInUser->getAdminedCoachesOptions(),
-    false, null, null, $loggedInUser->isClubAdmin(), $loggedInUser->primaryKey);
+//Coach
+echo $form->select2Row($model, 'coachID', array(
+        'data' => $loggedInUser->getAdminedCoachesOptions(Club::model()->findByPk($model->clubID)),
+        'htmlOptions' => array('class' => 'auto-submit-item'),
+    ));
 ?>
 
-<?php echo CHelper::select2Row($form, PracticeSession::model(), 'practiceSessionID', null); ?>
+<?php if(isset($model->date,$model->coachID,$model->clubID)): ?>
 
-<div class="athleteAttendance">
-    <?php echo $form->toggleButtonRow(new PracticeSessionHistoryRegistryForm(), 'cancelledDueToRain', array(
+    <?php
+    $allowedPracticeSession = $model->isPracticeSessionAllowed();
+    //PracticeSession
+    echo $form->select2Row($model, 'practiceSessionID', array(
+        'data' => $model->getPracticeSessionOptions(),
+        'options' => array(
+            "placeholder" => "Selecione a hora de início",
+        ),
+        'htmlOptions' => array(
+            'class' => 'auto-submit-item',
+        )
+    ));
+    ?>
+
+    <?php if ($allowedPracticeSession): ?>
+
+    <?php
+    //PracticeCancelled
+    echo $form->toggleButtonRow($model, 'cancelled', array(
         'enabledLabel' => 'SIM',
         'disabledLabel' => 'NÃO',
         'value' => false,
-        //TODO: Write a proper handler for change
-        'onChange' => 'js:function($el, status, e){alert("changed")}',
+        'htmlOptions' => array(
+            'class' => 'auto-submit-item',
+        )
     )); ?>
-    <?php echo CHelper::select2Row($form, new PracticeSessionHistoryRegistryForm(), 'athletesAttended',
-        $loggedInUser->getCoachedAthletesOptions(), true); ?>
-</div>
+    <?php
+        $model->setupAttendance();
+        $practiceSessionAthletes = $model->getPracticeSessionAthleteOptions();
+        //$athletes = $model->getPracticeSessionAthleteOptions();
+    //AthletesAttended
+    //echo CHelper::select2Row($form, $model, 'athletesAttended',
+    //    $loggedInUser->getCoachedAthletesOptions(), true);
+        echo $form->select2Row($model, 'athletesAttended', array(
+            'data' => $loggedInUser->getCoachedAthletesOptions(),
+            'options' => array(
+                "placeholder" => "Selecione atletas",
+            ),
+            'htmlOptions' => array(
+                'multiple' => 'multiple',
+            ),
+        ));
+
+        ?>
+    <?php
+    //AthletesUnnatended - Justified
+    //echo CHelper::select2Row($form, $model, 'athletesJustifiedUnnatendance',
+    //    $loggedInUser->getCoachedAthletesOptions(), true);
+        echo $form->select2Row($model, 'athletesJustifiedUnnatendance', array(
+            'data' => $practiceSessionAthletes,
+            'options' => array(
+                "placeholder" => "Selecione atletas",
+            ),
+            'htmlOptions' => array(
+                'multiple' => 'multiple',
+            ),
+        ));
+        ?>
+    <?php
+    //AthletesUnttended - Not Justified
+    //echo CHelper::select2Row($form, $model, 'athletesInjustifiedUnnatendance',
+    //    $loggedInUser->getCoachedAthletesOptions(), true);
+        echo $form->select2Row($model, 'athletesInjustifiedUnnatendance', array(
+            'data' => $practiceSessionAthletes,
+            'options' => array(
+                'allowClear' => true,
+                "placeholder" => "Selecione atletas",
+            ),
+            'htmlOptions' => array(
+                'multiple' => 'multiple',
+            ),
+        ));
+        ?>
 
 <div class="form-actions">
     <?php
@@ -52,5 +145,7 @@ echo CHelper::select2Row($form, $model, 'coachID', $loggedInUser->getAdminedCoac
     ));
     ?>
 </div>
+    <?php endif; ?>
+<?php endif; ?>
 
 <?php $this->endWidget(); ?>

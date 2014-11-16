@@ -97,15 +97,16 @@ class PracticeSessionHistoryController extends Controller {
      * Register session history and attendance.
      */
     public function actionRegister() {
-        $model = new PracticeSessionHistory;
+        $model = new PracticeSessionHistoryRegistryForm;
 
-// Uncomment the following line if AJAX validation is needed
+    // Uncomment the following line if AJAX validation is needed
     $this->performAjaxValidation($model);
 
-        if (isset($_POST['PracticeSessionHistory'])) {
-            $model->attributes = $_POST['PracticeSessionHistory'];
+        if (isset($_GET['PracticeSessionHistoryRegistryForm'])) {
+            $model->attributes = $_GET['PracticeSessionHistoryRegistryForm'];
             if ($model->save()) {
-                $this->redirect(array('view', 'id' => $model->practiceSessionHistoryID));
+                Yii::app()->user->setFlash('savedPracticeSessionAttendance',
+                    array(true, "Informação gravada com sucesso!"));
             }
         }
 

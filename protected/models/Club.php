@@ -67,7 +67,7 @@ class Club extends CExtendedActiveRecord {
                 'order' => 'name'),
             'clubHasUsers' => array(self::HAS_MANY, 'ClubHasUser', 'clubID'),
             'mainCoaches' => array(self::HAS_MANY, 'MainCoach', 'clubID'),
-            'practiceSessions' => array(self::HAS_MANY, 'PracticeSession', 'clubID'),
+            'practiceSessions' => array(self::HAS_MANY, 'PracticeSession', 'clubID', 'order' => 'startTime'),
             'practiceSessionHistories' => array(self::HAS_MANY, 'PracticeSessionHistory', 'clubID'),
         );
     }
@@ -264,6 +264,25 @@ class Club extends CExtendedActiveRecord {
             return $coachActions;
         }
         return array();
+    }
+
+    public function getPracticeSessionOptions($date = null, $coach = null)
+    {
+        return CHtml::listData($this->getPracticeSessions($date, $coach), 'practiceSessionID','listDataTextField');
+    }
+
+    public function getPracticeSessions($date = null, $coach = null)
+    {
+        if (CHelper::IsNullOrEmptyString(array($date, $coach))) {
+            return $this->practiceSessions;
+        }
+        $results = array();
+        foreach ($this->practiceSessions as $practiceSession) {
+            if ($practiceSession->isHappen($date) && $practiceSession->isCoachedBy($coach)) {
+                $results[] = $practiceSession;
+            }
+        }
+        return $results;
     }
 
 }

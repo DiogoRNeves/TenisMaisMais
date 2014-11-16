@@ -832,22 +832,27 @@ class User extends CExtendedActiveRecord {
     {
         return CHtml::listData($this->coachClubs, 'clubID', 'name');
     }
+
     /**
      *
+     * @param Club $club
      * @return array
      */
-    public function getAdminedCoachesOptions() {
-        $adminedCoaches = $this->isClubAdmin() ? $this->getAdminedCoaches() : array($this);
+    public function getAdminedCoachesOptions($club = null) {
+        $adminedCoaches = $this->isClubAdmin() ? $this->getAdminedCoaches($club) : array($this);
         return CHTML::listData($adminedCoaches, 'userID', 'name');
     }
+
     /**
      * return User[]
+     * @param Club $club
+     * @return \User[]
      */
-    public function getAdminedCoaches() {
+    public function getAdminedCoaches($club = null) {
         /* @var $coaches User[] */
         $coaches = array($this);
         foreach ($this->getRelatedCoaches() as $coach) {
-            if ($this->isAdminOfCoach($coach)) {
+            if ($this->isAdminOfCoach($coach) && ($club === null || $coach->isCoachAt($club))) {
                 $coaches[] = $coach;
             }
         }
