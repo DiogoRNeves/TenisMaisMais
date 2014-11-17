@@ -15,6 +15,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     public $athletesJustifiedUnnatendance;
     public $athletesInjustifiedUnnatendance;
     public $cancelled;
+    public $autoSubmit;
 
     /**
      * Declares the validation rules.
@@ -24,7 +25,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             // cancelledDueToRain needs to be a boolean
             array('cancelledDueToRain', 'boolean'),
             array('date,clubID,coachID,practiceSessionID,athletesAttended,athletesJustifiedUnnatendance,
-            athletesInjustifiedUnnatendance,cancelled','safe'),
+            athletesInjustifiedUnnatendance,cancelled,autoSubmit','safe'),
         );
     }
 
@@ -51,7 +52,8 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
 
     public function save()
     {
-        //TODO: actually save the information
+        if ($this->autoSubmit) { return false; }
+        //TODO: actually save the information in the database
         return true;
     }
 
@@ -90,22 +92,17 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     public function getPracticeSessionAthleteIds()
     {
         $practiceSession = PracticeSession::model()->findByPk($this->practiceSessionID);
-        $result = array();
-        foreach ($practiceSession->athletes as $athlete) {
-            $result[] = $athlete->primaryKey;
-        }
-        return $result;
+        return CHelper::getArrayOfAttribute($practiceSession->athletes, User::model()->getTableSchema()->primaryKey);
     }
 
     public function setupAttendance()
     {
-        //TODO: if submit source is not cancel switch, do nothing
+        if (!$this->autoSubmit) {
+            return null;
+        }
         $athleteIds = $this->getPracticeSessionAthleteIds();
         if ($this->cancelled) {
-            $this->athletesJustifiedUnnatendance = array_unique(array_merge(
-                $this->athletesAttended === null ? array() : $this->athletesAttended,
-                $athleteIds === null ? array() : $athleteIds,
-                $this->athletesJustifiedUnnatendance === null ? array() : $this->athletesJustifiedUnnatendance));
+            $this->athletesJustifiedUnnatendance = $athleteIds;
             $this->athletesAttended = array();
         } else if (count($this->athletesAttended) < 1 || !$this->isAttendedPlayersValid()) {
             $this->athletesAttended = $athleteIds;
@@ -119,7 +116,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
         return CHtml::listData($practiceSession->athletes, 'userID', 'name');
     }
 
-    private function isAttendedPlayersValid()
+    public function isAttendedPlayersValid()
     {
         if (count($this->athletesAttended) < 1) {
             return true;
@@ -136,6 +133,37 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             }
         }
         return true;
+    }
+
+    /**
+     * TODO: Test this method
+     * @return bool
+     */
+    public function loadHistoryFromDB()
+    {
+        /** @var PracticeSessionHistory $practiceSessionHistory */
+        $practiceSessionHistory = $this->getPracticeSessionHistory();
+        if ($practiceSessionHistory === null) {
+            return false;
+        }
+        //get PK to use on getArrayOfAttributes
+        $userPK = User::model()->getTableSchema()->primaryKey;
+        $athleteIDs = array();
+        //loop through athlete array indexed by attendanceTypeID
+        foreach ($practiceSessionHistory->getAthletesAttendanceType() as $key => $athletes) {
+            $athleteIDs[$key] = CHelper::getArrayOfAttribute($athletes, $userPK);
+        }
+        //set the properties as needed
+        $this->athletesAttended = $athleteIDs[PracticeSessionAttendanceType::getAttended()];
+        $this->athletesJustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getJustifiedUnnatended()];
+        $this->athletesInjustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getInjustifiedUnnatended()];
+        return true;
+    }
+
+    private function getPracticeSessionHistory()
+    {
+        //TODO: actually get it. this method is called {@see loadHistoryFromDB()}
+        return null;
     }
 
 }

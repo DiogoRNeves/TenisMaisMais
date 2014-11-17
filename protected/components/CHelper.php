@@ -97,7 +97,6 @@ class CHelper extends CApplicationComponent {
             $widgetOptions['htmlOptions'] = array('disabled' => 'true');
         }
         if ($defaultVal !== null) {
-            //TODO: usar initSelection : function (element, callback) para inicializar
             $widgetOptions['val'] = $defaultVal;
         }
         if ($multiSelect) {

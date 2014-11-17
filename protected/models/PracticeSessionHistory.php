@@ -14,7 +14,8 @@
  * The followings are the available model relations:
  * @property Club $club
  * @property User $coach
- * @property User[] $users
+ * @property User[] $athletes
+ * @property PracticeSessionHistoryHasAthlete[] $practiceSessionHistoryHasAthlete
  */
 class PracticeSessionHistory extends CExtendedActiveRecord {
 
@@ -49,7 +50,8 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
         return array(
             'club' => array(self::BELONGS_TO, 'Club', 'clubID'),
             'coach' => array(self::BELONGS_TO, 'User', 'coachID'),
-            'users' => array(self::MANY_MANY, 'User', 'PracticeSessionHistoryHasAthlete(practiceSessionHistoryID, athleteID)'),
+            'athletes' => array(self::MANY_MANY, 'User', 'PracticeSessionHistoryHasAthlete(practiceSessionHistoryID, athleteID)'),
+            'practiceSessionHistoryHasAthlete' => array(self::HAS_MANY, 'PracticeSessionHistoryHasAthlete', 'practiceSessionHistoryID'),
         );
     }
 
@@ -104,6 +106,24 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+
+    /**
+     * @return User[][] the athletes indexed by attendance type
+     */
+    public function getAthletesAttendanceType()
+    {
+        $result = array();
+        /** @var PracticeSessionAttendanceType $attendanceType */
+        //initialize all indexes with empty array
+        foreach (PracticeSessionAttendanceType::model()->findAll() as $attendanceType) {
+            $result[$attendanceType->primaryKey()] = array();
+        }
+        //distribute athletes through the indexes (attendance types)
+        foreach ($this->practiceSessionHistoryHasAthlete as $practiceSessionHistoryHasAthlete) {
+            $result[$practiceSessionHistoryHasAthlete->attendanceTypeID][] = $practiceSessionHistoryHasAthlete->athlete;
+        }
+        return $result;
     }
 
 }

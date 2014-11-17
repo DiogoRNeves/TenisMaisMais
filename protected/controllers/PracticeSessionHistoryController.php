@@ -104,9 +104,16 @@ class PracticeSessionHistoryController extends Controller {
 
         if (isset($_GET['PracticeSessionHistoryRegistryForm'])) {
             $model->attributes = $_GET['PracticeSessionHistoryRegistryForm'];
-            if ($model->save()) {
-                Yii::app()->user->setFlash('savedPracticeSessionAttendance',
-                    array(true, "Informação gravada com sucesso!"));
+            if (!$model->autoSubmit) {
+                if ($model->save()) {
+                    Yii::app()->user->setFlash('savedPracticeSessionAttendance',
+                        array(true, "Informação gravada com sucesso!"));
+                } else {
+                    Yii::app()->user->setFlash('savedPracticeSessionAttendance',
+                        array(false, "Não foi possível gravar os dados."));
+                }
+            } elseif ($model->isPracticeSessionAllowed()) {
+                $model->loadHistoryFromDB();
             }
         }
 

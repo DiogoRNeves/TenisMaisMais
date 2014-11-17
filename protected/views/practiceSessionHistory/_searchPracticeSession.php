@@ -20,7 +20,7 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 ));
 ?>
 
-<?php /** @var PracticeSessionHistory $model */
+<?php /** @var PracticeSessionHistoryRegistryForm $model */
 echo $form->datePickerRow($model, 'date', array(
     'options' => array(
         'format' => "yyyy-mm-dd",
@@ -147,5 +147,9 @@ echo $form->select2Row($model, 'coachID', array(
 </div>
     <?php endif; ?>
 <?php endif; ?>
+
+<div style="display: none">
+    <?php echo $form->checkBoxRow($model, 'autoSubmit'); ?>
+</div>
 
 <?php $this->endWidget(); ?>

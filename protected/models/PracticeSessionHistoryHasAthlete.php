@@ -6,7 +6,7 @@
  * The followings are the available columns in table 'PracticeSessionHistoryHasAthlete':
  * @property integer $practiceSessionHistoryID
  * @property integer $athleteID
- * @property integer $attendanceType
+ * @property integer $attendanceTypeID
  */
 class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
 
@@ -24,11 +24,11 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('practiceSessionHistoryID, athleteID, attendanceType', 'required'),
-            array('practiceSessionHistoryID, athleteID, attendanceType', 'numerical', 'integerOnly' => true),
+            array('practiceSessionHistoryID, athleteID, attendanceTypeID', 'required'),
+            array('practiceSessionHistoryID, athleteID, attendanceTypeID', 'numerical', 'integerOnly' => true),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('practiceSessionHistoryID, athleteID, attendanceType', 'safe', 'on' => 'search'),
+            array('practiceSessionHistoryID, athleteID, attendanceTypeID', 'safe', 'on' => 'search'),
         );
     }
 
@@ -39,6 +39,8 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
+            'attendanceType' => array(self::BELONGS_TO, 'PracticeSessionAttendanceType', 'attendanceTypeID'),
+            'athlete'  => array(self::BELONGS_TO, 'User', 'userID'),
         );
     }
 
@@ -49,7 +51,7 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         return array(
             'practiceSessionHistoryID' => 'Practice Session History',
             'athleteID' => 'Athlete',
-            'attendanceType' => 'Attendance Type',
+            'attendanceTypeID' => 'Attendance Type',
         );
     }
 
@@ -72,7 +74,7 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
 
         $criteria->compare('practiceSessionHistoryID', $this->practiceSessionHistoryID);
         $criteria->compare('athleteID', $this->athleteID);
-        $criteria->compare('attendanceType', $this->attendanceType);
+        $criteria->compare('attendanceTypeID', $this->attendanceTypeID);
 
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
