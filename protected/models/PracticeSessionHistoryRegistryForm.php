@@ -50,11 +50,30 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
         return parent::model($className);
     }
 
+    /**
+     * TODO: Test this method. Called by {@see PracticeSessionController->actionRegister()}
+     * Saves the information in the form to the database.
+     * @return bool
+     */
     public function save()
     {
         if ($this->autoSubmit) { return false; }
-        //TODO: actually save the information in the database
-        return true;
+        $practiceSessionHistory = $this->getPracticeSessionHistory();
+        if ($practiceSessionHistory === null) {
+            $practiceSessionHistory = new PracticeSessionHistory();
+            $practiceSessionHistory->date = $this->date;
+            $practiceSessionHistory->clubID = $this->clubID;
+            $practiceSessionHistory->coachID = $this->coachID;
+            $practiceSession = $this->getPracticeSession();
+            $practiceSessionHistory->startTime = $practiceSession->startTime;
+            $practiceSessionHistory->endTime = $practiceSession->endTime;
+            if (!$practiceSessionHistory->save()) {
+                //TODO: somehow it enters this if and returns false. Check it out and fix it. Probably some validation rules being violated.
+                //echo $practiceSessionHistory->getErrorsString(); // <------- usar isto
+                return false;
+            }
+        }
+        return $this->saveAthletesAttendanceToDB();
     }
 
     public function getPracticeSessionOptions()
@@ -104,7 +123,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
         if ($this->cancelled) {
             $this->athletesJustifiedUnnatendance = $athleteIds;
             $this->athletesAttended = array();
-        } else if (count($this->athletesAttended) < 1 || !$this->isAttendedPlayersValid()) {
+        } else {
             $this->athletesAttended = $athleteIds;
             $this->athletesJustifiedUnnatendance = array();
         }
@@ -136,7 +155,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     /**
-     * TODO: Test this method
+     * TODO: Test this method. Called by {@see PracticeSessionController->actionRegister()}
      * @return bool
      */
     public function loadHistoryFromDB()
@@ -154,16 +173,43 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             $athleteIDs[$key] = CHelper::getArrayOfAttribute($athletes, $userPK);
         }
         //set the properties as needed
-        $this->athletesAttended = $athleteIDs[PracticeSessionAttendanceType::getAttended()];
-        $this->athletesJustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getJustifiedUnnatended()];
-        $this->athletesInjustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getInjustifiedUnnatended()];
+        $this->athletesAttended = $athleteIDs[PracticeSessionAttendanceType::getAttended()->primaryKey];
+        $this->athletesJustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getJustifiedUnnatended()->primaryKey];
+        $this->athletesInjustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getInjustifiedUnnatended()->primaryKey];
         return true;
     }
 
+    /**
+     * TODO: Test this method. Called by {@see loadHistoryFromDB()) and {@see save()}
+     * @return PracticeSessionHistory
+     */
     private function getPracticeSessionHistory()
     {
-        //TODO: actually get it. this method is called {@see loadHistoryFromDB()}
-        return null;
+        /** @var PracticeSession $practiceSession */
+        $practiceSession = $this->getPracticeSession();
+        return PracticeSessionHistory::model()->findByAttributes(array(
+            'date' => $this->date,
+            'clubID' => $this->clubID,
+            'coachID' => $this->coachID,
+            'startTime' => $practiceSession->startTime,
+            'endTime' => $practiceSession->endTime,
+        ));
+    }
+
+    private function getPracticeSession()
+    {
+        return PracticeSession::model()->findByPk($this->practiceSessionID);
+    }
+
+    /**
+     * TODO: write this method. Called by {@see save()}
+     * Converts the athletes attendance registered on the form to the DB format by inserting, deleting or updating every
+     * database record (through active records, of course)
+     * @return bool
+     */
+    private function saveAthletesAttendanceToDB()
+    {
+        return true;
     }
 
 }
