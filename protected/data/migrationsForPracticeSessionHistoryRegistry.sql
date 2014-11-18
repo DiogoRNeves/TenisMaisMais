@@ -19,3 +19,5 @@ ALTER TABLE mytennisapp.PracticeSessionHistoryHasAthlete CHANGE attendanceType a
 #indicar que este campo é chave estrangeira
 ALTER TABLE mytennisapp.PracticeSessionHistoryHasAthlete ADD CONSTRAINT fk_PracticeSessionAttendanceType 
 FOREIGN KEY (attendanceTypeID) REFERENCES PracticeSessionAttendanceType(attendanceTypeID);
+
+ALTER TABLE PracticeSessionHistory MODIFY COLUMN practiceSessionHistoryID INT auto_increment;

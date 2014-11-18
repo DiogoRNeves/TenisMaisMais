@@ -33,7 +33,7 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('practiceSessionHistoryID, startTime, endTime, date, coachID, clubID', 'required'),
+            array('startTime, endTime, date, coachID, clubID', 'required'),
             array('practiceSessionHistoryID, coachID, clubID', 'numerical', 'integerOnly' => true),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
@@ -117,7 +117,7 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
         /** @var PracticeSessionAttendanceType $attendanceType */
         //initialize all indexes with empty array
         foreach (PracticeSessionAttendanceType::model()->findAll() as $attendanceType) {
-            $result[$attendanceType->primaryKey()] = array();
+            $result[$attendanceType->primaryKey] = array();
         }
         //distribute athletes through the indexes (attendance types)
         foreach ($this->practiceSessionHistoryHasAthlete as $practiceSessionHistoryHasAthlete) {

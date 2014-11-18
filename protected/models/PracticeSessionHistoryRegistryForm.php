@@ -4,6 +4,8 @@
  * PracticeSessionHistoryRegistryForm class.
  * PracticeSessionHistoryRegistryForm is the data structure for keeping
  * the information about the attendance registry. It is used by the 'register' action of 'PracticeSessionHistory'.
+ *
+ * @property PracticeSessionHistory $practiceSessionHistory
  */
 class PracticeSessionHistoryRegistryForm extends CFormModel {
 
@@ -16,6 +18,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     public $athletesInjustifiedUnnatendance;
     public $cancelled;
     public $autoSubmit;
+    public $practiceSessionHistory;
 
     /**
      * Declares the validation rules.
@@ -51,25 +54,23 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     /**
-     * TODO: Test this method. Called by {@see PracticeSessionController->actionRegister()}
+     *
      * Saves the information in the form to the database.
      * @return bool
      */
     public function save()
     {
         if ($this->autoSubmit) { return false; }
-        $practiceSessionHistory = $this->getPracticeSessionHistory();
-        if ($practiceSessionHistory === null) {
-            $practiceSessionHistory = new PracticeSessionHistory();
-            $practiceSessionHistory->date = $this->date;
-            $practiceSessionHistory->clubID = $this->clubID;
-            $practiceSessionHistory->coachID = $this->coachID;
+        $this->getPracticeSessionHistory();
+        if ($this->practiceSessionHistory === null) {
+            $this->practiceSessionHistory = new PracticeSessionHistory();
+            $this->practiceSessionHistory->date = $this->date;
+            $this->practiceSessionHistory->clubID = $this->clubID;
+            $this->practiceSessionHistory->coachID = $this->coachID;
             $practiceSession = $this->getPracticeSession();
-            $practiceSessionHistory->startTime = $practiceSession->startTime;
-            $practiceSessionHistory->endTime = $practiceSession->endTime;
-            if (!$practiceSessionHistory->save()) {
-                //TODO: somehow it enters this if and returns false. Check it out and fix it. Probably some validation rules being violated.
-                //echo $practiceSessionHistory->getErrorsString(); // <------- usar isto
+            $this->practiceSessionHistory->startTime = $practiceSession->startTime;
+            $this->practiceSessionHistory->endTime = $practiceSession->endTime;
+            if (!$this->practiceSessionHistory->save()) {
                 return false;
             }
         }
@@ -116,7 +117,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
 
     public function setupAttendance()
     {
-        if (!$this->autoSubmit) {
+        if (!$this->autoSubmit || (isset($this->practiceSessionHistory) && !$this->practiceSessionHistory->isNewRecord)) {
             return null;
         }
         $athleteIds = $this->getPracticeSessionAthleteIds();
@@ -155,21 +156,21 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     /**
-     * TODO: Test this method. Called by {@see PracticeSessionController->actionRegister()}
+     *
      * @return bool
      */
     public function loadHistoryFromDB()
     {
         /** @var PracticeSessionHistory $practiceSessionHistory */
-        $practiceSessionHistory = $this->getPracticeSessionHistory();
-        if ($practiceSessionHistory === null) {
+        $this->getPracticeSessionHistory();
+        if ($this->practiceSessionHistory === null) {
             return false;
         }
         //get PK to use on getArrayOfAttributes
         $userPK = User::model()->getTableSchema()->primaryKey;
         $athleteIDs = array();
         //loop through athlete array indexed by attendanceTypeID
-        foreach ($practiceSessionHistory->getAthletesAttendanceType() as $key => $athletes) {
+        foreach ($this->practiceSessionHistory->getAthletesAttendanceType() as $key => $athletes) {
             $athleteIDs[$key] = CHelper::getArrayOfAttribute($athletes, $userPK);
         }
         //set the properties as needed
@@ -180,14 +181,14 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     /**
-     * TODO: Test this method. Called by {@see loadHistoryFromDB()) and {@see save()}
+     *
      * @return PracticeSessionHistory
      */
     private function getPracticeSessionHistory()
     {
         /** @var PracticeSession $practiceSession */
         $practiceSession = $this->getPracticeSession();
-        return PracticeSessionHistory::model()->findByAttributes(array(
+        $this->practiceSessionHistory = PracticeSessionHistory::model()->findByAttributes(array(
             'date' => $this->date,
             'clubID' => $this->clubID,
             'coachID' => $this->coachID,

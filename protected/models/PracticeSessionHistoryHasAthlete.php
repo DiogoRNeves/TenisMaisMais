@@ -40,7 +40,7 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'attendanceType' => array(self::BELONGS_TO, 'PracticeSessionAttendanceType', 'attendanceTypeID'),
-            'athlete'  => array(self::BELONGS_TO, 'User', 'userID'),
+            'athlete'  => array(self::BELONGS_TO, 'User', 'athleteID'),
         );
     }
 
