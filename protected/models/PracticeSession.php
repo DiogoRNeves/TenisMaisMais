@@ -219,7 +219,7 @@ class PracticeSession extends CExtendedActiveRecord {
     }
 
     /**
-     * Adds an athlete to this practice session.
+     * Removes an athlete to this practice session.
      * @param User $athlete the athlete to add to practice.
      * @return boolean wheter the operation was successfull or not.
      */

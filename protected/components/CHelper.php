@@ -47,7 +47,7 @@ class CHelper extends CApplicationComponent {
 
     /**
      * Returns an array containing only an attribute of the objects in another array.
-     * @param CExtendedActiveRecord $models The array of objects
+     * @param CExtendedActiveRecord[] $models The array of objects
      * @param string $attributeName the attribute name
      * @return array an array containing only the specified attribute for all the elements of the given array
      */
@@ -214,6 +214,17 @@ class CHelper extends CApplicationComponent {
     {
         $date = new DateTime($date);
         return $date->format('w');
+    }
+
+    public static function mergeArrays($arrays, $unique = true)
+    {
+        $result = array();
+        foreach ($arrays as $array) {
+            if (is_array($array)) {
+                $result = array_merge($result, $array);
+            }
+        }
+        return $unique ? array_unique($result) : $result;
     }
 
 }

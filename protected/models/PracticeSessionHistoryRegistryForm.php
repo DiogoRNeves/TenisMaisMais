@@ -49,9 +49,9 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
 
-    public static function model($className = __CLASS__) {
-        return parent::model($className);
-    }
+    //public static function model($className = __CLASS__) {
+    //    return parent::model($className);
+    //}
 
     /**
      *
@@ -203,14 +203,70 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     /**
-     * TODO: write this method. Called by {@see save()}
      * Converts the athletes attendance registered on the form to the DB format by inserting, deleting or updating every
      * database record (through active records, of course)
      * @return bool
      */
     private function saveAthletesAttendanceToDB()
     {
+        $affectedAthleteIDs = array_unique(array_merge($this->getDbAthleteIds(), $this->getAthletesWithSubmittedAttendance()));
+        foreach ($affectedAthleteIDs as $athleteID) {
+            if (!$this->saveAthleteAttendance($athleteID)) {
+                return false;
+            }
+        }
         return true;
+    }
+
+    private function saveAthleteAttendance($athleteID)
+    {
+        $practiceSessionHistoryHasAthlete = PracticeSessionHistoryHasAthlete::model()->findByAttributes(array(
+            'practiceSessionHistoryID' => $this->practiceSessionHistory->primaryKey,
+            'athleteID' => $athleteID,
+        ));
+        if (in_array($athleteID, $this->getAthletesWithSubmittedAttendance())) {
+            if ($practiceSessionHistoryHasAthlete === null) {
+                //create object and assign values
+                $practiceSessionHistoryHasAthlete = new PracticeSessionHistoryHasAthlete();
+                $practiceSessionHistoryHasAthlete->practiceSessionHistoryID = $this->practiceSessionHistory->primaryKey;
+                $practiceSessionHistoryHasAthlete->athleteID = $athleteID;
+            }
+            //assign attendance type
+            $practiceSessionHistoryHasAthlete->attendanceTypeID = $this->getAthleteSubmittedAttendanceTypeID($athleteID);
+            return $practiceSessionHistoryHasAthlete->save();
+        }
+        return $practiceSessionHistoryHasAthlete->delete();
+    }
+
+    private function getDbAthleteIds() {
+        return CHelper::getArrayOfAttribute($this->practiceSessionHistory->athletes,
+            User::model()->tableSchema->primaryKey);
+    }
+
+    /**
+     * @param $athleteID
+     * @throws CException
+     * @return int
+     */
+    private function getAthleteSubmittedAttendanceTypeID($athleteID)
+    {
+        if (in_array($athleteID, $this->athletesAttended)) {
+            return PracticeSessionAttendanceType::getAttended()->primaryKey;
+        }
+        if (in_array($athleteID, $this->athletesJustifiedUnnatendance)) {
+            return PracticeSessionAttendanceType::getJustifiedUnnatended()->primaryKey;
+        }
+        if (in_array($athleteID, $this->athletesInjustifiedUnnatendance)) {
+            return PracticeSessionAttendanceType::getInjustifiedUnnatended()->primaryKey;
+        }
+        throw new CException('O atleta ' . User::model()->findByPk($athleteID)->name .
+            ' foi submetido com um tipo de assiduidade inválido');
+    }
+
+    private function getAthletesWithSubmittedAttendance()
+    {
+        return CHelper::mergeArrays(array($this->athletesAttended, $this->athletesJustifiedUnnatendance,
+            $this->athletesInjustifiedUnnatendance));
     }
 
 }
