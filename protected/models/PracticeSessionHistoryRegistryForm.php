@@ -176,7 +176,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
 
     public function setupAttendance()
     {
-        if ($this->existsOnDb() && !$this->clickedCancel) { return null; }
+        if (($this->existsOnDb() || $this->hasErrors()) && !$this->clickedCancel) { return null; }
         $athleteIds = $this->getPracticeSessionAthleteIds();
         if ($this->cancelled) {
             $this->athletesJustifiedUnnatendance = $athleteIds;
