@@ -87,8 +87,7 @@ echo $form->select2Row($model, 'coachID', array(
     <?php if ($allowedPracticeSession): ?>
         <?php
         $existsOnDb = $model->existsOnDb();
-        $textToShow = $existsOnDb ? 'Existe informação sobre assiduidade a este treino no sistema.' :
-            'Não existe informação sobre assiduidade a este treino registada no sistema.';
+        $textToShow = ucfirst(($existsOnDb ? '' : 'Não ') . 'existe informação sobre assiduidade a este treino no sistema.');
         $alertType = $existsOnDb ? 'success' : 'info';
         ?>
         <div class="alert alert-<?php echo $alertType; ?>">
@@ -151,7 +150,7 @@ echo $form->select2Row($model, 'coachID', array(
             $this->widget('bootstrap.widgets.TbButton', array(
                 'buttonType' => 'submit',
                 'type' => 'primary',
-                'label' => 'Registar',
+                'label' => 'Gravar',
             ));
             ?>
         </div>

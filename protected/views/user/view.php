@@ -28,6 +28,11 @@ $this->menu = $this->getSideMenuItems($model);
 $this->widget('bootstrap.widgets.TbDetailView', array(
     'data' => $model,
     'attributes' => array(
+        array(
+            'name' => $model->getAttributeLabel('male'),
+            'type' => 'raw',
+            'value' => $model->getGender(),
+        ),
         'birthDate',
         'federationNumber',
         'coachLevel.coachLevel',

@@ -28,6 +28,14 @@
     <?php echo $form->textFieldRow($user, 'name', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php
+    //PracticeCancelled
+    echo $form->toggleButtonRow($user, 'male', array(
+        'enabledLabel' => 'M',
+        'disabledLabel' => 'F',
+        'value' => true,
+    )); ?>
+
+    <?php
     if (isset($sponsor) && $sponsor->hasNotNullAttributes()) {
         echo CHelper::select2Row($form, $sponsor, 'relationshipType', SponsorAthleteRelationshipType::model()->getListData());
     }

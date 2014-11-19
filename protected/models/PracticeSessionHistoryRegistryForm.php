@@ -5,7 +5,17 @@
  * PracticeSessionHistoryRegistryForm is the data structure for keeping
  * the information about the attendance registry. It is used by the 'register' action of 'PracticeSessionHistory'.
  *
+ * @property string $date
+ * @property int $clubID
+ * @property int $coachID
+ * @property int $practiceSessionID
+ * @property int[] $athletesAttended
+ * @property int[] $athletesJustifiedUnnatendance
+ * @property int[] $athletesInjustifiedUnnatendance
+ * @property bool $cancelled
+ * @property bool $autoSubmit
  * @property PracticeSessionHistory $practiceSessionHistory
+ * @property bool $clickedCancel
  */
 class PracticeSessionHistoryRegistryForm extends CFormModel {
 
@@ -37,10 +47,13 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     public function caseCancelled($attribute) {
-        if ( $this->cancelled && $this->getAthletesWithSubmittedAttendance() !== $this->athletesJustifiedUnnatendance) {
-            $this->addError($attribute, "No caso de aula cancelada, todos os atletas devem ter a ausência justificada");
-            //para colocar valores corretos automaticamente
-            $this->clickedCancel = true;
+        if ( $this->cancelled && count($this->athletesAttended) > 0) {
+            $this->addError($attribute, "No caso de aula cancelada, não podem haver atletas presentes");
+            //move athletes to unjustified absence
+            $this->athletesJustifiedUnnatendance = CHelper::mergeArrays(array(
+                $this->athletesAttended, $this->athletesInjustifiedUnnatendance
+            ));
+            $this->athletesInjustifiedUnnatendance = array();
             return false;
         }
         return true;
@@ -92,8 +105,8 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             'coachID' => PracticeSessionHistory::model()->getAttributeLabel('coachID'),
             'practiceSessionID' => PracticeSession::model()->getAttributeLabel('practiceSessionID'),
             'athletesAttended' => 'Presenças',
-            'athletesJustifiedUnnatendance' => 'Ausências Justificadas (compensáveis)',
-            'athletesInjustifiedUnnatendance' => 'Ausências Injustificadas (não compensáveis)',
+            'athletesJustifiedUnnatendance' => 'Ausências com compensação de treino',
+            'athletesInjustifiedUnnatendance' => 'Ausências sem compensação de treino',
             'cancelled' => PracticeSessionHistory::model()->getAttributeLabel('cancelled'),
         );
     }
@@ -163,7 +176,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
 
     public function setupAttendance()
     {
-        if (!$this->clickedCancel) { return null; }
+        if ($this->existsOnDb() && !$this->clickedCancel) { return null; }
         $athleteIds = $this->getPracticeSessionAthleteIds();
         if ($this->cancelled) {
             $this->athletesJustifiedUnnatendance = $athleteIds;

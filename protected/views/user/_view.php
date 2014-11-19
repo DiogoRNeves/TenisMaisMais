@@ -9,6 +9,10 @@
     <?php echo CHtml::link(CHtml::encode($data->name), array('view', 'id' => $data->userID)); ?>
     <br />
 
+    <b><?php echo CHtml::encode($data->getAttributeLabel('male')); ?>:</b>
+    <?php echo CHtml::encode($data->getGender()); ?>
+    <br />
+
     <?php if (!$data->isAttributeBlank('birthDate')): ?>
         <b><?php echo CHtml::encode($data->getAttributeLabel('birthDate')); ?>:</b>
         <?php echo CHtml::encode($data->birthDate); ?>

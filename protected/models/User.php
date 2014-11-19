@@ -16,6 +16,7 @@
  * @property integer $activated
  * @property string $activationHash
  * @property integer $activationMailSent whether the activation mail was sent or not
+ * @property integer $male
  *
  * The followings are the available model relations:
  * @property ClubHasUser[] $clubHasUsers
@@ -84,7 +85,7 @@ class User extends CExtendedActiveRecord {
                 'message' => 'A nova password tem que ser igual.'),
             array('birthDate, federationNumber', 'default', 'value' => NULL),
             array('newPassword, newPasswordRepeated, birthDate', 'required', 'on' => 'activation'),
-            array('oldPassword', 'safe'),
+            array('oldPassword,male', 'safe'),
         );
     }
 
@@ -141,7 +142,8 @@ class User extends CExtendedActiveRecord {
             'sponsors' => 'Patrocinadores',
             'sponsoredAthletes' => 'Atletas Patrocinados',
             'newPasswordRepeated' => 'Repetir Password Nova',
-            'oldPassword' => 'Password Antiga'
+            'oldPassword' => 'Password Antiga',
+            'male' => 'Género',
         );
     }
 
@@ -857,6 +859,11 @@ class User extends CExtendedActiveRecord {
             }
         }
         return $coaches;
+    }
+
+    public function getGender()
+    {
+        return $this->male ? 'Masculino' : 'Feminino';
     }
 
 }
