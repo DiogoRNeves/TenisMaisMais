@@ -19,6 +19,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     public $cancelled;
     public $autoSubmit;
     public $practiceSessionHistory;
+    public $clickedCancel;
 
     /**
      * Declares the validation rules.
@@ -26,10 +27,59 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     public function rules() {
         return array(
             // cancelledDueToRain needs to be a boolean
-            array('cancelledDueToRain', 'boolean'),
+            array('cancelled', 'boolean'),
             array('date,clubID,coachID,practiceSessionID,athletesAttended,athletesJustifiedUnnatendance,
-            athletesInjustifiedUnnatendance,cancelled,autoSubmit','safe'),
+            athletesInjustifiedUnnatendance,cancelled,autoSubmit,clickedCancel','safe'),
+            array('athletesAttended', 'allAthletesReferenced'),
+            array('athletesAttended', 'noAthleteRepetitions'),
+            array('athletesJustifiedUnnatendance', 'caseCancelled'),
         );
+    }
+
+    public function caseCancelled($attribute) {
+        if ( $this->cancelled && $this->getAthletesWithSubmittedAttendance() !== $this->athletesJustifiedUnnatendance) {
+            $this->addError($attribute, "No caso de aula cancelada, todos os atletas devem ter a ausência justificada");
+            //para colocar valores corretos automaticamente
+            $this->clickedCancel = true;
+            return false;
+        }
+        return true;
+    }
+
+    public function allAthletesReferenced($attribute) {
+        $notRegisteredAthletes = array();
+        foreach ($this->getPracticeSessionAthleteIds() as $athleteID) {
+            if (!in_array($athleteID, $this->getAthletesWithSubmittedAttendance())) {
+                $notRegisteredAthletes[] = $athleteID;
+            }
+        }
+        if (count($notRegisteredAthletes) > 0) {
+            $athletesNameString = User::getAttributeStringFromIDs($notRegisteredAthletes, 'name');
+            $this->addError($attribute, "Tem que registar o(s) atleta(s) $athletesNameString");
+            return false;
+        }
+        return true;
+    }
+
+    public function noAthleteRepetitions($attribute) {
+        //TODO write method
+        $attendanceCount = array();
+        $athletesWithMultipleAttendance = array();
+        foreach ($this->getAthletesWithSubmittedAttendance() as $athleteID) {
+            $attendanceCount[$athleteID] = 0;
+            if (CHelper::inArray($athleteID, $this->athletesAttended)) { $attendanceCount[$athleteID]++; }
+            if (CHelper::inArray($athleteID, $this->athletesJustifiedUnnatendance)) { $attendanceCount[$athleteID]++; }
+            if (CHelper::inArray($athleteID, $this->athletesInjustifiedUnnatendance)) { $attendanceCount[$athleteID]++; }
+            if ($attendanceCount[$athleteID] > 1) {
+                $athletesWithMultipleAttendance[] = $athleteID;
+            }
+        }
+        if (count($athletesWithMultipleAttendance) > 0) {
+            $athletesNameString = User::getAttributeStringFromIDs($athletesWithMultipleAttendance, 'name');
+            $this->addError($attribute, "O(s) atleta(s) $athletesNameString aparece(m) com mais do que um tipo de assiduidade");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -44,23 +94,18 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             'athletesAttended' => 'Presenças',
             'athletesJustifiedUnnatendance' => 'Ausências Justificadas (compensáveis)',
             'athletesInjustifiedUnnatendance' => 'Ausências Injustificadas (não compensáveis)',
-            'cancelled' => 'Treino cancelado (chuva, etc)',
+            'cancelled' => PracticeSessionHistory::model()->getAttributeLabel('cancelled'),
         );
     }
-
-
-    //public static function model($className = __CLASS__) {
-    //    return parent::model($className);
-    //}
 
     /**
      *
      * Saves the information in the form to the database.
      * @return bool
      */
-    public function save()
+    public function save($validate = true)
     {
-        if ($this->autoSubmit) { return false; }
+        if ($this->autoSubmit || ($validate && !$this->validate())) { return false; }
         $this->getPracticeSessionHistory();
         if ($this->practiceSessionHistory === null) {
             $this->practiceSessionHistory = new PracticeSessionHistory();
@@ -70,9 +115,10 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             $practiceSession = $this->getPracticeSession();
             $this->practiceSessionHistory->startTime = $practiceSession->startTime;
             $this->practiceSessionHistory->endTime = $practiceSession->endTime;
-            if (!$this->practiceSessionHistory->save()) {
-                return false;
-            }
+        }
+        $this->practiceSessionHistory->cancelled = $this->cancelled;
+        if (!$this->practiceSessionHistory->save()) {
+            return false;
         }
         return $this->saveAthletesAttendanceToDB();
     }
@@ -117,9 +163,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
 
     public function setupAttendance()
     {
-        if (!$this->autoSubmit || (isset($this->practiceSessionHistory) && !$this->practiceSessionHistory->isNewRecord)) {
-            return null;
-        }
+        if (!$this->clickedCancel) { return null; }
         $athleteIds = $this->getPracticeSessionAthleteIds();
         if ($this->cancelled) {
             $this->athletesJustifiedUnnatendance = $athleteIds;
@@ -128,6 +172,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             $this->athletesAttended = $athleteIds;
             $this->athletesJustifiedUnnatendance = array();
         }
+        $this->athletesInjustifiedUnnatendance = array();
     }
 
     public function getPracticeSessionAthleteOptions()
@@ -166,6 +211,9 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
         if ($this->practiceSessionHistory === null) {
             return false;
         }
+        if (!$this->clickedCancel) {
+            $this->cancelled = $this->practiceSessionHistory->cancelled;
+        }
         //get PK to use on getArrayOfAttributes
         $userPK = User::model()->getTableSchema()->primaryKey;
         $athleteIDs = array();
@@ -182,7 +230,6 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
 
     /**
      *
-     * @return PracticeSessionHistory
      */
     private function getPracticeSessionHistory()
     {
@@ -250,23 +297,32 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
      */
     private function getAthleteSubmittedAttendanceTypeID($athleteID)
     {
-        if (in_array($athleteID, $this->athletesAttended)) {
+        if (CHelper::inArray($athleteID, $this->athletesAttended)) {
             return PracticeSessionAttendanceType::getAttended()->primaryKey;
         }
-        if (in_array($athleteID, $this->athletesJustifiedUnnatendance)) {
+        if (CHelper::inArray($athleteID, $this->athletesJustifiedUnnatendance)) {
             return PracticeSessionAttendanceType::getJustifiedUnnatended()->primaryKey;
         }
-        if (in_array($athleteID, $this->athletesInjustifiedUnnatendance)) {
+        if (CHelper::inArray($athleteID, $this->athletesInjustifiedUnnatendance)) {
             return PracticeSessionAttendanceType::getInjustifiedUnnatended()->primaryKey;
         }
         throw new CException('O atleta ' . User::model()->findByPk($athleteID)->name .
             ' foi submetido com um tipo de assiduidade inválido');
     }
 
+    /**
+     * @return int[]
+     */
     private function getAthletesWithSubmittedAttendance()
     {
         return CHelper::mergeArrays(array($this->athletesAttended, $this->athletesJustifiedUnnatendance,
             $this->athletesInjustifiedUnnatendance));
+    }
+
+    public function existsOnDb()
+    {
+        $this->getPracticeSessionHistory();
+        return isset($this->practiceSessionHistory);
     }
 
 }

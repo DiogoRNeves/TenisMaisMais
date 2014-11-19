@@ -1,6 +1,9 @@
 # adicionar campo 'male' na tabela user e definir o default como true
 ALTER TABLE mytennisapp.User ADD male BOOL DEFAULT 1 NOT NULL;
 
+#adicionarcampo em PracticeSessionHistory para indicação de aula cancelada
+ALTER TABLE mytennisapp.PracticeSessionHistory ADD cancelled BOOL DEFAULT 0 NOT NULL;
+
 #criar tabela dos tipos de presença
 CREATE TABLE mytennisapp.PracticeSessionAttendanceType
 (
@@ -20,4 +23,5 @@ ALTER TABLE mytennisapp.PracticeSessionHistoryHasAthlete CHANGE attendanceType a
 ALTER TABLE mytennisapp.PracticeSessionHistoryHasAthlete ADD CONSTRAINT fk_PracticeSessionAttendanceType 
 FOREIGN KEY (attendanceTypeID) REFERENCES PracticeSessionAttendanceType(attendanceTypeID);
 
+#colocar auto_increment que não estava por lapso
 ALTER TABLE PracticeSessionHistory MODIFY COLUMN practiceSessionHistoryID INT auto_increment;

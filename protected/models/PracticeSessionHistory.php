@@ -10,6 +10,7 @@
  * @property string $date
  * @property integer $coachID
  * @property integer $clubID
+ * @property bool $cancelled
  *
  * The followings are the available model relations:
  * @property Club $club
@@ -66,6 +67,7 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
             'date' => 'Data',
             'coachID' => PracticeSession::model()->getAttributeLabel('coachID'),
             'clubID' => PracticeSession::model()->getAttributeLabel('clubID'),
+            'cancelled' => 'Treino cancelado (chuva, etc.)',
         );
     }
 

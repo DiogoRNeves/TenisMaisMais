@@ -17,6 +17,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/practice
 $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
     'action' => Yii::app()->createUrl($this->route),
     'method' => 'get',
+    'enableAjaxValidation' => true,
 ));
 ?>
 
@@ -84,6 +85,15 @@ echo $form->select2Row($model, 'coachID', array(
     ?>
 
     <?php if ($allowedPracticeSession): ?>
+        <?php
+        $existsOnDb = $model->existsOnDb();
+        $textToShow = $existsOnDb ? 'Existe informação sobre assiduidade a este treino no sistema.' :
+            'Não existe informação sobre assiduidade a este treino registada no sistema.';
+        $alertType = $existsOnDb ? 'success' : 'info';
+        ?>
+        <div class="alert alert-<?php echo $alertType; ?>">
+            <?php echo $textToShow; ?>
+        </div>
 
         <?php
         //PracticeCancelled
@@ -98,10 +108,7 @@ echo $form->select2Row($model, 'coachID', array(
         <?php
         $model->setupAttendance();
         $practiceSessionAthletes = $model->getPracticeSessionAthleteOptions();
-        //$athletes = $model->getPracticeSessionAthleteOptions();
         //AthletesAttended
-        //echo CHelper::select2Row($form, $model, 'athletesAttended',
-        //    $loggedInUser->getCoachedAthletesOptions(), true);
         echo $form->select2Row($model, 'athletesAttended', array(
             'data' => $loggedInUser->getCoachedAthletesOptions(),
             'options' => array(
@@ -115,8 +122,6 @@ echo $form->select2Row($model, 'coachID', array(
         ?>
         <?php
         //AthletesUnnatended - Justified
-        //echo CHelper::select2Row($form, $model, 'athletesJustifiedUnnatendance',
-        //    $loggedInUser->getCoachedAthletesOptions(), true);
         echo $form->select2Row($model, 'athletesJustifiedUnnatendance', array(
             'data' => $practiceSessionAthletes,
             'options' => array(
@@ -129,8 +134,6 @@ echo $form->select2Row($model, 'coachID', array(
         ?>
         <?php
         //AthletesUnttended - Not Justified
-        //echo CHelper::select2Row($form, $model, 'athletesInjustifiedUnnatendance',
-        //    $loggedInUser->getCoachedAthletesOptions(), true);
         echo $form->select2Row($model, 'athletesInjustifiedUnnatendance', array(
             'data' => $practiceSessionAthletes,
             'options' => array(
@@ -157,6 +160,7 @@ echo $form->select2Row($model, 'coachID', array(
 
     <div style="display: none">
         <?php echo $form->checkBoxRow($model, 'autoSubmit'); ?>
+        <?php echo $form->checkBoxRow($model, 'clickedCancel'); ?>
     </div>
 
 <?php $this->endWidget(); ?>

@@ -227,4 +227,10 @@ class CHelper extends CApplicationComponent {
         return $unique ? array_unique($result) : $result;
     }
 
+    public static function inArray($needle, $haystack)
+    {
+        if (!is_array($haystack)) { return false; }
+        return in_array($needle, $haystack);
+    }
+
 }

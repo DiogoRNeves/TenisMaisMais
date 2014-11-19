@@ -22,6 +22,18 @@ abstract class CExtendedActiveRecord extends CActiveRecord {
     }
 
     /**
+     * @param $idsArray int[]
+     * @param $attribute string
+     * @return string
+     */
+    public static function getAttributeStringFromIDs($idsArray, $attribute, $glue = ', ')
+    {
+        $class = get_called_class();
+        $attributeValues = CHelper::getArrayOfAttribute($class::model()->findAllByPk($idsArray), $attribute);
+        return implode($glue, $attributeValues);
+    }
+
+    /**
      * Returns the list of data from this model, given the criteria
      * @param CDbCriteria $criteria The criteria to be used in order to get results. Defaults to all records.
      * @param string $valueField The value field attribute name. Defaults to the primary key.
