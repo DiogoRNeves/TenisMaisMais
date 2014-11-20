@@ -189,7 +189,7 @@ class CHelper extends CApplicationComponent {
         return $result;
     }
 
-    public static function IsNullOrEmptyString($variables)
+    public static function isNullOrEmptyString($variables)
     {
         $variables = CHelper::toArray($variables);
         foreach ($variables as $variable) {

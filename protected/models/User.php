@@ -49,6 +49,9 @@ class User extends CExtendedActiveRecord {
     //TODO: handle save for password changing
     public $newPassword, $oldPassword, $newPasswordRepeated;
 
+    /**
+     * @return User
+     */
     public static function getLoggedInUser()
     {
         return User::model()->findByPk(Yii::app()->user->id);
@@ -280,7 +283,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * Checks the usertypes primary keys assotiated with this model
+     * Checks the usertypes primary keys associated with this model
      * @return array the user types primary key for this instance of the model
      */
     public function getUserTypesPK() {

@@ -273,7 +273,7 @@ class Club extends CExtendedActiveRecord {
 
     public function getPracticeSessions($date = null, $coach = null)
     {
-        if (CHelper::IsNullOrEmptyString(array($date, $coach))) {
+        if (CHelper::isNullOrEmptyString(array($date, $coach))) {
             return $this->practiceSessions;
         }
         $results = array();

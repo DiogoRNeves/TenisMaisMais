@@ -54,6 +54,11 @@ class UserController extends Controller {
                 'users' => array('@'),
                 'expression' => array($user, 'canCreateUsers'),
             ),
+            array('allow', // allow authenticated user to perform actions
+                'actions' => array('removeFromClub'),
+                'users' => array('@'),
+                'expression' => array($user, 'isClubAdmin'),
+            ),
             array('deny', // deny all users
                 'users' => array('*'),
             ),
@@ -119,16 +124,20 @@ class UserController extends Controller {
 
     /**
      * Return true if all models are ready to be saved
-     * @param array $models the models
+     * @param CExtendedActiveRecord[] $models the models
      * @return boolean true if all models are ready to be saved to persitance
      */
     protected function isRequiredFieldsFilled($models) {
-        $userOK = $models['user']->validate() && $models['user']->isPasswordChangeOK();
+        /** @var User $user */
+        $user = $models['user'];
+        $userOK = $user->validate() && $user->isPasswordChangeOK();
         $contactOK = $models['contact']->validate();
         if (isset($models['sponsor'])) {
-            $attributes = $models['sponsor']->getAttributeNamesExcept(array('sponsorID'));
-            $sponsorOK = ($models['sponsor']->hasNotNullAttributes() ?
-                            $models['sponsor']->validate($attributes) : true);
+            /** @var Sponsor $sponsor */
+            $sponsor = $models['sponsor'];
+            $attributes = $sponsor->getAttributeNamesExcept(array('sponsorID'));
+            $sponsorOK = ($sponsor->hasNotNullAttributes() ?
+                $sponsor->validate($attributes) : true);
         } else {
             $sponsorOK = true;
         }
@@ -139,7 +148,7 @@ class UserController extends Controller {
      * Saves the models to persitence, allows the activation of the user
      *  and redirects to 'view' page if successfull. If activation, logs in and redirects to home.
      * 
-     * @param array $models
+     * @param CExtendedActiveRecord[] $models
      */
     protected function handleSave($models) {
         if ($models['user']->save(false)) {
@@ -152,17 +161,19 @@ class UserController extends Controller {
             if (isset($models['sponsor'])) {
                 $this->saveSponsor($models);
             }
-            if ($models['user']->scenario == 'activation') {
-                $this->handleActivation($models['user']);
+            /** @var User $user */
+            $user = $models['user'];
+            if ($user->scenario == 'activation') {
+                $this->handleActivation($user);
             }
-            $this->allowActivation($models['user']);
+            $this->allowActivation($user);
             $this->redirect(array('view', 'id' => $models['user']->userID));
         }
     }
 
     /**
      * relates a user with a club
-     * @param array $models assotiative array containing 'user' to be saved into 'clubHasUser'
+     * @param CExtendedActiveRecord[] $models assotiative array containing 'user' to be saved into 'clubHasUser'
      */
     protected function saveSponsor($models) {
         if ($this->isNewModelNotNull($models['sponsor'])) {
@@ -182,7 +193,7 @@ class UserController extends Controller {
 
     /**
      * relates a contact with a user
-     * @param array $models assotiative array containing 'contact' to be saved into 'user'
+     * @param CExtendedActiveRecord[] $models assotiative array containing 'contact' to be saved into 'user'
      */
     protected function relateContactWithUser($models) {
         if (empty($models['user']->contact)) {
@@ -194,7 +205,7 @@ class UserController extends Controller {
 
     /**
      * relates a user with a club
-     * @param array $models assotiative array containing 'user' to be saved into 'clubHasUser'
+     * @param CExtendedActiveRecord[] $models assotiative array containing 'user' to be saved into 'clubHasUser'
      */
     protected function saveClubHasUser($models) {
         if ($this->isNewModelNotNull($models['clubHasUser'])) {
@@ -220,7 +231,6 @@ class UserController extends Controller {
      * Updates a particular model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id the ID of the model to be updated
-     * @param boolean $activate true if this is an activation
      */
     public function actionUpdate($id) {
         $models = array('user' => $this->loadModel($id));
@@ -250,7 +260,7 @@ class UserController extends Controller {
      * Lists all models.
      */
     public function actionIndex() {
-        $currentUser = $this->loadModel(Yii::app()->user->getId());
+        $currentUser = User::model()->getLoggedInUser();
         /* @var $userType UserType */
         $userType = isset($_GET['userType']) ? UserType::model()->findByPk($_GET['userType']) : null;
         if ($userType != null) {
@@ -289,8 +299,10 @@ class UserController extends Controller {
      * Activates a user.
      * @param String $activationHash
      * @param int $userID
+     * @throws CHttpException
      */
     public function actionActivate($activationHash, $userID) {
+        /** @var CExtendedActiveRecord[] $models */
         $models = array('user' => $this->loadModel($userID));
         $models['contact'] = $models['user']->contact;
         $models['user']->scenario = 'activation';
@@ -298,15 +310,22 @@ class UserController extends Controller {
         // Uncomment the following line if AJAX validation is needed
         $this->performAjaxValidation($models);
 
-        if ($models['user']->canBeActivated($activationHash)) {
+        /** @var User $user */
+        $user = $models['user'];
+        if ($user->canBeActivated($activationHash)) {
             $this->renderUpdate($models);
         }
-        if ($models['user']->isActivated()) {
+        if ($user->isActivated()) {
             throw new CHttpException(403, "O utilizador " . $models['user']->name . " já foi ativado.");
         }
-        if (!$models['user']->isActivationHash($activationHash)) {
+        if ($user->isActivationHash($activationHash)) {
             throw new CHttpException(403, "Link incorreto para o utilizador " . $models['user']->name . ".");
         }
+    }
+
+    public function actionRemoveFromClub($userID, $clubID) {
+        //TODO actually execute action and show view
+        echo "OK. ClubID: $clubID, UserID: $userID.";
     }
 
     /**
@@ -345,20 +364,19 @@ class UserController extends Controller {
         //something like array('label' => 'Manage User', 'url' => array('admin')),
         $result = array(); //no common items at the moment
         if ($user instanceof User) {
-            if ($user->primaryKey == NULL) {
-                //options for non detailed view actions only (false)  
-                $this->loadSideMenuOptions($result, $user, false);
-            } else {
-                //options for detailed view actions only (true)                
-                $this->loadSideMenuOptions($result, $user, true);
-                //array_push($result, $assignExistingCoach, $addNewSponsor, $assignExistingSponsor, $editUser, $seePracticeHistory);
-            }
+            //options for non detailed view actions only (false)
+            //options for detailed view actions only (true)
+            $this->loadSideMenuOptions($result, $user, $user->primaryKey !== NULL);
         }
         return $result;
     }
 
+    /**
+     * @param $user User
+     * @return array
+     */
     protected function getDetailedViewsOptions($user) {
-        //arrays of arguments to be passed as GET
+        //arrays of arguments to be passed as query string
         $sponsorAttributes = array(
             'athleteID' => $user->primaryKey,
             'startDate' => date('Y-m-d'),
@@ -368,31 +386,58 @@ class UserController extends Controller {
         $sponsor = UserType::model()->getSponsor()->primaryKey;
         $result = array(
             'addNewSponsor' => array(
-                'option' => array('label' => 'Adicionar Patrocinador', 'url' => array('create', 'Sponsor' => $sponsorAttributes)),
+                'option' => array(
+                    'label' => 'Adicionar Patrocinador',
+                    'url' => array('create', 'Sponsor' => $sponsorAttributes)
+                ),
                 'detailedView' => true,
                 'selectedUserTypesAllowed' => array($athlete),
                 'loggedInUserTypesAllowed' => array($coach)),
             'editAthlete' => array(
-                'option' => array('label' => 'Editar Atleta', 'url' => array('update', 'id' => $user->userID, 'userTypeId' => $athlete)),
+                'option' => array(
+                    'label' => 'Editar Atleta',
+                    'url' => array('update', 'id' => $user->userID, 'userTypeId' => $athlete)
+                ),
                 'detailedView' => true,
                 'selectedUserTypesAllowed' => array($athlete),
                 'loggedInUserTypesAllowed' => array($coach, $sponsor, $athlete)),
             'editCoach' => array(
-                'option' => array('label' => 'Editar Treinador', 'url' => array('update', 'id' => $user->userID, 'userTypeId' => $coach)),
+                'option' => array(
+                    'label' => 'Editar Treinador',
+                    'url' => array('update', 'id' => $user->userID, 'userTypeId' => $coach)
+                ),
                 'detailedView' => true,
                 'selectedUserTypesAllowed' => array($coach),
                 'loggedInUserTypesAllowed' => array($coach)),
             'editSponsor' => array(
-                'option' => array('label' => 'Editar Patrocinador', 'url' => array('update', 'id' => $user->userID, 'userTypeId' => $sponsor)),
+                'option' => array(
+                    'label' => 'Editar Patrocinador',
+                    'url' => array('update', 'id' => $user->userID, 'userTypeId' => $sponsor)
+                ),
                 'detailedView' => true,
                 'selectedUserTypesAllowed' => array($sponsor),
                 'loggedInUserTypesAllowed' => array($coach)),
             'viewPracticeSchedule' => array(
-                'option' => array('label' => 'Ver Horário', 'url' => array('practiceSession/index', 'userID' => $user->userID)),
+                'option' => array('label' => 'Ver Horário',
+                    'url' => array('practiceSession/index', 'userID' => $user->userID)
+                ),
                 'detailedView' => true,
                 'selectedUserTypesAllowed' => array($coach, $athlete),
                 'loggedInUserTypesAllowed' => array($coach, $athlete, $sponsor)),
         );
+        /** @var Club $club */
+        foreach ($user->clubs as $club) {
+            $result[] = array(
+                'option' => array(
+                    'label' => 'Desassociar de ' . $club->name,
+                    'url' => array('user/removeFromClub', 'userID' => $user->userID, 'clubID' => $club->primaryKey)
+                ),
+                'detailedView' => true,
+                'selectedUserTypesAllowed' => array($athlete, $coach),
+                'loggedInUserTypesAllowed' => array(),
+                'adminOfClub' => $club->primaryKey,
+            );
+        }
         return $result;
     }
 
@@ -404,21 +449,23 @@ class UserController extends Controller {
      * or the non detailed ones (false)
      */
     public function loadSideMenuOptions(&$result, $user, $detailedView) {
-        $loggedUser = Yii::app()->user;
-        if (!$loggedUser->isGuest) {
-            $loggedInUserTypes = User::model()->findByPk($loggedUser->getId())->getUserTypesPk();
+        if (!Yii::app()->user->isGuest) {
+            $loggedInUser = User::model()->getLoggedInUser();
+            $loggedInUserTypes = $loggedInUser->getUserTypesPk();
+            $loggedInManagedClubs = $loggedInUser->clubsManaged;
             $selectedUserTypes = $user->getUserTypesPK();
             foreach ($this->getDetailedViewsOptions($user) as $detailOption) {
-                if ($this->sideMenuOptionIsVisible($detailOption, $detailedView, $loggedInUserTypes, $selectedUserTypes)) {
+                if ($this->sideMenuOptionIsVisible($detailOption, $detailedView, $loggedInUserTypes,
+                    $selectedUserTypes, $loggedInManagedClubs)) {
                     array_push($result, $detailOption['option']);
                 }
             }
         }
     }
 
-    protected function sideMenuOptionIsVisible($detailOption, $detailedView, $loggedInUserTypes, $selectedUserTypes) {
+    protected function sideMenuOptionIsVisible($detailOption, $detailedView, $loggedInUserTypes, $selectedUserTypes, $loggedInManagedClubs) {
         //check if this option is OK for this action (create, update, view, index, ...)
-        $isSystemAdmin = User::model()->findByPk(Yii::app()->user->getId())->isSystemAdmin();
+        $isSystemAdmin = User::model()->getLoggedInUser()->isSystemAdmin();
         $action = $detailOption['detailedView'] == $detailedView;
         //check if this option is OK for the selected user (update/1, update/4, ...)
         if (count($selectedUserTypes) != 0) {
@@ -429,7 +476,10 @@ class UserController extends Controller {
             throw new CHttpException('403', 'This user has no UserType defined!');
         }
         //check if this option is OK for the logged in user
-        $loggedInUser = CHelper::arraysIntersect($detailOption['loggedInUserTypesAllowed'], $loggedInUserTypes);
+        $loggedInUser = $isSystemAdmin ? true :
+            (isset($detailOption['adminOfClub']) ?
+                CHelper::inArray($detailOption['adminOfClub'],$loggedInManagedClubs) :
+                CHelper::arraysIntersect($detailOption['loggedInUserTypesAllowed'], $loggedInUserTypes));
         return $action && $selectUser && $loggedInUser;
     }
 
