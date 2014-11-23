@@ -17,7 +17,7 @@ class CHelper extends CApplicationComponent {
      * returns true.
      * @param array $array1
      * @param array $array2
-     * @return boolean false if all elements in both arrays are diferent, true otherwise
+     * @return boolean false if all elements in both arrays are different, true otherwise
      */
     public static function arraysIntersect($array1, $array2) {
         $countA1 = count($array1);
@@ -175,7 +175,7 @@ class CHelper extends CApplicationComponent {
      * 
      * @param string $string
      * @param string $searchValue
-     * @return bool weather $searchValue is in $string or not
+     * @return bool whether $searchValue is in $string or not
      */
     public static function stringContains($string, $searchValue, $splitWords = false, $caseSensitive = false) {
         $searchValue = trim($searchValue);
@@ -243,9 +243,9 @@ class CHelper extends CApplicationComponent {
         return self::timeToString($startTime, $format) . " - " . self::timeToString($endTime, $format);
     }
 
-    public static function getPlural($description)
+    public static function getPlural($string)
     {
-        $words = explode(" ", $description);
+        $words = explode(" ", $string);
         $result = $words[0] . "s ";
         for ($i = 1; $i < count($words); $i++) {
             $result .= $words[$i] . " ";

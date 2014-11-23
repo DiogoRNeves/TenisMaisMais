@@ -324,8 +324,40 @@ class UserController extends Controller {
     }
 
     public function actionRemoveFromClub($userID, $clubID) {
-        //TODO actually execute action and show view
-        echo "OK. ClubID: $clubID, UserID: $userID.";
+        $model = new ClubHasUser();
+        $model->userID = $userID;
+        $model->clubID = $clubID;
+        $deleted = null;
+        /** @var User $user */
+        $user = User::model()->findByPk($userID);
+        /** @var Club $club */
+        $club = Club::model()->findByPk($clubID);
+        if (isset($_POST['confirmedDeletion']) && $_POST['confirmedDeletion']) {
+            $model = ClubHasUser::model()->findByAttributes(array(
+                'userID' => $userID,
+                'clubID' => $clubID,
+                'userTypeID' => $_POST['ClubHasUser']['userTypeID'],
+            ));
+            if ($model === null) {
+                throw new CHttpException(404, $user->name . ' não pertence a ' . $club->name);
+            }
+            $deleted = $model->delete();
+            if ($deleted) {
+                $this->render('removalFromClubConfirmed', array(
+                    'deleted' => $deleted,
+                    'userName' => $user->name,
+                    'clubName' => $club->name,
+                ));
+                return true;
+            }
+        }
+        if ($model === null) {
+            throw new CHttpException(404, $user->name . ' não pertence a ' . $club->name);
+        }
+        $this->render('removeFromClub', array(
+            'model' => $model,
+            'deleted' => $deleted,
+        ));
     }
 
     /**

@@ -296,7 +296,7 @@ class User extends CExtendedActiveRecord {
 
     /**
      * Checks the usertypes assotiated with this model
-     * @return array the user types for this instance of the model
+     * @return UserType[] array the user types for this instance of the model
      */
     public function getUserTypes() {
         $result = array();
