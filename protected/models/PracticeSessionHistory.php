@@ -68,6 +68,7 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
             'coachID' => PracticeSession::model()->getAttributeLabel('coachID'),
             'clubID' => PracticeSession::model()->getAttributeLabel('clubID'),
             'cancelled' => 'Treino cancelado (chuva, etc.)',
+            'timeString' => 'Horário',
         );
     }
 
@@ -126,6 +127,10 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
             $result[$practiceSessionHistoryHasAthlete->attendanceTypeID][] = $practiceSessionHistoryHasAthlete->athlete;
         }
         return $result;
+    }
+
+    public function getTimeString() {
+        return CHelper::timeIntervalString($this->startTime, $this->endTime);
     }
 
 }

@@ -5,6 +5,8 @@
  */
 class CHelper extends CApplicationComponent {
 
+    const DEFAULT_TIME_FORMAT = 'H:i';
+
     private static $_select2HtmlOptions = array(
         'placeholder' => 'Please Select a Value',
         'select2Options' => array('allowClear' => true)
@@ -119,7 +121,7 @@ class CHelper extends CApplicationComponent {
                 'bootstrap.widgets.TbButton', array(
             'buttonType' => 'submit',
             'type' => 'primary',
-            'label' => $model->isNewRecord ? 'Create' : 'Save',
+            'label' => $model->isNewRecord ? 'Criar' : 'Gravar',
         ));
     }
 
@@ -139,8 +141,9 @@ class CHelper extends CApplicationComponent {
         );
     }
 
-    public static function timeToString($time) {
-        return substr($time, 0, 5);
+    public static function timeToString($time, $format = self::DEFAULT_TIME_FORMAT) {
+        $time = new DateTime($time);
+        return $time->format($format);
     }
 
     /**
@@ -170,9 +173,10 @@ class CHelper extends CApplicationComponent {
      * 
      * @param string $string
      * @param string $searchValue
-     * @return bool wether $searchValue is in $string or not
+     * @return bool weather $searchValue is in $string or not
      */
     public static function stringContains($string, $searchValue, $splitWords = false, $caseSensitive = false) {
+        $searchValue = trim($searchValue);
         if (!$caseSensitive) {
             $string = strtolower($string);
             $searchValue = strtolower($searchValue);
@@ -231,6 +235,10 @@ class CHelper extends CApplicationComponent {
     {
         if (!is_array($haystack)) { return false; }
         return in_array($needle, $haystack);
+    }
+
+    public static function timeIntervalString($startTime, $endTime, $format = self::DEFAULT_TIME_FORMAT) {
+        return self::timeToString($startTime, $format) . " - " . self::timeToString($endTime, $format);
     }
 
 }

@@ -34,10 +34,10 @@
  * @property Home $home
  * @property PlayerLevel $playerLevel
  * @property CoachLevel $coachLevel
- * @property Club $clubsManaged The clubs managed by this user
- * @property Club $clubs Clubs related to this user
- * @property Club $coachClubs Clubs this user is a coach at
- * @property Club $athleteClubs Clubs this user is an athlete at
+ * @property Club[] $clubsManaged The clubs managed by this user
+ * @property Club[] $clubs Clubs related to this user
+ * @property Club[] $coachClubs Clubs this user is a coach at
+ * @property Club[] $athleteClubs Clubs this user is an athlete at
  * @property PracticeSession[] $activeAthletePracticeSessions the active practice sessions as an athlete for this user
  *
  * @property String $newPassword Password in plain text, from form
@@ -476,7 +476,7 @@ class User extends CExtendedActiveRecord {
      * @return User[] the related Athletes
      */
     public function getRelatedAthletes(array $filter = null) {
-        $result = array_unique(array_merge($this->getCoachedAthletes(), $this->sponsoredAthletes));
+        $result = CHelper::mergeArrays(array($this->getCoachedAthletes(), $this->sponsoredAthletes));
         return CHelper::searchArray($result, $filter);
     }
 
@@ -484,7 +484,7 @@ class User extends CExtendedActiveRecord {
         /* @var $club Club */
         $result = array();
         foreach ($this->coachClubs as $club) {
-            $result = array_merge($result, $club->athletes);
+            $result = CHelper::mergeArrays(array($result, $club->athletes));
         }
         return CHelper::searchArray($result, $filter);
     }
@@ -498,7 +498,7 @@ class User extends CExtendedActiveRecord {
         /* @var $club Club */
         $result = array();
         foreach ($this->coachClubs as $club) {
-            $result = array_merge($result, $club->coaches);
+            $result = CHelper::mergeArrays(array($result, $club->coaches));
         }
         return CHelper::searchArray($result, $filter);
     }
@@ -867,6 +867,11 @@ class User extends CExtendedActiveRecord {
     public function getGender()
     {
         return $this->male ? 'Masculino' : 'Feminino';
+    }
+
+    public function getAthleteClubsOptions()
+    {
+        return CHTML::listData($this->athleteClubs, 'clubID', 'name');
     }
 
 }

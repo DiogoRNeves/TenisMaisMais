@@ -245,7 +245,7 @@ class PracticeSession extends CExtendedActiveRecord {
     }
 
     public function getClubLink() {
-        $result = CHelper::getObjectsLinks($this->cl, 'name');
+        $result = CHelper::getObjectsLinks($this->club, 'name');
         $result['label'] = 'Club';
         return $result;
     }
@@ -345,7 +345,7 @@ class PracticeSession extends CExtendedActiveRecord {
     }
 
     public function getListDataTextField() {
-        return $this->startTime . "-" . $this->endTime;
+        return CHelper::timeIntervalString($this->startTime, $this->endTime);
     }
 
 }

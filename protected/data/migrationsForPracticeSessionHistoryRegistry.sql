@@ -13,8 +13,8 @@ CREATE TABLE mytennisapp.PracticeSessionAttendanceType
 
 #inserts for table jut created
 INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (1,'presença');
-INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (2,'ausência justificada');
-INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (3,'ausência injustificada');
+INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (2,'ausência com compensação');
+INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (3,'ausência sem compensação');
 
 #mudar o nome do campo na tabela que vai receber o ID
 ALTER TABLE mytennisapp.PracticeSessionHistoryHasAthlete CHANGE attendanceType attendanceTypeID INT;

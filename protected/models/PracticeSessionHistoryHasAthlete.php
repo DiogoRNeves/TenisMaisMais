@@ -7,8 +7,17 @@
  * @property integer $practiceSessionHistoryID
  * @property integer $athleteID
  * @property integer $attendanceTypeID
+ *
+ * The following are available through relations:
+ * @property PracticeSessionHistory $practiceSessionHistory
+ * @property User $athlete
+ * @property PracticeSessionAttendanceType $attendanceType
+ *
  */
 class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
+
+    public $clubID;
+    public $date;
 
     /**
      * @return string the associated database table name
@@ -28,7 +37,7 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
             array('practiceSessionHistoryID, athleteID, attendanceTypeID', 'numerical', 'integerOnly' => true),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('practiceSessionHistoryID, athleteID, attendanceTypeID', 'safe', 'on' => 'search'),
+            array('practiceSessionHistoryID, athleteID, attendanceTypeID, clubID, date', 'safe', 'on' => 'search'),
         );
     }
 
@@ -41,6 +50,8 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         return array(
             'attendanceType' => array(self::BELONGS_TO, 'PracticeSessionAttendanceType', 'attendanceTypeID'),
             'athlete'  => array(self::BELONGS_TO, 'User', 'athleteID'),
+            'practiceSessionHistory' => array(self::BELONGS_TO, 'PracticeSessionHistory', 'practiceSessionHistoryID'),
+            'club' => array(self::BELONGS_TO, 'Club', array('clubID' => 'clubID'), 'through' => 'practiceSessionHistory'),
         );
     }
 
@@ -52,6 +63,8 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
             'practiceSessionHistoryID' => 'Practice Session History',
             'athleteID' => 'Athlete',
             'attendanceTypeID' => 'Attendance Type',
+            'clubID' => Club::model()->getAttributeLabel('clubID'),
+            'date' => 'Ano-Mês',
         );
     }
 
@@ -72,9 +85,13 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
 
         $criteria = new CDbCriteria;
 
+        $criteria->with = array('practiceSessionHistory', 'club', 'attendanceType', 'athlete');
+
         $criteria->compare('practiceSessionHistoryID', $this->practiceSessionHistoryID);
         $criteria->compare('athleteID', $this->athleteID);
         $criteria->compare('attendanceTypeID', $this->attendanceTypeID);
+        $criteria->compare('club.clubID', $this->clubID);
+        $criteria->compare('practiceSessionHistory.date', $this->date, true);
 
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,

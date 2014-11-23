@@ -22,7 +22,7 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
      */
     public static function getJustifiedUnnatended()
     {
-        return self::getAttendanceType('ausência justificada');
+        return self::getAttendanceType('ausência com compensação');
     }
 
     /**
@@ -30,7 +30,7 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
      */
     public static function getInjustifiedUnnatended()
     {
-        return self::getAttendanceType('ausência injustificada');
+        return self::getAttendanceType('ausência sem compensação');
     }
 
     /**
@@ -87,8 +87,9 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'attendanceTypeID' => 'Attendance Type',
-			'description' => 'Description',
+			'attendanceTypeID' => 'Tipo de assiduidade',
+			'description' => 'Tipo de assiduidade',
+            'listDataTextField' => 'Tipo de assiduidade',
 		);
 	}
 
@@ -128,4 +129,8 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    public function getListDataTextField() {
+        return ucfirst($this->description);
+    }
 }

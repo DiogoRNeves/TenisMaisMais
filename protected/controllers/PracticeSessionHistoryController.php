@@ -25,7 +25,7 @@ class PracticeSessionHistoryController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('index', 'view', 'create', 'update', 'register'),
+                'actions' => array('index', 'view', 'create', 'update', 'register', 'list'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -142,12 +142,34 @@ class PracticeSessionHistoryController extends Controller {
     }
 
     /**
-     * Lists all models.
+     * Redirects to correct action, depending on logged user type
      */
     public function actionIndex() {
-        $dataProvider = new CActiveDataProvider('PracticeSessionHistory');
-        $this->render('index', array(
-            'dataProvider' => $dataProvider,
+        $loggedUser = User::getLoggedInUser();
+        if ($loggedUser->isCoach()) {
+            $this->redirect('register');
+        }
+        $athleteID = $loggedUser->isSponsor() ? $loggedUser->sponsoredAthletes[0]->primaryKey : $loggedUser->primaryKey;
+        $this->redirect(array('list', 'athleteID' => $athleteID));
+    }
+
+    /**
+     * Lists all models.
+     * @param $athleteID
+     */
+    public function actionList($athleteID) {
+        //$dataProvider = new CActiveDataProvider('PracticeSessionHistoryHasAthlete');
+        //$criteria = new CDbCriteria();
+        //$criteria->compare('athleteID', $athleteID);
+        //$dataProvider->setCriteria($criteria);
+        $model = new PracticeSessionHistoryHasAthlete('search');
+        if (!empty($_GET['PracticeSessionHistoryHasAthlete'])) {
+            $model->attributes = $_GET['PracticeSessionHistoryHasAthlete'];
+        }
+        $model->athleteID = $athleteID;
+        //$model->clubName = "diog";
+        $this->render('list', array(
+            'model' => $model,
         ));
     }
 
