@@ -16,8 +16,7 @@
  */
 class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
 
-    public $clubID;
-    public $date;
+    public $showCancelled;
 
     /**
      * @return string the associated database table name
@@ -37,7 +36,7 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
             array('practiceSessionHistoryID, athleteID, attendanceTypeID', 'numerical', 'integerOnly' => true),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('practiceSessionHistoryID, athleteID, attendanceTypeID, clubID, date', 'safe', 'on' => 'search'),
+            array('practiceSessionHistoryID, athleteID, attendanceTypeID, showCancelled', 'safe', 'on' => 'search'),
         );
     }
 
@@ -63,8 +62,6 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
             'practiceSessionHistoryID' => 'Practice Session History',
             'athleteID' => 'Athlete',
             'attendanceTypeID' => 'Attendance Type',
-            'clubID' => Club::model()->getAttributeLabel('clubID'),
-            'date' => 'Ano-Mês',
         );
     }
 
@@ -90,13 +87,19 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         $criteria->compare('practiceSessionHistoryID', $this->practiceSessionHistoryID);
         $criteria->compare('athleteID', $this->athleteID);
         $criteria->compare('attendanceTypeID', $this->attendanceTypeID);
-        $criteria->compare('club.clubID', $this->clubID);
-        $criteria->compare('practiceSessionHistory.date', $this->date, true);
+        if (isset($this->practiceSessionHistory)) {
+            $criteria->compare('practiceSessionHistory.clubID', $this->practiceSessionHistory->clubID);
+            $criteria->compare('practiceSessionHistory.date', $this->practiceSessionHistory->date, true);
+        }
+        if ($this->showCancelled == 0) {
+                $criteria->compare('practiceSessionHistory.cancelled', 0);
+        }
 
         $criteria->order = "practiceSessionHistory.date DESC";
 
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
+            'pagination' => false,
         ));
     }
 

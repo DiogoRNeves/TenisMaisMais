@@ -125,6 +125,8 @@ class CHelper extends CApplicationComponent {
         ));
     }
 
+
+
     public static function timepickerRow($form, $model, $attribute) {
         return $form->timepickerRow(
                         $model, $attribute, array(
@@ -239,6 +241,16 @@ class CHelper extends CApplicationComponent {
 
     public static function timeIntervalString($startTime, $endTime, $format = self::DEFAULT_TIME_FORMAT) {
         return self::timeToString($startTime, $format) . " - " . self::timeToString($endTime, $format);
+    }
+
+    public static function getPlural($description)
+    {
+        $words = explode(" ", $description);
+        $result = $words[0] . "s ";
+        for ($i = 1; $i < count($words); $i++) {
+            $result .= $words[$i] . " ";
+        }
+        return trim($result);
     }
 
 }

@@ -158,16 +158,17 @@ class PracticeSessionHistoryController extends Controller {
      * @param $athleteID
      */
     public function actionList($athleteID) {
-        //$dataProvider = new CActiveDataProvider('PracticeSessionHistoryHasAthlete');
-        //$criteria = new CDbCriteria();
-        //$criteria->compare('athleteID', $athleteID);
-        //$dataProvider->setCriteria($criteria);
         $model = new PracticeSessionHistoryHasAthlete('search');
-        if (!empty($_GET['PracticeSessionHistoryHasAthlete'])) {
+        $model->practiceSessionHistory = new PracticeSessionHistory('search');
+        $model->showCancelled = false;
+        $model->practiceSessionHistory->date = (new DateTime())->format('Y-m');
+        if (isset($_GET['PracticeSessionHistoryHasAthlete'])) {
             $model->attributes = $_GET['PracticeSessionHistoryHasAthlete'];
         }
+        if (isset($_GET['PracticeSessionHistory'])) {
+            $model->practiceSessionHistory->attributes = $_GET['PracticeSessionHistory'];
+        }
         $model->athleteID = $athleteID;
-        //$model->clubName = "diog";
         $this->render('list', array(
             'model' => $model,
         ));

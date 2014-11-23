@@ -422,6 +422,13 @@ class UserController extends Controller {
                     'url' => array('practiceSession/index', 'userID' => $user->userID)
                 ),
                 'detailedView' => true,
+                'selectedUserTypesAllowed' => array($athlete),
+                'loggedInUserTypesAllowed' => array($coach, $athlete, $sponsor)),
+            'viewPracticeAttendance' => array(
+                'option' => array('label' => 'Ver Assiduidade',
+                    'url' => array('practiceSessionHistory/list', 'athleteID' => $user->userID)
+                ),
+                'detailedView' => true,
                 'selectedUserTypesAllowed' => array($coach, $athlete),
                 'loggedInUserTypesAllowed' => array($coach, $athlete, $sponsor)),
         );

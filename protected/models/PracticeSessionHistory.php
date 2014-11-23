@@ -133,4 +133,13 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
         return CHelper::timeIntervalString($this->startTime, $this->endTime);
     }
 
+    public function getWeekdayString() {
+        return Yii::app()->getLocale()->getWeekDayName(CHelper::getDayOfWeek($this->date));
+    }
+
+    public function getDateString() {
+        $format = Yii::app()->getLocale()->getDateFormat('long');
+        return Yii::app()->getLocale()->getDateFormatter()->format($format, $this->date);
+    }
+
 }

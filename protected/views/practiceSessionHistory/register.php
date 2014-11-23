@@ -4,10 +4,7 @@ $this->breadcrumbs=array(
 	'Registar',
 );
 
-	$this->menu=array(
-	array('label'=>'List PracticeSessionHistory','url'=>array('index')),
-	array('label'=>'Manage PracticeSessionHistory','url'=>array('admin')),
-	);
+//$this->menu=$this->getMenuOptions();
 	?>
 
 	<h1>Registar assiduidade aos treinos</h1>

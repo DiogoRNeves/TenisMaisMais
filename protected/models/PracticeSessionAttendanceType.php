@@ -44,6 +44,16 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
         return self::model()->find($criteria);
     }
 
+    public static function getTypesAndLabels()
+    {
+        $result = array();
+        /** @var PracticeSessionAttendanceType $type */
+        foreach (self::model()->findAll() as $type) {
+            $result[ucfirst($type->description)] = array('label' => ucwords(CHelper::getPlural($type->description)));
+        }
+        return $result;
+    }
+
     /**
 	 * @return string the associated database table name
 	 */
