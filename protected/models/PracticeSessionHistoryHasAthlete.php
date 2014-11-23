@@ -93,6 +93,8 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         $criteria->compare('club.clubID', $this->clubID);
         $criteria->compare('practiceSessionHistory.date', $this->date, true);
 
+        $criteria->order = "practiceSessionHistory.date DESC";
+
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));
