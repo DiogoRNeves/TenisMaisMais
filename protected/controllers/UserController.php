@@ -23,14 +23,14 @@ class UserController extends Controller {
      * @return array access control rules
      */
     public function accessRules() {
-        $user = User::model()->findByPk(Yii::app()->user->id);
+        $user = User::getLoggedInUser();
         return array(
             array('allow', //allow guest users to activate an account
                 'actions' => array('activate'),
                 'users' => array('Guest')
             ),
             array('allow', // allow system admin to perform all actions
-                'actions' => array('admin', 'index', 'view', 'update', 'create'),
+                'actions' => array('admin', 'index', 'view', 'update', 'create', 'removeFromClub'),
                 'users' => array('@'),
                 'expression' => array($user, 'isSystemAdmin'),
             ),
@@ -57,7 +57,7 @@ class UserController extends Controller {
             array('allow', // allow authenticated user to perform actions
                 'actions' => array('removeFromClub'),
                 'users' => array('@'),
-                'expression' => array($user, 'isClubAdmin'),
+                'expression' => array($user, 'canRemoveUser'),
             ),
             array('deny', // deny all users
                 'users' => array('*'),
@@ -332,6 +332,11 @@ class UserController extends Controller {
         $user = User::model()->findByPk($userID);
         /** @var Club $club */
         $club = Club::model()->findByPk($clubID);
+        $loggedInUser = User::getLoggedInUser();
+        if (!($loggedInUser->isCoachOf($user) || $loggedInUser->isClubAdminOf($club))) {
+            throw new CHttpException(303, 'Apenas treinadores de ' . $user->name . ' ou administradores de ' . $club->name .
+                ' podem efetuar esta ação.');
+        }
         if (isset($_POST['confirmedDeletion']) && $_POST['confirmedDeletion']) {
             $model = ClubHasUser::model()->findByAttributes(array(
                 'userID' => $userID,

@@ -23,14 +23,26 @@ class PracticeSessionHistoryController extends Controller {
      * @return array access control rules
      */
     public function accessRules() {
+        $user = User::getLoggedInUser();
         return array(
-            array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('index', 'view', 'create', 'update', 'register', 'list'),
+            array('allow',
+                'actions' => array('index'), //all logged in users can go to index. index only redirects according to usertype
                 'users' => array('@'),
             ),
-            array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('admin', 'delete'),
-                'users' => array('admin'),
+            array('allow', // allow admin to all actions
+                'actions' => array('register', 'list', 'admin'),
+                'users' => array('@'),
+                'expression' => array($user, 'isSystemAdmin'),
+            ),
+            array('allow',
+                'actions' => array('list'),
+                'users' => array('@'),
+                'expression' => array($user, 'canListAttendance'),
+            ),
+            array('allow',
+                'actions' => array('register'),
+                'users' => array('@'),
+                'expression' => array($user, 'canRegisterAttendance'),
             ),
             array('deny', // deny all users
                 'users' => array('*'),

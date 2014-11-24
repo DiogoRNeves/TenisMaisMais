@@ -11,7 +11,7 @@ $this->breadcrumbs=array(
 
 ?>
 
-
+<h1>Assiduidade de <?php echo $model->athlete->name; ?></h1>
 
 <?php
 /** @var TbActiveForm $form */

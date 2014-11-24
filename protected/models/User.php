@@ -568,13 +568,16 @@ class User extends CExtendedActiveRecord {
     }
 
     public function getSuperglobalUserID() {
-        if (isset($_GET['userID'])) {
-            return $_GET['userID'];
+        if (isset($_REQUEST['userID'])) {
+            return $_REQUEST['userID'];
         }
-        if (isset($_GET['id'])) {
-            return $_GET['id'];
+        if (isset($_REQUEST['id'])) {
+            return $_REQUEST['id'];
         }
-        return false;
+        if (isset($_REQUEST['athleteID'])) {
+            return $_REQUEST['athleteID'];
+        }
+        throw new CException('no userID found in REQUEST');
     }
 
     /**
@@ -872,6 +875,20 @@ class User extends CExtendedActiveRecord {
     public function getAthleteClubsOptions()
     {
         return CHTML::listData($this->athleteClubs, 'clubID', 'name');
+    }
+
+    public function canRemoveUser() {
+        return $this->isCoach() || $this->isClubAdmin();
+    }
+
+    public function canRegisterAttendance() {
+        return $this->isCoach() || $this->isClubAdmin();
+    }
+
+    public function canListAttendance() {
+        /** @var User $targetUser */
+        $targetUser = User::model()->findByPk(User::getSuperglobalUserID());
+        return $this->isUser($targetUser) || $this->isSponsorOf($targetUser) || $this->isCoachAt($targetUser->clubs) || $this->isClubAdminOf($targetUser->clubs);
     }
 
 }
