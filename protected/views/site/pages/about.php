@@ -73,7 +73,7 @@ $this->breadcrumbs = array(
                     <li>
                         Sistema de controlo de assiduidade aos treinos e de contabilização 
                         de aulas de compensação
-                        <span class="label label-important">Aguarda desenvolvimento</span>
+                        <span class="label label-success">OK</span>
                     </li>
                     <li>
                         Registo competitivo dos atletas (por torneio e por jogo)
