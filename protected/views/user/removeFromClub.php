@@ -8,8 +8,6 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php echo print_r($model->attributes) . 'deleted => ' . $deleted; ?>
-
 <?php /** @var TbActiveForm $form */
 $form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
     'method' => 'post',
