@@ -110,12 +110,13 @@ class PracticeSessionHistoryController extends Controller {
      */
     public function actionRegister() {
         $model = new PracticeSessionHistoryRegistryForm;
-
-    // Uncomment the following line if AJAX validation is needed
-    $this->performAjaxValidation($model);
+		
+		// Uncomment the following line if AJAX validation is needed
+		$this->performAjaxValidation($model);
 
         if (isset($_GET['PracticeSessionHistoryRegistryForm'])) {
             $model->attributes = $_GET['PracticeSessionHistoryRegistryForm'];
+			$model->setDefaults();
             if (!$model->autoSubmit) {
                 if ($model->validate() && $model->save(false)) {
                     Yii::app()->user->setFlash('savedPracticeSessionAttendance',
@@ -127,24 +128,10 @@ class PracticeSessionHistoryController extends Controller {
             } elseif ($model->isPracticeSessionAllowed()) {
                 $model->loadHistoryFromDB();
             }
-        }
-        if (!isset($model->date)) {
-            $model->date = CHelper::getTodayDate();
-        }
-        $loggedInUser = User::getLoggedInUser();
-        if (!isset($model->clubID)) {
-            if (count($loggedInUser->clubs) == 1) {
-                $model->clubID = $loggedInUser->clubs[0]->primaryKey;
-            }
-        }
-        if (!isset($model->coachID)) {
-            $model->coachID = $loggedInUser->primaryKey;
-        }
-        if (!isset($model->practiceSessionID)) {
-            $model->practiceSessionID = PracticeSession::getCurrentPracticeSessionID(
-                Club::model()->findByPk($model->clubID), $loggedInUser
-            );
-        }
+        } else {
+			$model->setDefaults();
+			$model->loadHistoryFromDB();
+		}
         $this->render('register', array(
             'model' => $model,
         ));

@@ -248,13 +248,15 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     {
         /** @var PracticeSession $practiceSession */
         $practiceSession = $this->getPracticeSession();
-        $this->practiceSessionHistory = PracticeSessionHistory::model()->findByAttributes(array(
-            'date' => $this->date,
-            'clubID' => $this->clubID,
-            'coachID' => $this->coachID,
-            'startTime' => $practiceSession->startTime,
-            'endTime' => $practiceSession->endTime,
-        ));
+        if (isset($practiceSession)) {
+            $this->practiceSessionHistory = PracticeSessionHistory::model()->findByAttributes(array(
+                'date' => $this->date,
+                'clubID' => $this->clubID,
+                'coachID' => $this->coachID,
+                'startTime' => $practiceSession->startTime,
+                'endTime' => $practiceSession->endTime,
+            ));
+        }
     }
 
     private function getPracticeSession()
@@ -336,6 +338,25 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     {
         $this->getPracticeSessionHistory();
         return isset($this->practiceSessionHistory);
-    }
+    }	
+	
+	public function setDefaults() {
+        $today = CHelper::getTodayDate();
+        if (!isset($this->date)) {
+            $this->date = $today;
+        }
+        $loggedInUser = User::getLoggedInUser();
+        if (!isset($this->clubID)) {
+            $this->clubID = $loggedInUser->clubs[0]->primaryKey;
+        }
+        if (!isset($this->coachID)) {
+            $this->coachID = $loggedInUser->primaryKey;
+        }
+        if ((!isset($this->practiceSessionID) || $this->practiceSessionID == "") && $this->date === $today) {
+            $this->practiceSessionID = PracticeSession::getCurrentPracticeSessionID(
+                Club::model()->findByPk($this->clubID), $loggedInUser
+            );
+        }
+	}
 
 }

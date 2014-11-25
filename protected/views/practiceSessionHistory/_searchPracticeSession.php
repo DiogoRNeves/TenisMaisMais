@@ -85,15 +85,14 @@ echo $form->select2Row($model, 'coachID', array(
     ?>
 
     <?php if ($allowedPracticeSession): ?>
-        <?php
+	<?php
         $existsOnDb = $model->existsOnDb();
         $textToShow = ucfirst(($existsOnDb ? '' : 'Não ') . 'existe informação sobre assiduidade a este treino no sistema.');
         $alertType = $existsOnDb ? 'success' : 'info';
         ?>
-        <div class="alert alert-<?php echo $alertType; ?>">
+        <div class="alert alert-<?php echo $alertType; ?>" style="margin-top:20px">
             <?php echo $textToShow; ?>
         </div>
-
         <?php
         //PracticeCancelled
         echo $form->toggleButtonRow($model, 'cancelled', array(

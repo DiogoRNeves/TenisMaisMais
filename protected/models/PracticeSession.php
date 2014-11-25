@@ -366,8 +366,9 @@ class PracticeSession extends CExtendedActiveRecord {
 
     private function isGoingOn()
     {
-        $startTime = (new DateTime($this->startTime))->getTimestamp();
-        $endTime = (new DateTime($this->endTime))->getTimestamp();
+        $today = CHelper::getTodayDate();
+        $startTime = CHelper::newDateTime($today . " " . $this->startTime)->getTimestamp();
+        $endTime = CHelper::newDateTime($today . " " . $this->endTime)->getTimestamp();
         $currentTime = CHelper::getNow()->getTimestamp();
         return $startTime < $currentTime && $currentTime < $endTime;
     }

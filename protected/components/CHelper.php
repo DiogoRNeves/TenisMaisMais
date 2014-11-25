@@ -260,7 +260,16 @@ class CHelper extends CApplicationComponent {
 
     public static function getNow()
     {
-        return new DateTime(null, new DateTimeZone('Europe/London'));
+        return self::newDateTime();
+    }
+
+    public static function getTimeZone() {
+        return new DateTimeZone('Europe/London');
+    }
+
+    public static function newDateTime($dateTimeString = null)
+    {
+        return new DateTime($dateTimeString, self::getTimeZone());
     }
 
 }
