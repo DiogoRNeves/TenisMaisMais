@@ -29,6 +29,22 @@ class PracticeSession extends CExtendedActiveRecord {
     private $athletesToNotify = array();
 
     /**
+     * @param Club $club
+     * @param User $coach
+     * @return int
+     */
+    public static function getCurrentPracticeSessionID($club, $coach)    {
+        $today = CHelper::getTodayDate();
+        /** @var PracticeSession $practiceSession */
+        foreach ($club->getPracticeSessions($today, $coach) as $practiceSession) {
+            if ($practiceSession->isGoingOn()) {
+                return $practiceSession->primaryKey;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return string the associated database table name
      */
     public function tableName() {
@@ -346,6 +362,14 @@ class PracticeSession extends CExtendedActiveRecord {
 
     public function getListDataTextField() {
         return CHelper::timeIntervalString($this->startTime, $this->endTime);
+    }
+
+    private function isGoingOn()
+    {
+        $startTime = (new DateTime($this->startTime))->getTimestamp();
+        $endTime = (new DateTime($this->endTime))->getTimestamp();
+        $currentTime = CHelper::getNow()->getTimestamp();
+        return $startTime < $currentTime && $currentTime < $endTime;
     }
 
 }

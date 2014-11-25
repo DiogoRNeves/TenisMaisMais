@@ -253,4 +253,14 @@ class CHelper extends CApplicationComponent {
         return trim($result);
     }
 
+    public static function getTodayDate()
+    {
+        return self::getNow()->format('Y-m-d');
+    }
+
+    public static function getNow()
+    {
+        return new DateTime(null, new DateTimeZone('Europe/London'));
+    }
+
 }

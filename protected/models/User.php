@@ -22,8 +22,8 @@
  * @property ClubHasUser[] $clubHasUsers
  * @property CompetitiveResultHistory[] $competitiveLosses
  * @property CompetitiveResultHistory[] $competitiveVictories
- * @property MainCoach[] $mainCoaches
- * @property MainCoach[] $athletesCoached
+ * @property User[] $mainCoaches
+ * @property User[] $athletesCoached
  * @property PracticeSession[] $coachPracticeSessions
  * @property PracticeSession[] $athletePracticeSessions
  * @property PracticeSessionHistory[] $practiceSessionHistories
@@ -450,6 +450,7 @@ class User extends CExtendedActiveRecord {
      * @return User[]
      */
     public function getRelatedUsers($userType, array $filter = null) {
+        //TODO remove hardcoded strings and check this first if statement (i think it's useless)
         if ($userType == null) {
             $result = $this->getRelatedAthletes($filter);
         }

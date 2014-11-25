@@ -128,7 +128,23 @@ class PracticeSessionHistoryController extends Controller {
                 $model->loadHistoryFromDB();
             }
         }
-
+        if (!isset($model->date)) {
+            $model->date = CHelper::getTodayDate();
+        }
+        $loggedInUser = User::getLoggedInUser();
+        if (!isset($model->clubID)) {
+            if (count($loggedInUser->clubs) == 1) {
+                $model->clubID = $loggedInUser->clubs[0]->primaryKey;
+            }
+        }
+        if (!isset($model->coachID)) {
+            $model->coachID = $loggedInUser->primaryKey;
+        }
+        if (!isset($model->practiceSessionID)) {
+            $model->practiceSessionID = PracticeSession::getCurrentPracticeSessionID(
+                Club::model()->findByPk($model->clubID), $loggedInUser
+            );
+        }
         $this->render('register', array(
             'model' => $model,
         ));
