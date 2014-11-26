@@ -54,6 +54,11 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
         return $result;
     }
 
+    public static function getCompensation()
+    {
+        return self::getAttendanceType('presença de compensação');
+    }
+
     /**
 	 * @return string the associated database table name
 	 */

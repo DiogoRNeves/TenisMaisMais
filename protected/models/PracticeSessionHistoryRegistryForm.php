@@ -47,7 +47,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     public function caseCancelled($attribute) {
-        if ( $this->cancelled && count($this->athletesAttended) > 0) {
+        if ($this->cancelled && count($this->athletesAttended) > 0) {
             $this->addError($attribute, "No caso de aula cancelada, não podem haver atletas presentes");
             //move athletes to unjustified absence
             $this->athletesJustifiedUnnatendance = CHelper::mergeArrays(array(
@@ -306,14 +306,19 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     /**
-     * @param $athleteID
+     * @param int $athleteID
      * @throws CException
      * @return int
      */
     private function getAthleteSubmittedAttendanceTypeID($athleteID)
     {
         if (CHelper::inArray($athleteID, $this->athletesAttended)) {
-            return PracticeSessionAttendanceType::getAttended()->primaryKey;
+            /** @var PracticeSession $practiceSession */
+            $practiceSession = PracticeSession::model()->findByPk($this->practiceSessionID);
+            if ($practiceSession->hasAthlete($athleteID)) {
+                return PracticeSessionAttendanceType::getAttended()->primaryKey;
+            }
+            else return PracticeSessionAttendanceType::getCompensation()->primaryKey;
         }
         if (CHelper::inArray($athleteID, $this->athletesJustifiedUnnatendance)) {
             return PracticeSessionAttendanceType::getJustifiedUnnatended()->primaryKey;

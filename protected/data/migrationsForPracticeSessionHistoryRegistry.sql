@@ -7,14 +7,15 @@ ALTER TABLE mytennisapp.PracticeSessionHistory ADD cancelled BOOL DEFAULT 0 NOT 
 #criar tabela dos tipos de presença
 CREATE TABLE mytennisapp.PracticeSessionAttendanceType
 (
-  attendanceTypeID int PRIMARY KEY NOT NULL,
+  attendanceTypeID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   description VARCHAR(45) NOT NULL UNIQUE
 );
 
 #inserts for table jut created
-INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (1,'presença');
-INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (2,'ausência com compensação');
-INSERT INTO mytennisapp.PracticeSessionAttendanceType (attendanceTypeID,description) VALUES (3,'ausência sem compensação');
+INSERT INTO mytennisapp.PracticeSessionAttendanceType (description) VALUES ('presença');
+INSERT INTO mytennisapp.PracticeSessionAttendanceType (description) VALUES ('ausência com compensação');
+INSERT INTO mytennisapp.PracticeSessionAttendanceType (description) VALUES ('ausência sem compensação');
+INSERT INTO mytennisapp.PracticeSessionAttendanceType (description) VALUES ('presença de compensação');
 
 #mudar o nome do campo na tabela que vai receber o ID
 ALTER TABLE mytennisapp.PracticeSessionHistoryHasAthlete CHANGE attendanceType attendanceTypeID INT;

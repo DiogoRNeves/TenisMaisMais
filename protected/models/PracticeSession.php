@@ -155,6 +155,16 @@ class PracticeSession extends CExtendedActiveRecord {
         return $coach->isUser($this->coach);
     }
 
+    public function hasAthlete($athleteID)
+    {
+        foreach ($this->athletes as $athlete) {
+            if ($athlete->userID === $athleteID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Updates the formAthlete value to match the athletes. This allows the form to load properly.
      */
