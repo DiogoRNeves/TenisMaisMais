@@ -75,7 +75,6 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
     }
 
     public function noAthleteRepetitions($attribute) {
-        //TODO write method
         $attendanceCount = array();
         $athletesWithMultipleAttendance = array();
         foreach ($this->getAthletesWithSubmittedAttendance() as $athleteID) {
@@ -318,7 +317,7 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             if ($practiceSession->hasAthlete($athleteID)) {
                 return PracticeSessionAttendanceType::getAttended()->primaryKey;
             }
-            else return PracticeSessionAttendanceType::getCompensation()->primaryKey;
+            return PracticeSessionAttendanceType::getCompensation()->primaryKey;
         }
         if (CHelper::inArray($athleteID, $this->athletesJustifiedUnnatendance)) {
             return PracticeSessionAttendanceType::getJustifiedUnnatended()->primaryKey;
