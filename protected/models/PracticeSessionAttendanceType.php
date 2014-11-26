@@ -148,4 +148,13 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
     public function getListDataTextField() {
         return ucfirst($this->description);
     }
+
+    /**
+     * @param PracticeSessionAttendanceType $attendanceType
+     * @return bool
+     */
+    public function isAttendanceType($attendanceType)
+    {
+        return $this->primaryKey === $attendanceType->primaryKey;
+    }
 }

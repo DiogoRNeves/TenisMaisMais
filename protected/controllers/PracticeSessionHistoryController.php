@@ -183,6 +183,11 @@ class PracticeSessionHistoryController extends Controller {
         if (isset($_GET['PracticeSessionHistory'])) {
             $model->practiceSessionHistory->attributes = $_GET['PracticeSessionHistory'];
         }
+        if ($model->practiceSessionHistory->clubID === null) {
+            /** @var User $athlete */
+            $athlete = User::model()->findByPk($athleteID);
+            $model->practiceSessionHistory->clubID = $athlete->athleteClubs[0]->primaryKey;
+        }
         $model->athleteID = $athleteID;
         $this->render('list', array(
             'model' => $model,

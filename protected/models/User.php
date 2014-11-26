@@ -892,4 +892,28 @@ class User extends CExtendedActiveRecord {
         return $this->isUser($targetUser) || $this->isSponsorOf($targetUser) || $this->isCoachAt($targetUser->clubs) || $this->isClubAdminOf($targetUser->clubs);
     }
 
+    /**
+     * @param Club $club
+     * @return int
+     */
+    public function getPracticeBalance($club)
+    {
+        /** @var PracticeSessionHistoryHasAthlete $practiceSessionHistoryHasAthlete */
+        //TODO make search
+        $practiceSessionHistoryHasAthlete = new PracticeSessionHistoryHasAthlete();
+        $practiceSessionHistoryHasAthlete->practiceSessionHistory = new PracticeSessionHistory();
+        $practiceSessionHistoryHasAthlete->practiceSessionHistory->clubID = $club->primaryKey;
+        $practiceSessionHistoryHasAthlete->athleteID = $this->userID;
+        $balance = 0;
+        /** @var PracticeSessionHistoryHasAthlete $athleteAttendance */
+        foreach ($practiceSessionHistoryHasAthlete->search()->getData() as $athleteAttendance) {
+            if (PracticeSessionAttendanceType::getCompensation()->isAttendanceType($athleteAttendance->attendanceType)) {
+                $balance++;
+            } else if (PracticeSessionAttendanceType::getJustifiedUnnatended()->isAttendanceType($athleteAttendance->attendanceType)) {
+                $balance--;
+            }
+        }
+        return $balance;
+    }
+
 }

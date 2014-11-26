@@ -113,4 +113,20 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         return parent::model($className);
     }
 
+    public function getAthletePracticeBalance()
+    {
+        $club = $this->practiceSessionHistory->club !== null ? $this->practiceSessionHistory->club :
+            Club::model()->findByPk($this->practiceSessionHistory->clubID);
+        return $this->athlete->getPracticeBalance($club);
+    }
+
+    public function getAthletePracticeBalanceString()    {
+
+        $attendanceBalance = $this->getAthletePracticeBalance();
+        if ($attendanceBalance >= 0) {
+            return "atleta sem treinos para compensar.";
+        }
+        return "atleta tem " . abs($attendanceBalance) . " treino(s) para compensar.";
+    }
+
 }

@@ -234,7 +234,10 @@ class PracticeSessionHistoryRegistryForm extends CFormModel {
             $athleteIDs[$key] = CHelper::getArrayOfAttribute($athletes, $userPK);
         }
         //set the properties as needed
-        $this->athletesAttended = $athleteIDs[PracticeSessionAttendanceType::getAttended()->primaryKey];
+        $this->athletesAttended = CHelper::mergeArrays(array(
+            $athleteIDs[PracticeSessionAttendanceType::getAttended()->primaryKey],
+            $athleteIDs[PracticeSessionAttendanceType::getCompensation()->primaryKey])
+        );
         $this->athletesJustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getJustifiedUnnatended()->primaryKey];
         $this->athletesInjustifiedUnnatendance = $athleteIDs[PracticeSessionAttendanceType::getInjustifiedUnnatended()->primaryKey];
         return true;

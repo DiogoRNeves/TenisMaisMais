@@ -9,6 +9,8 @@ $this->breadcrumbs=array(
 
 //$this->menu=$this->getMenuOptions();
 
+$balanceString = $model->getAthletePracticeBalanceString();
+
 ?>
 
 <h1>Assiduidade de <?php echo $model->athlete->name; ?></h1>
@@ -48,7 +50,7 @@ $gridViewColumns =  array(
     ),
 );
 /** @var User $athlete */
-$athlete = User::model()->findByPk($model->athleteID);
+$athlete = $model->athlete;
 if (count($athlete->athleteClubs)>1) {
     echo $form->select2Row($model->practiceSessionHistory, 'clubID',  array(
         'data' => $athlete->getAthleteClubsOptions(),
@@ -82,7 +84,7 @@ echo $form->toggleButtonRow($model, 'showCancelled',
     ));
 ?>
 
-<?php /** @var PracticeSessionHistoryRegistryForm $model */
+<?php
 echo $form->datePickerRow($model->practiceSessionHistory, 'date', array(
         'options' => array(
             'format' => "yyyy-mm",
@@ -107,10 +109,14 @@ echo $form->datePickerRow($model->practiceSessionHistory, 'date', array(
 
 <?php $this->endWidget(); ?>
 
+Saldo de treinos: <?php echo $balanceString; ?>
+
 <?php
 $this->widget('bootstrap.widgets.TbExtendedGridView', array(
     'id' => 'ajaxGridView',
     'responsiveTable' => true,
+    'fixedHeader' => true,
+    'headerOffset' => 40,
     //'template' => "{extendedSummary}\n{items}\n{summary}",
     'dataProvider' => $model->search(),
     'type' => 'striped',
@@ -128,8 +134,8 @@ $this->widget('bootstrap.widgets.TbExtendedGridView', array(
                     'lineWidth' => 8 ,
                     'lineCap' => 'square'
                 ),
-            )
-        )
+            ),
+        ),
     ),
     'extendedSummaryOptions' => array(
         'class' => 'well pull-right',
