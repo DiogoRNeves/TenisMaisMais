@@ -312,14 +312,14 @@ class UserController extends Controller {
 
         /** @var User $user */
         $user = $models['user'];
+        if ($user->isActivated()) {
+            throw new CHttpException(403, "O utilizador " . $user->name . " já foi ativado.");
+        }
+        if (!$user->isActivationHash($activationHash)) {
+            throw new CHttpException(403, "Link incorreto para o utilizador " . $user->name . ".");
+        }
         if ($user->canBeActivated($activationHash)) {
             $this->renderUpdate($models);
-        }
-        if ($user->isActivated()) {
-            throw new CHttpException(403, "O utilizador " . $models['user']->name . " já foi ativado.");
-        }
-        if ($user->isActivationHash($activationHash)) {
-            throw new CHttpException(403, "Link incorreto para o utilizador " . $models['user']->name . ".");
         }
     }
 
