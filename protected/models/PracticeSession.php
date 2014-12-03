@@ -143,7 +143,7 @@ class PracticeSession extends CExtendedActiveRecord {
 
     public function isHappen($date)
     {
-        return CHelper::getDayOfWeek($date) == $this->dayOfWeek;
+        return $this->activePracticeSession && CHelper::getDayOfWeek($date) == $this->dayOfWeek;
     }
 
     /**
