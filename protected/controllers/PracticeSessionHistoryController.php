@@ -169,14 +169,15 @@ class PracticeSessionHistoryController extends Controller {
     }
 
     /**
-     * Lists all models.
+     * Lists practice attendance for a given athlete.
      * @param $athleteID
      */
     public function actionList($athleteID) {
         $model = new PracticeSessionHistoryHasAthlete('search');
         $model->practiceSessionHistory = new PracticeSessionHistory('search');
         $model->showCancelled = false;
-        $model->practiceSessionHistory->date = (new DateTime())->format('Y-m');
+        /** @var User $athlete */
+        $athlete = User::model()->findByPk($athleteID);
         if (isset($_GET['PracticeSessionHistoryHasAthlete'])) {
             $model->attributes = $_GET['PracticeSessionHistoryHasAthlete'];
         }
@@ -184,9 +185,14 @@ class PracticeSessionHistoryController extends Controller {
             $model->practiceSessionHistory->attributes = $_GET['PracticeSessionHistory'];
         }
         if ($model->practiceSessionHistory->clubID === null) {
-            /** @var User $athlete */
-            $athlete = User::model()->findByPk($athleteID);
-            $model->practiceSessionHistory->clubID = $athlete->athleteClubs[0]->primaryKey;
+            $club = $athlete->isAthlete() ? $athlete->athleteClubs[0] :
+                ($athlete->isCoach() ? $athlete->coachClubs[0] : $athlete->clubs[0]);
+            $model->practiceSessionHistory->clubID = $club->primaryKey;
+        }
+        if ($model->practiceSessionHistory->date === null) {
+            $mostRecentPracticeSession = $athlete->getMostRecentPracticeSessionHistory();
+            $mostRecentPracticeSessionDateTime = new DateTime($mostRecentPracticeSession ? $mostRecentPracticeSession->date : null);
+            $model->practiceSessionHistory->date = $mostRecentPracticeSessionDateTime->format('Y-m');
         }
         $model->athleteID = $athleteID;
         $this->render('list', array(

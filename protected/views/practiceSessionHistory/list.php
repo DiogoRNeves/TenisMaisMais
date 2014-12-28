@@ -36,10 +36,12 @@ Yii::app()->clientScript->registerScript('doAjax', $javascript);
 $gridViewColumns =  array(
     array(
         'header' => 'Data',
+        'name' => 'practiceSessionHistory.date',
         'value' => '$data->practiceSessionHistory->getDateString()',
     ),
     array(
         'header' => 'Dia da Semana',
+        'name' => 'practiceSessionHistory.weekDay',
         'value' => '$data->practiceSessionHistory->getWeekdayString()',
     ),
     'practiceSessionHistory.timeString',
@@ -66,9 +68,16 @@ if (count($athlete->athleteClubs)>1) {
     ));
     $gridViewColumns[] = array(
             'header' => 'Clube',
-            'value' => '$data->club->name',
+            'name' => 'club.name',
+            'value' => '$data->practiceSessionHistory->club->name',
         );
 }
+
+$gridViewColumns[] = array(
+        'header' => 'Treinador',
+        'name' => 'coach.name',
+        'value' => '$data->practiceSessionHistory->coach->name',
+    );
 ?>
 
 <?php
@@ -112,6 +121,7 @@ echo $form->datePickerRow($model->practiceSessionHistory, 'date', array(
 Saldo de treinos: <?php echo $balanceString; ?>
 
 <?php
+
 $this->widget('bootstrap.widgets.TbExtendedGridView', array(
     'id' => 'ajaxGridView',
     'responsiveTable' => true,
@@ -125,21 +135,19 @@ $this->widget('bootstrap.widgets.TbExtendedGridView', array(
         'title' => 'Resumo de assiduidade',
         'columns' => array(
             'attendanceType.listDataTextField' => array(
-                'label'=>'Tipo de assiduidade',
+                'label'=>'Assiduidade',
                 'types' => PracticeSessionAttendanceType::getTypesAndLabels(),
-                'class'=>'TbPercentOfTypeEasyPieOperation',
+                'class'=>'TbPercentOfTypeGooglePieOperation',
                 'chartOptions' => array(
-                    'barColor' => '#333',
-                    'trackColor' => '#999',
-                    'lineWidth' => 8 ,
-                    'lineCap' => 'square'
+                    'title' => 'Assiduidade',
+                    'is3D' => true,
                 ),
             ),
         ),
     ),
     'extendedSummaryOptions' => array(
         'class' => 'well pull-right',
-    //    'style' => 'width:300px'
+        'style' => 'width:420px'
     ),
 ));
 ?>

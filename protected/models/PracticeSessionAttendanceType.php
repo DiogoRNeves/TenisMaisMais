@@ -49,7 +49,7 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
         $result = array();
         /** @var PracticeSessionAttendanceType $type */
         foreach (self::model()->findAll() as $type) {
-            $result[ucfirst($type->description)] = array('label' => ucwords(CHelper::getPlural($type->description)));
+            $result[$type->getListDataTextField()] = array('label' => $type->getChartLabel());
         }
         return $result;
     }
@@ -156,5 +156,10 @@ class PracticeSessionAttendanceType extends CExtendedActiveRecord
     public function isAttendanceType($attendanceType)
     {
         return $this->primaryKey === $attendanceType->primaryKey;
+    }
+
+    private function getChartLabel()
+    {
+        return ucwords(CHelper::getPlural($this->description));
     }
 }

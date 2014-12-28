@@ -274,6 +274,7 @@ class Club extends CExtendedActiveRecord {
     public function getPracticeSessions($date = null, $coach = null)
     {
         if (CHelper::isNullOrEmptyString(array($date, $coach))) {
+            //TODO shouldn't this return null here?
             return $this->practiceSessions;
         }
         $results = array();

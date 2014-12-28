@@ -916,4 +916,15 @@ class User extends CExtendedActiveRecord {
         return $balance;
     }
 
+    /**
+     * @return PracticeSessionHistory
+     */
+    public function getMostRecentPracticeSessionHistory() {
+        $practiceSessionHistoryHasAthlete = new PracticeSessionHistoryHasAthlete();
+        $practiceSessionHistoryHasAthlete->athleteID = $this->userID;
+        /** @var PracticeSessionHistoryHasAthlete[] $data */
+        $data = $practiceSessionHistoryHasAthlete->search()->getData();
+        return empty($data) ? false : $data[0]->practiceSessionHistory;
+    }
+
 }

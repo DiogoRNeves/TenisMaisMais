@@ -49,8 +49,11 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
         return array(
             'attendanceType' => array(self::BELONGS_TO, 'PracticeSessionAttendanceType', 'attendanceTypeID'),
             'athlete'  => array(self::BELONGS_TO, 'User', 'athleteID'),
-            'practiceSessionHistory' => array(self::BELONGS_TO, 'PracticeSessionHistory', 'practiceSessionHistoryID'),
-            'club' => array(self::BELONGS_TO, 'Club', array('clubID' => 'clubID'), 'through' => 'practiceSessionHistory'),
+            //'practiceSessionHistory' => array(self::BELONGS_TO, 'PracticeSessionHistory', 'practiceSessionHistoryID'),
+            //'club' => array(self::BELONGS_TO, 'Club', array('clubID' => 'clubID'), 'through' => 'practiceSessionHistory'),
+            //'coach' => array(self::BELONGS_TO, 'User', array('coachID' => 'userID'), 'through' => 'practiceSessionHistory'),
+            'practiceSessionHistory' => array(self::BELONGS_TO, 'PracticeSessionHistory', 'practiceSessionHistoryID',
+                'with' => array('club', 'coach')),
         );
     }
 
@@ -78,11 +81,10 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
      * based on the search/filter conditions.
      */
     public function search() {
-        // @todo Please modify the following code to remove attributes that should not be searched.
 
         $criteria = new CDbCriteria;
 
-        $criteria->with = array('practiceSessionHistory', 'club', 'attendanceType', 'athlete');
+        $criteria->with = array('practiceSessionHistory', 'attendanceType', 'athlete');
 
         $criteria->compare('practiceSessionHistoryID', $this->practiceSessionHistoryID);
         $criteria->compare('athleteID', $this->athleteID);
@@ -95,11 +97,26 @@ class PracticeSessionHistoryHasAthlete extends CExtendedActiveRecord {
                 $criteria->compare('practiceSessionHistory.cancelled', 0);
         }
 
-        $criteria->order = "practiceSessionHistory.date DESC";
+        //$criteria->order = "practiceSessionHistory.date DESC";
+
+        $sort = new CSort(__CLASS__);
+        $sort->defaultOrder = array("practiceSessionHistory.date" => CSort::SORT_DESC);
+        $sort->multiSort = true;
+        $sort->attributes = array(
+            'practiceSessionHistory.date',
+            //this is a computed field, not in DB table so must do it later
+            //'practiceSessionHistory.weekDay',
+            'practiceSessionHistory.cancelled',
+            'coach.name',
+            'club.name',
+            'attendanceType.listDataTextField' => 'attendanceType.description',
+        );
+        //$sort->attributes = array('*');
 
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
             'pagination' => false,
+            'sort' => $sort,
         ));
     }
 

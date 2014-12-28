@@ -1223,7 +1223,8 @@ class TbPercentOfTypeGooglePieOperation extends TbPercentOfTypeOperation
 
 			$this->data[] = $this->getTotal() ? array(
 				$type['label'],
-				(float)number_format(($type['value'] / $this->getTotal()) * 100, 1)
+				//(float)number_format(($type['value'] / $this->getTotal()) * 100, 1)
+                $type['value']
 			) : 0;
 		}
 		$data = CJavaScript::jsonEncode($this->data);
