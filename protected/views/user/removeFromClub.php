@@ -9,7 +9,7 @@ $this->breadcrumbs = array(
 ?>
 
 <?php /** @var TbActiveForm $form */
-$form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
+$form = $this->beginWidget('booster.widgets.TbActiveForm',array(
     'method' => 'post',
     'type' => 'horizontal',
 )); ?>
@@ -27,7 +27,7 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 <?php echo CHtml::checkBox('confirmedDeletion', true, array('style' => 'display: none')); ?>
 
 <?php
-$form->widget('bootstrap.widgets.TbButton', array(
+$form->widget('booster.widgets.TbButton', array(
     'buttonType' => 'submit',
     'type' => 'primary',
     'label' => 'Confirmar',

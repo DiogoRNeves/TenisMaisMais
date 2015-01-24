@@ -5,7 +5,7 @@
 ?>
 
 <?php
-$form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+$form = $this->beginWidget('booster.widgets.TbActiveForm', array(
     'id' => 'practice-session-form',
     'type' => 'horizontal',
     'action' => $this->createUrl('practiceSession/assync'),
@@ -22,7 +22,7 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 <?php echo $form->errorSummary($model); ?>
 
 <div style="display: none">
-    <?php echo $form->textFieldRow($model, 'practiceSessionID'); ?>
+    <?php echo $form->textFieldGroup($model, 'practiceSessionID'); ?>
     <?php echo CHelper::select2Row($form, $model, 'coachID', $model->club->getCoachesListData()); ?>
 </div>
 
@@ -30,13 +30,13 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 
 <?php echo CHelper::select2Row($form, $model, 'groupLevel', PlayerLevel::model()->getListData()); ?>
 
-<?php echo $form->textFieldRow($model, 'startTime'); ?>    
+<?php echo $form->textFieldGroup($model, 'startTime'); ?>
 
-<?php echo $form->textFieldRow($model, 'endTime'); ?>
+<?php echo $form->textFieldGroup($model, 'endTime'); ?>
 
 <div class="well" style="display: none">
-    <?php echo $form->textFieldRow($model, 'dayOfWeek'); ?>
-    <?php echo $form->textFieldRow($model, 'clubID', array('class' => 'ignoreField')); ?>
+    <?php echo $form->textFieldGroup($model, 'dayOfWeek'); ?>
+    <?php echo $form->textFieldGroup($model, 'clubID', array('class' => 'ignoreField')); ?>
 </div>
 
 <?php $this->endWidget(); ?><!-- form -->

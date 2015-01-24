@@ -4,6 +4,7 @@
 
 $this->pageTitle = Yii::app()->name;
 
+/* @var $loggedUser User */
 $loggedUser = User::model()->findByPk(Yii::app()->user->id);
 $this->menu = Yii::app()->user->isGuest ? null : $loggedUser->getQuickActions();
 

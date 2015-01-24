@@ -6,7 +6,7 @@
  * @copyright  Copyright &copy; Christoffer Niska 2011-
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
-
+Yii::import('booster.widgets.TbWidget');
 /**
  *## Bootstrap badge widget.
  *
@@ -14,21 +14,8 @@
  *
  * @package booster.widgets.decoration
  */
-class TbBadge extends CWidget
-{
-	const TYPE_SUCCESS = 'success';
-	const TYPE_WARNING = 'warning';
-	const TYPE_IMPORTANT = 'important';
-	const TYPE_INFO = 'info';
-	const TYPE_INVERSE = 'inverse';
-
-	/**
-	 * @var string the badge type.
-	 *
-	 * See `TYPE_*` constants for list of allowed types.
-	 */
-	public $type;
-
+class TbBadge extends TbWidget {
+	
 	/**
 	 * @var string the badge text.
 	 */
@@ -49,21 +36,12 @@ class TbBadge extends CWidget
 	 *
 	 * At the start of widget we collect the attributes for badge tag.
 	 */
-	public function init()
-	{
+	public function init() {
+		
 		$classes = array('badge');
 
-		$validTypes = array(
-			self::TYPE_SUCCESS,
-			self::TYPE_WARNING,
-			self::TYPE_IMPORTANT,
-			self::TYPE_INFO,
-			self::TYPE_INVERSE
-		);
-
-		if (isset($this->type) && in_array($this->type, $validTypes)) {
-			$classes[] = 'badge-' . $this->type;
-		}
+		if ($this->isValidContext())
+			$classes[] = 'alert-' . $this->getContextClass();
 
 		if (!empty($classes)) {
 			$classes = implode(' ', $classes);

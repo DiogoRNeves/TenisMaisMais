@@ -33,15 +33,18 @@ echo CHtml::beginForm(CHtml::normalizeUrl(array('user/index')), 'get', array('id
         )
 );
 ?>
-<div class="input-prepend">
-    <span class="add-on"><i class="icon-search"></i></span>
+<div class="input-group col-md-3">
+    <span class="input-group-addon">
+        <i class="glyphicon glyphicon-search"></i>
+    </span>
         <?php
         echo CHtml::textField('name', (isset($_GET['name'])) ? $_GET['name'] : '', array('id' => 'name',
-            'class' => "input-prepend search-query",
+            'class' => "form-control",
             'placeholder' => "Nome do $userTypeText")
         );
         ?>
 </div>
+
 
 <div hidden="true">
     <?php echo CHtml::textField('userType', (isset($_GET['userType'])) ? $_GET['userType'] : '', array('id' => 'userType')); ?>
@@ -53,7 +56,7 @@ echo CHtml::endForm();
 ?>
 
 <?php
-$this->widget('bootstrap.widgets.TbListView', array(
+$this->widget('booster.widgets.TbListView', array(
     'dataProvider' => $dataProvider,
     'itemView' => '_view',
     'id' => 'ajaxListView'

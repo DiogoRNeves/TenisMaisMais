@@ -7,7 +7,7 @@
 <div class="form">
 
     <?php
-    $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+    $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'id' => 'club-form',
         'type' => 'horizontal',
         // Please note: When you enable ajax validation, make sure the corresponding
@@ -22,17 +22,17 @@
 
     <?php echo $form->errorSummary(array($model, $model->home, $model->contact)); ?>
     
-    <?php echo $form->textFieldRow($model, 'name'); ?>
+    <?php echo $form->textFieldGroup($model, 'name'); ?>
     
-    <?php echo $form->textFieldRow($model->contact, 'email'); ?>
+    <?php echo $form->textFieldGroup($model->contact, 'email'); ?>
     
-    <?php echo $form->textFieldRow($model->home, 'phoneNumber'); ?>
+    <?php echo $form->textFieldGroup($model->home, 'phoneNumber'); ?>
     
-    <?php echo $form->textFieldRow($model->home, 'address'); ?>
+    <?php echo $form->textFieldGroup($model->home, 'address'); ?>
     
-    <?php echo $form->textFieldRow($model->home, 'postCode'); ?>
+    <?php echo $form->textFieldGroup($model->home, 'postCode'); ?>
     
-    <?php echo $form->textFieldRow($model->home, 'city'); ?>
+    <?php echo $form->textFieldGroup($model->home, 'city'); ?>
     
     <?php echo CHelper::select2Row($form, $model, 'adminUserID', $model->getAdminUserOptions()); ?>
 

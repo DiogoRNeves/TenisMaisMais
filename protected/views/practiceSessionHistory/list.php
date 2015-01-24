@@ -17,7 +17,7 @@ $balanceString = $model->getAthletePracticeBalanceString();
 
 <?php
 /** @var TbActiveForm $form */
-$form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+$form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'type' => 'horizontal',
     'method' => 'GET',
     ));
@@ -54,7 +54,7 @@ $gridViewColumns =  array(
 /** @var User $athlete */
 $athlete = $model->athlete;
 if (count($athlete->athleteClubs)>1) {
-    echo $form->select2Row($model->practiceSessionHistory, 'clubID',  array(
+    echo $form->select2Group($model->practiceSessionHistory, 'clubID',  array('widgetOptions' => array(
         'data' => $athlete->getAthleteClubsOptions(),
         'options' => array(
             "placeholder" => "Selecione clube",
@@ -65,7 +65,7 @@ if (count($athlete->athleteClubs)>1) {
     ),
     array(
         'label' => 'Clube',
-    ));
+    )));
     $gridViewColumns[] = array(
             'header' => 'Clube',
             'name' => 'club.name',
@@ -81,20 +81,19 @@ $gridViewColumns[] = array(
 ?>
 
 <?php
-echo $form->toggleButtonRow($model, 'showCancelled',
-    array(
-        'enabledLabel' => 'SIM',
-        'disabledLabel' => 'NÃO',
+echo $form->switchGroup($model, 'showCancelled',
+    array('widgetOptions' => array('options' => array(
+        'onText' => 'SIM',
+        'offText' => 'NÃO',
         'value' => false,
-        'onChange' => 'js:function($el, status, e){doAjax();}',
-    ),
-    array(
+        'onSwitchChange' => 'js:function($el, status, e){doAjax();}',
+    )),
         'label' => 'Mostrar treinos cancelados',
     ));
 ?>
 
 <?php
-echo $form->datePickerRow($model->practiceSessionHistory, 'date', array(
+echo $form->datePickerGroup($model->practiceSessionHistory, 'date', array('widgetOptions' => array(
         'options' => array(
             'format' => "yyyy-mm",
             'endDate' => 'today',
@@ -109,10 +108,8 @@ echo $form->datePickerRow($model->practiceSessionHistory, 'date', array(
             'change' => 'js:function($el, status, e){doAjax();}',
         )
     ),
-    array(
         'label' => 'Ano-Mês',
-    )
-);
+));
 
 ?>
 
@@ -122,11 +119,11 @@ Saldo de treinos: <?php echo $balanceString; ?>
 
 <?php
 
-$this->widget('bootstrap.widgets.TbExtendedGridView', array(
+$this->widget('booster.widgets.TbExtendedGridView', array(
     'id' => 'ajaxGridView',
     'responsiveTable' => true,
     'fixedHeader' => true,
-    'headerOffset' => 40,
+    'headerOffset' => 50,
     //'template' => "{extendedSummary}\n{items}\n{summary}",
     'dataProvider' => $model->search(),
     'type' => 'striped',

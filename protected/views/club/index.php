@@ -12,7 +12,7 @@ $this->menu = array();
 <h1>Clubs</h1>
 
 <?php
-$this->widget('bootstrap.widgets.TbListView', array(
+$this->widget('booster.widgets.TbListView', array(
     'dataProvider' => $dataProvider,
     'itemView' => '_view',
 ));

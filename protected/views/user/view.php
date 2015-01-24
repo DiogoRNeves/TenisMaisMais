@@ -25,7 +25,7 @@ $this->menu = $this->getSideMenuItems($model);
 <h1><?php echo $model->name; ?></h1>
 
 <?php
-$this->widget('bootstrap.widgets.TbDetailView', array(
+$this->widget('booster.widgets.TbDetailView', array(
     'data' => $model,
     'attributes' => array(
         array(

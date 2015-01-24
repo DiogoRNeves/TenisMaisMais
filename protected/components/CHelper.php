@@ -90,7 +90,7 @@ class CHelper extends CApplicationComponent {
         $widgetOptions = array(
             'data' => $data,
             'options' => array(
-                'placeholder' => 'Please Select a Value',
+                'placeholder' => $model->getAttributeLabel($attribute),
                 'allowClear' => true,
             ),
             //'htmlOptions' => array('disabled' => !$enabled ? 'true' : 'false'),
@@ -106,21 +106,21 @@ class CHelper extends CApplicationComponent {
                 'multiple' => 'multiple',
             );
         }
-        $rowOptions = array();
+        $options = array('widgetOptions' => $widgetOptions);
         if ($hint !== null) {
-            $rowOptions['hint'] = $hint;
+            $options['hint'] = $hint;
         }
         if ($hintOptions !== null) {
-            $rowOptions['hintOptions'] = $hintOptions;
+            $options['hintOptions'] = $hintOptions;
         }
-        return $form->select2Row($model, $attribute, $widgetOptions, $rowOptions);
+        return $form->select2Group($model, $attribute, $options);
     }
 
     public static function echoSubmitButton($form, $model) {
         $form->widget(
-                'bootstrap.widgets.TbButton', array(
+                'booster.widgets.TbButton', array(
             'buttonType' => 'submit',
-            'type' => 'primary',
+            'context' => 'primary',
             'label' => $model->isNewRecord ? 'Criar' : 'Gravar',
         ));
     }

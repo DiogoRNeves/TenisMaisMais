@@ -14,15 +14,16 @@ if ($notification !== NULL) {
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/practiceSessionAttendance.js');
 
 /* @var $form TbActiveForm */
-$form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+$form = $this->beginWidget('booster.widgets.TbActiveForm', array(
     'action' => Yii::app()->createUrl($this->route),
     'method' => 'get',
     'enableAjaxValidation' => true,
+    'type' => 'horizontal',
 ));
 ?>
 
 <?php /** @var PracticeSessionHistoryRegistryForm $model */
-echo $form->datePickerRow($model, 'date', array(
+echo $form->datePickerGroup($model, 'date', array('widgetOptions' => array(
     'options' => array(
         'format' => "yyyy-mm-dd",
         'endDate' => 'today',
@@ -33,7 +34,7 @@ echo $form->datePickerRow($model, 'date', array(
     'htmlOptions' => array(
         'class' => 'auto-submit-item',
     )
-)); ?>
+))); ?>
 
 <?php
 /* @var $loggedInUser User */
@@ -46,25 +47,28 @@ $coachInOneClub = count($loggedInUser->coachClubs) === 1;
 <?php
 /** @var PracticeSessionHistoryRegistryForm $model */
 //Club
-echo $form->select2Row($model, 'clubID', array(
-    'data' => $loggedInUser->getClubsCoachedOptions(),
-    'options' => array(
-        'enabled' => false,
-        'minimumResultsForSearch' => -1
-    ),
-    'htmlOptions' => array('class' => 'auto-submit-item'),
+echo $form->select2Group($model, 'clubID', array('widgetOptions' => array(
+            'data' => $loggedInUser->getClubsCoachedOptions(),
+            'options' => array(
+                'enabled' => false,
+                'minimumResultsForSearch' => -1,
+                'width' => '70%',
+            ),
+            'htmlOptions' => array('class' => 'auto-submit-item'),
+        )
 ));
 ?>
 
 <?php
 //Coach
-echo $form->select2Row($model, 'coachID', array(
+echo $form->select2Group($model, 'coachID', array('widgetOptions' => array(
     'data' => $loggedInUser->getAdminedCoachesOptions(Club::model()->findByPk($model->clubID)),
     'options' => array(
-        'minimumResultsForSearch' => -1
+        'minimumResultsForSearch' => -1,
+        'width' => '70%',
     ),
     'htmlOptions' => array('class' => 'auto-submit-item'),
-));
+)));
 ?>
 
 <?php if (isset($model->date, $model->coachID, $model->clubID)): ?>
@@ -72,16 +76,17 @@ echo $form->select2Row($model, 'coachID', array(
     <?php
     $allowedPracticeSession = $model->isPracticeSessionAllowed();
     //PracticeSession
-    echo $form->select2Row($model, 'practiceSessionID', array(
+    echo $form->select2Group($model, 'practiceSessionID', array('widgetOptions' => array(
         'data' => $model->getPracticeSessionOptions(),
         'options' => array(
             "placeholder" => "Selecione a hora de início",
-            'minimumResultsForSearch' => -1
+            'minimumResultsForSearch' => -1,
+            'width' => '70%',
         ),
         'htmlOptions' => array(
             'class' => 'auto-submit-item',
         )
-    ));
+    )));
     ?>
 
     <?php if ($allowedPracticeSession): ?>
@@ -95,60 +100,66 @@ echo $form->select2Row($model, 'coachID', array(
         </div>
         <?php
         //PracticeCancelled
-        echo $form->toggleButtonRow($model, 'cancelled', array(
-            'enabledLabel' => 'SIM',
-            'disabledLabel' => 'NÃO',
-            'value' => false,
+        echo $form->switchGroup($model, 'cancelled', array('widgetOptions' => array(
+            'options' => array(
+                'onText' => 'SIM',
+                'offText' => 'NÃO',
+                'value' => false,
+            ),
             'htmlOptions' => array(
                 'class' => 'auto-submit-item',
-            )
+            )),
+            'hint' => 'Devido a chuva, por exemplo.'
         )); ?>
         <?php
         $model->setupAttendance();
         $practiceSessionAthletes = $model->getPracticeSessionAthleteOptions();
         //AthletesAttended
-        echo $form->select2Row($model, 'athletesAttended', array(
+        echo $form->select2Group($model, 'athletesAttended', array('widgetOptions' => array(
             'data' => $loggedInUser->getCoachedAthletesOptions(),
             'options' => array(
                 "placeholder" => "Selecione atletas",
+                'width' => '70%',
             ),
             'htmlOptions' => array(
                 'multiple' => 'multiple',
             ),
-        ));
+        )));
 
         ?>
         <?php
         //AthletesUnnatended - Justified
-        echo $form->select2Row($model, 'athletesJustifiedUnnatendance', array(
+        echo $form->select2Group($model, 'athletesJustifiedUnnatendance', array('widgetOptions' => array(
             'data' => $practiceSessionAthletes,
             'options' => array(
                 "placeholder" => "Selecione atletas",
+                'width' => '70%',
             ),
             'htmlOptions' => array(
                 'multiple' => 'multiple',
             ),
-        ));
+        )));
         ?>
         <?php
         //AthletesUnttended - Not Justified
-        echo $form->select2Row($model, 'athletesInjustifiedUnnatendance', array(
+        echo $form->select2Group($model, 'athletesInjustifiedUnnatendance', array('widgetOptions' => array(
             'data' => $practiceSessionAthletes,
             'options' => array(
                 'allowClear' => true,
                 "placeholder" => "Selecione atletas",
+                'width' => '70%',
             ),
             'htmlOptions' => array(
                 'multiple' => 'multiple',
             ),
-        ));
+        )));
         ?>
 
         <div class="form-actions">
             <?php
-            $this->widget('bootstrap.widgets.TbButton', array(
+            $this->widget('booster.widgets.TbButton', array(
                 'buttonType' => 'submit',
-                'type' => 'primary',
+                'context' => 'primary',
                 'label' => 'Gravar',
             ));
             ?>
@@ -157,8 +168,8 @@ echo $form->select2Row($model, 'coachID', array(
 <?php endif; ?>
 
     <div style="display: none">
-        <?php echo $form->checkBoxRow($model, 'autoSubmit'); ?>
-        <?php echo $form->checkBoxRow($model, 'clickedCancel'); ?>
+        <?php echo $form->checkBox($model, 'autoSubmit'); ?>
+        <?php echo $form->checkBox($model, 'clickedCancel'); ?>
     </div>
 
 <?php $this->endWidget(); ?>

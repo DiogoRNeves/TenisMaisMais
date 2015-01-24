@@ -4,7 +4,7 @@
  * - $this: the BootCrudCode object
  */
 ?>
-<?php echo "<?php \$form=\$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
+<?php echo "<?php \$form=\$this->beginWidget('booster.widgets.TbActiveForm',array(
 	'id'=>'" . $this->class2id($this->modelClass) . "-form',
 	'enableAjaxValidation'=>false,
 )); ?>\n"; ?>
@@ -19,15 +19,15 @@ foreach ($this->tableSchema->columns as $column) {
 		continue;
 	}
 	?>
-	<?php echo "<?php echo " . $this->generateActiveRow($this->modelClass, $column) . "; ?>\n"; ?>
+	<?php echo "<?php echo " . $this->generateActiveGroup($this->modelClass, $column) . "; ?>\n"; ?>
 
 <?php
 }
 ?>
 <div class="form-actions">
-	<?php echo "<?php \$this->widget('bootstrap.widgets.TbButton', array(
+	<?php echo "<?php \$this->widget('booster.widgets.TbButton', array(
 			'buttonType'=>'submit',
-			'type'=>'primary',
+			'context'=>'primary',
 			'label'=>\$model->isNewRecord ? 'Create' : 'Save',
 		)); ?>\n"; ?>
 </div>

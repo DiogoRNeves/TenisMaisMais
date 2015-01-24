@@ -11,7 +11,7 @@ return array(
     // preloading 'log' component
     'preload' => array(
         'log',
-        'bootstrap',
+        'booster',
     ),
     //set the language to PT
     'language' => 'pt',
@@ -29,15 +29,14 @@ return array(
             // If removed, Gii defaults to localhost only. Edit carefully to taste.
             'ipFilters' => array('127.0.0.1', '::1'),
             'generatorPaths' => array(
-                'bootstrap.gii'
+                'booster.gii'
             ),
         ),
     ),
     // application components
     'components' => array(
-        'bootstrap' => array(
-            'class' => 'ext.yiibooster.components.Bootstrap',
-            'responsiveCss' => true,
+        'booster' => array(
+            'class' => 'ext.yiibooster.components.Booster',
         ),
         'user' => array(
             // enable cookie-based authentication

@@ -1,16 +1,27 @@
 <?php
 /* @var $this BootstrapRssReader */
-Yii::app()->clientScript->registerCss("carousselCenterImage", '  
-  .carousel-inner a img {
-    margin-left: auto;
-    margin-right: auto;
-    height: 400px;
+Yii::app()->clientScript->registerCss("carousselCenterImage", '
+.carousel {
+  height: 400px;
+  overflow: hidden;
+  }
+
+  .carousel-caption {
+    top: 0;
+    bottom: auto;
+}
+
+  .carousel-inner .item a img {
+    min-height: 100%;
+    min-width: 100%;
+    max-width: 300%;
+    max-height: 300%;
 }');
 ?>
 <div id="rss">
     <?php
     $this->widget(
-            'bootstrap.widgets.TbCarousel', array(
+            'booster.widgets.TbCarousel', array(
         'items' => $this->getBoosterCarouselItemsFromRSS(),
             )
     );

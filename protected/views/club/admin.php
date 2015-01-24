@@ -42,7 +42,7 @@ $('.search-form form').submit(function(){
 </div><!-- search-form -->
 
 <?php
-$this->widget('bootstrap.widgets.TbGridView', array(
+$this->widget('booster.widgets.TbGridView', array(
     'id' => 'club-grid',
     'dataProvider' => $model->search(),
     'filter' => $model,

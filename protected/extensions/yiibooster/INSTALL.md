@@ -35,11 +35,11 @@ You have to write something like this inside each Controller you want to have Yi
     public function filters() {
         return array(
             ... probably other filter specifications ...
-            array('path.alias.to.bootstrap.filters.BootstrapFilter - delete')
+            array('path.alias.to.bootstrap.filters.BoosterFilter - delete')
         );
     }
 
-`.filters.BootstrapFilter` snippet has to be written verbatim - it is the path to subfolder under the YiiBooster directory.
+`.filters.BoosterFilter` snippet has to be written verbatim - it is the path to subfolder under the YiiBooster directory.
 
 This example declaration will tell the Controller in question to load `Bootstrap` component on any action except `delete` one.
 You can look at the [documentation for CController.filters() method](http://www.yiiframework.com/doc/api/CController#filters-detail)
@@ -49,7 +49,7 @@ for details about using this feature.
 
 Now you can call widgets included in YiiBooster using the following incantation in your view files:
 
-    $this->widget('bootstrap.widgets.TbWidgetClassName', $config);
+    $this->widget('booster.widgets.TbWidgetClassName', $config);
 
 Where `WidgetClassName` placeholder stands for name of the widget.
 All YiiBooster widget classes are prefixed by `Tb` by convention.

@@ -6,7 +6,7 @@
  * @copyright  Copyright &copy; Christoffer Niska 2011-
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
-
+Yii::import('booster.widgets.TbWidget');
 /**
  *## Bootstrap label widget.
  *
@@ -14,20 +14,7 @@
  *
  * @package booster.widgets.decoration
  */
-class TbLabel extends CWidget
-{
-	const TYPE_SUCCESS = 'success';
-	const TYPE_WARNING = 'warning';
-	const TYPE_IMPORTANT = 'important';
-	const TYPE_INFO = 'info';
-	const TYPE_INVERSE = 'inverse';
-
-	/**
-	 * @var string the label type.
-	 *
-     * See `TYPE_*` constants for list of allowed types.
-	 */
-	public $type;
+class TbLabel extends TbWidget {
 
 	/**
 	 * @var string the label text.
@@ -49,21 +36,12 @@ class TbLabel extends CWidget
 	 *
      * At the start of widget we collect the attributes for badge tag.
 	 */
-	public function init()
-	{
+	public function init() {
+		
 		$classes = array('label');
 
-		$validTypes = array(
-			self::TYPE_SUCCESS,
-			self::TYPE_WARNING,
-			self::TYPE_IMPORTANT,
-			self::TYPE_INFO,
-			self::TYPE_INVERSE
-		);
-
-		if (isset($this->type) && in_array($this->type, $validTypes)) {
-			$classes[] = 'label-' . $this->type;
-		}
+		if($this->isValidContext())
+			$classes[] = 'label-' . $this->getContextClass();
 
 		if (!empty($classes)) {
 			$classes = implode(' ', $classes);
@@ -84,8 +62,8 @@ class TbLabel extends CWidget
 	 *
      * Upon completing the badge we write the span tag with collected attributes to document.
 	 */
-	public function run()
-	{
+	public function run() {
+		
 		echo CHtml::tag('span', $this->htmlOptions, $this->label);
 	}
 }

@@ -15,7 +15,7 @@ $this->breadcrumbs = array(
 
 <div class="form">
     <?php
-    $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+    $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'id' => 'login-form',
         'type' => 'search'
     ));
@@ -30,7 +30,7 @@ $this->breadcrumbs = array(
     <div class="form-actions">
         <?php
         $form->widget(
-                'bootstrap.widgets.TbButton', array(
+                'booster.widgets.TbButton', array(
             'buttonType' => 'submit',
             'type' => 'primary',
             'label' => 'Login',

@@ -10,7 +10,7 @@
 <div class="form">
 
     <?php
-    $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+    $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'id' => 'user-form',
         'type' => 'horizontal',
         // Please note: When you enable ajax validation, make sure the corresponding
@@ -25,11 +25,11 @@
 
     <?php echo $form->errorSummary($user); ?>
 
-    <?php echo $form->textFieldRow($user, 'name', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($user, 'name', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php
     //PracticeCancelled
-    echo $form->toggleButtonRow($user, 'male', array(
+    echo $form->switchGroup($user, 'male', array(
         'enabledLabel' => 'M',
         'disabledLabel' => 'F',
         'value' => true,
@@ -42,16 +42,16 @@
     ?>
 
     <?php
-    echo $form->datePickerRow($user, 'birthDate', array('options' => array(
+    echo $form->datePickerGroup($user, 'birthDate', array('widgetOptions' => array('options' => array(
             'format' => "yyyy-mm-dd",
             'startDate' => "-90y",
             'endDate' => "-1y",
             'startView' => 2,
             'autoclose' => true
-    )));
+    ))));
     ?>
 
-    <?php echo $form->textFieldRow($user, 'federationNumber', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($user, 'federationNumber', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php 
     if ($user->isNewRecord || ($user->scenario == 'activation' ? false : User::model()->findByPk(Yii::app()->user->id)->canUpdateUserLevels($user))): ?>
@@ -63,28 +63,28 @@
         ?>
 
     <?php endif; ?>
-    <?php echo $form->textFieldRow($contact, 'cellularPhone', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($contact, 'cellularPhone', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
-    <?php echo $form->textFieldRow($contact, 'workPhone', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($contact, 'workPhone', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
-    <?php echo $form->textFieldRow($contact, 'email', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($contact, 'email', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
-    <?php echo $form->textFieldRow($contact, 'fax', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($contact, 'fax', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
-    <?php echo $form->textFieldRow($contact, 'website', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+    <?php echo $form->textFieldGroup($contact, 'website', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php if ($user->canChangePassword()): ?>
         <p class="note"><?php echo 'Mudar a password:' ?></p>
         <?php
         if ($user->scenario != 'activation') {
-            echo $form->passwordFieldRow($user, 'oldPassword', array('size' => 45, 'maxlength' => 45, 'class' => 'span5'));
+            echo $form->passwordFieldGroup($user, 'oldPassword', array('size' => 45, 'maxlength' => 45, 'class' => 'span5'));
         }
         ?>
         <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>
             As passswords têm que ter pelo menos uma minúscula, uma maiúscula, um número, 4 caracteres e não podem conter espaços.
         </div>
-        <?php echo $form->passwordFieldRow($user, 'newPassword', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
-        <?php echo $form->passwordFieldRow($user, 'newPasswordRepeated', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+        <?php echo $form->passwordFieldGroup($user, 'newPassword', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+        <?php echo $form->passwordFieldGroup($user, 'newPasswordRepeated', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
     <?php endif; ?>
 
     <!-- hidden fields from the create user action -->

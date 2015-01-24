@@ -1,7 +1,7 @@
 <?php
 /* @var $user User */
 
-$this->beginWidget('bootstrap.widgets.TbModal', array(
+$this->beginWidget('booster.widgets.TbModal', array(
     'id' => 'modalDialog',
 ));
 ?>
@@ -11,15 +11,15 @@ $this->beginWidget('bootstrap.widgets.TbModal', array(
     <h4>Sessão de Treino</h4>
 </div>
 
-<div class="modal-body" style="max-height: 150px">    
+<div class="modal-body">
     <?php $this->renderPartial('_form', array('model' => $user->getSamplePracticeSession())); ?>
 </div>
 
 <div class="modal-footer">
     <?php
     $this->widget(
-            'bootstrap.widgets.TbButton', array(
-        'type' => 'primary',
+            'booster.widgets.TbButton', array(
+        'context' => 'primary',
         'label' => 'Save',
         'htmlOptions' => array(
             'class' => 'submitModal'),
@@ -28,8 +28,8 @@ $this->beginWidget('bootstrap.widgets.TbModal', array(
     ?>
     <?php
     $this->widget(
-            'bootstrap.widgets.TbButton', array(
-        'type' => 'danger',
+            'booster.widgets.TbButton', array(
+        'context' => 'danger',
         'label' => 'Delete',
         'htmlOptions' => array(
             'class' => 'deleteObject',
@@ -42,7 +42,7 @@ $this->beginWidget('bootstrap.widgets.TbModal', array(
     ?>
     <?php
     $this->widget(
-            'bootstrap.widgets.TbButton', array(
+            'booster.widgets.TbButton', array(
         'label' => 'Close',
         'url' => '#',
         'htmlOptions' => array('data-dismiss' => 'modal'),

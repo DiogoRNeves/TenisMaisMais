@@ -14,7 +14,7 @@ $this->breadcrumbs = array(
     <div class="span12">
         O <?php echo Yii::app()->name ?> é uma aplicação de código aberto que permite às equipas técnicas 
         dos clubes de ténis registar e acompanhar a evolução dos seus atletas. Esta aplicação está na
-        fase de <span class="label label-important">protótipo</span>, tendo sido construída no âmbito 
+        fase de <span class="label label-danger">protótipo</span>, tendo sido construída no âmbito
         da tese de mestrado do autor.
         <div class="row-fluid">
             <div class="span6">
@@ -56,11 +56,11 @@ $this->breadcrumbs = array(
                     </li>
                     <li>
                         Notificações perto de eventos importantes 
-                        <span class="label label-important">Depende de 10</span>
+                        <span class="label label-danger">Depende de 10</span>
                     </li>
                     <li>
                         Sistema de ranking 
-                        <span class="label label-important">Depende de 12</span>
+                        <span class="label label-danger">Depende de 12</span>
                     </li>
                     <li>
                         Compatível vários sistemas operativos desktop 
@@ -77,7 +77,7 @@ $this->breadcrumbs = array(
                     </li>
                     <li>
                         Registo competitivo dos atletas (por torneio e por jogo)
-                        <span class="label label-important">Aguarda desenvolvimento</span>
+                        <span class="label label-danger">Aguarda desenvolvimento</span>
                     </li>
                 </ol>
                 <p>

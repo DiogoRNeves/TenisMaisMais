@@ -55,13 +55,15 @@
                     'clubAdmin' => $user->isClubAdmin(),
                 );
             }
-            $this->widget('bootstrap.widgets.TbNavbar', array(
+            $this->widget('booster.widgets.TbNavbar', array(
                 'type' => null, // null or 'inverse'
                 'brand' => Yii::app()->name,
                 'collapse' => true, // requires bootstrap-responsive.css
+                'fluid' => true,
                 'items' => array(
                     array(
-                        'class' => 'bootstrap.widgets.TbMenu',
+                        'class' => 'booster.widgets.TbMenu',
+                        'type' => 'navbar',
                         'items' => array(
                             array(
                                 'label' => 'O Meu Perfil',
@@ -96,6 +98,11 @@
                                 'visible' => !$isGuest,
                             ),
                             array(
+                                'label' => 'Plano Competitivo',
+                                'url' => array('/competitivePlan/index'),
+                                'visible' => !$isGuest,
+                            ),
+                            array(
                                 'label' => 'Sobre',
                                 'url' => array('/site/page', 'view' => 'about')
                             ),
@@ -116,7 +123,7 @@
             <div class="container-fluid" style="margin-top:80px">
                 <?php if (isset($this->breadcrumbs)): ?>
                     <?php
-                    $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
+                    $this->widget('booster.widgets.TbBreadcrumbs', array(
                         'links' => $this->breadcrumbs,
                     ));
                     ?><!-- breadcrumbs -->

@@ -8,33 +8,39 @@ Thank you all
 
 Antonio Ramirez.
 
-## YiiBooster latest development alpha
--
+## YiiBooster latest development alpha  
 
-## YiiBooster version 3.1.1 
-- **(fix)** added TbHtml TbArray dependency  
-- **(fix)** fix font-awesome for TbHtml
-- **(fix)** fix _prepareToAutoText is undefined in TbEditableField
-- **(fix)** manually minified bootstrap-editable.js because of js error
-- **(fix)** TbBox header overflow css fix
+## YiiBooster version 4.0.1
+- **(fix)** fix gii generated TbActiveForm code - #851
 
-## YiiBooster version 3.1.0
-- **(enh)** update bootstrap-datepicker to the latest version - #823
-- **(fix)** fix Submenus in collapsed TbNavbar on touch screens - #811
-- **(fix)** fix bulk action now works on visible items only
-- **(fix)** fix select all for grid bulk action - #843
-- **(enh)** TbHtml upgrade to latest stable 1.3.0 
-- **(fix)** typeahead added to the editable types so now you can set the type to "typeahead" - #824 
-- **(fix)** phpdoc, fix editable with datepicker "and picker language" conflicts - #835
-- **(fix)** grid/chart switcher after ajax fix - #781
-- **(enh)** latest Font Awesome 1.4.0 - #818
-- **(enh)** Add bootstrap2 skin to select2 from https://github.com/t0m/select2-bootstrap-css (kev360)
-- **(fix)** many Editable fixes
-- **(fix)** TbExtendedGridView - fix JavaScript undefined variable error, when using strict mode - #805, #805
-- **(fix)** yiiGroupGridView fix - #786
- 
-## YiiBooster version 3.0.1
-- **(fix)** branch and tag fix - no code changes from 3.0.0
+## YiiBooster version 4.0.0
+- Bootstrap 3 production ready version - http://yiibooster.clevertech.biz/ - http://yiibooster.clevertech.biz/api/
+
+## YiiBooster version 4.0.0-beta-2
+- Finalize editables
+- Finalize datepicker
+- Finalize timepicker
+- Finalize select2
+- Finalize pagers
+- Finalize navbar
+- Finalize buttons, and button groups
+- Finalize typeahead
+- more work done on grids, extended grids, bulk actions
+- upgrade font awesome 
+
+## YiiBooster version 4.0.0-beta-1
+- TbActiveForm working
+- more widgets working 
+- api doc
+- travis, and scrutinizer ci
+
+## YiiBooster version 4.0.0-alpha
+- upgrade the bootstrap version to 3.1.1
+- upgrade and fix many widgets to work with bootstrap 3.1.1
+- many widgets still not ported
+- code structure is not final yet 
+- working widgets (TbAlert, TbBadge, TbButton, TbJumbotron, TbLabel, TbProgressBar, TbEditableField, TbEditableColumn, TbEditableDetailView, TbHighChart, TbActiveForm, TbPager)
+- not all TbActiveForm controls are ported yet
 
 ## YiiBooster version 3.0.0
 - **(fix)** TbExtendedGridView - TbProgress inside cell css fix - #448

@@ -6,7 +6,7 @@
  * @copyright Copyright &copy; Christoffer Niska 2011-
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
-
+Yii::import('booster.widgets.TbWidget');
 /**
  *## Bootstrap alert widget.
  *
@@ -16,23 +16,17 @@
  *
  * @package booster.widgets.decoration
  */
-class TbAlert extends CWidget
-{
-	const TYPE_SUCCESS = 'success';
-	const TYPE_INFO = 'info';
-	const TYPE_WARNING = 'warning';
-	const TYPE_ERROR = 'error';
-	const TYPE_DANGER = 'danger'; // same as error
-
+class TbAlert extends TbWidget {
+	
+	const CTX_ERROR = 'error';
+	const CTX_ERROR_CLASS = 'danger';
+	
 	/**
 	 * @var array The configuration for individual types of alerts.
 	 *
 	 * Here's the allowed array elements:
 	 *
 	 * 'visible' (= null) If set to false, this type of alerts will not be rendered.
-	 * 'block' (= widget value) The same as a global block property.
-	 *   If set, size of alert block will be larger.
-	 *   It defaults to the widget-level block property value.
 	 * 'fade' (= widget value) The same as a global fade property.
 	 *   If set, alert will close itself fading away.
 	 *   It defaults to the widget-level fade property value.
@@ -58,11 +52,6 @@ class TbAlert extends CWidget
 	 * If set to false, no close button will be rendered, making user unable to close the alert.
 	 */
 	public $closeText = '&times;';
-
-	/**
-	 * @var boolean When set, alert has a larger block size. Defaults to 'true'
-	 */
-	public $block = true;
 
 	/**
 	 * @var boolean When set, alert will fade out using transitions when closed. Defaults to 'true'
@@ -99,8 +88,8 @@ class TbAlert extends CWidget
 	 *
 	 * Initializes the widget.
 	 */
-	public function init()
-	{
+	public function init() {
+		
 		if (!isset($this->htmlOptions['id'])) {
 			$this->htmlOptions['id'] = $this->getId();
 		}
@@ -112,11 +101,11 @@ class TbAlert extends CWidget
 		// Display all alert types by default.
 		if (!isset($this->alerts)) {
 			$this->alerts = array(
-				self::TYPE_SUCCESS,
-				self::TYPE_INFO,
-				self::TYPE_WARNING,
-				self::TYPE_ERROR,
-				self::TYPE_DANGER
+				self::CTX_SUCCESS,
+				self::CTX_INFO,
+				self::CTX_WARNING,
+				self::CTX_DANGER,
+				self::CTX_ERROR
 			);
 		}
 	}
@@ -126,8 +115,8 @@ class TbAlert extends CWidget
 	 *
 	 * Runs the widget.
 	 */
-	public function run()
-	{
+	public function run() {
+		
 		$id = $this->htmlOptions['id'];
 
 		echo CHtml::openTag('div', $this->htmlOptions);
@@ -179,17 +168,9 @@ class TbAlert extends CWidget
 	 * @param $type
 	 * @param $alertText
 	 */
-	protected function renderSingleAlert($alert, $type, $alertText)
-	{
+	protected function renderSingleAlert($alert, $context, $alertText) {
+		
 		$classes = array('alert in');
-
-		if (!isset($alert['block'])) {
-			$alert['block'] = $this->block;
-		}
-
-		if ($alert['block'] === true) {
-			$classes[] = 'alert-block';
-		}
 
 		if (!isset($alert['fade'])) {
 			$alert['fade'] = $this->fade;
@@ -199,16 +180,8 @@ class TbAlert extends CWidget
 			$classes[] = 'fade';
 		}
 
-		$validTypes = array(
-			self::TYPE_SUCCESS,
-			self::TYPE_INFO,
-			self::TYPE_WARNING,
-			self::TYPE_ERROR,
-			self::TYPE_DANGER
-		);
-
-		if (in_array($type, $validTypes)) {
-			$classes[] = 'alert-' . $type;
+		if ($this->isValidContext($context)) {
+			$classes[] = 'alert-' . $this->getContextClass($context);
 		}
 
 		if (!isset($alert['htmlOptions'])) {
@@ -240,4 +213,18 @@ class TbAlert extends CWidget
 		echo $alertText;
 		echo CHtml::closeTag('div');
 	}
+	
+	/**
+	 * only these are allowed for alerts
+	 */
+	protected function isValidContext($context = false) {
+		return in_array($context, [
+			self::CTX_SUCCESS,
+			self::CTX_INFO,
+			self::CTX_WARNING,
+			self::CTX_DANGER,
+			self::CTX_ERROR,
+		]);
+	}
+	
 }

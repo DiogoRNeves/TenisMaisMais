@@ -67,7 +67,7 @@ class PracticeSessionHistory extends CExtendedActiveRecord {
             'date' => 'Data',
             'coachID' => PracticeSession::model()->getAttributeLabel('coachID'),
             'clubID' => PracticeSession::model()->getAttributeLabel('clubID'),
-            'cancelled' => 'Treino cancelado (chuva, etc.)',
+            'cancelled' => 'Treino cancelado',
             'timeString' => 'Horário',
         );
     }

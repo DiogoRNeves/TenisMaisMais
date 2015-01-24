@@ -13,7 +13,7 @@ $this->menu = $this->getDetailViewsMenu($model);
 <h1>View Club #<?php echo $model->name; ?></h1>
 
 <?php
-$this->widget('bootstrap.widgets.TbDetailView', array(
+$this->widget('booster.widgets.TbDetailView', array(
     'data' => $model,
     'attributes' => array(
         'name',

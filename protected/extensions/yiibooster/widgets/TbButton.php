@@ -6,17 +6,20 @@
  * @copyright Copyright &copy; Christoffer Niska 2011-
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  * @since 0.9.10
+ * 
+ * @author Amr Bedair <amr.bedair@gmail.com>
+ * @since v4.0.0 - upgraded to bootstrap 3.1.1
  */
-
+Yii::import('booster.widgets.TbWidget');
 /**
  * Bootstrap button widget.
  *
- * @see http://twitter.github.com/bootstrap/base-css.html#buttons
+ * @see http://getbootstrap.com/css/#buttons
  *
  * @package booster.widgets.forms.buttons
  */
-class TbButton extends CWidget
-{
+class TbButton extends TbWidget {
+	
 	// Button callback types.
 	const BUTTON_LINK = 'link';
 	const BUTTON_BUTTON = 'button';
@@ -28,32 +31,30 @@ class TbButton extends CWidget
 	const BUTTON_AJAXSUBMIT = 'ajaxSubmit';
 	const BUTTON_INPUTBUTTON = 'inputButton';
 	const BUTTON_INPUTSUBMIT = 'inputSubmit';
+	const BUTTON_TOGGLE_RADIO = 'radio';
+	const BUTTON_TOGGLE_CHECKBOX = 'checkbox';
 
-	// Button types.
-	const TYPE_PRIMARY = 'primary';
-	const TYPE_INFO = 'info';
-	const TYPE_SUCCESS = 'success';
-	const TYPE_WARNING = 'warning';
-	const TYPE_DANGER = 'danger';
-	const TYPE_INVERSE = 'inverse';
-	const TYPE_LINK = 'link';
+	const CTX_LINK = 'link';
+	const CTX_LINK_CLASS = 'link';
 
 	// Button sizes.
-	const SIZE_MINI = 'mini';
-	const SIZE_SMALL = 'small';
 	const SIZE_LARGE = 'large';
+	const SIZE_DEFAULT = 'default';
+	const SIZE_SMALL = 'small';
+	const SIZE_EXTRA_SMALL = 'extra_small';
+	
+	protected static $sizeClasses = [
+		self::SIZE_LARGE => 'btn-lg',
+		self::SIZE_DEFAULT => '',
+		self::SIZE_SMALL => 'btn-sm',
+		self::SIZE_EXTRA_SMALL => 'btn-xs',
+	];
 
 	/**
 	 * @var string the button callback types.
 	 * Valid values are 'link', 'button', 'submit', 'submitLink', 'reset', 'ajaxLink', 'ajaxButton' and 'ajaxSubmit'.
 	 */
-	public $buttonType = self::BUTTON_LINK;
-
-	/**
-	 * @var string the button type.
-	 * Valid values are 'primary', 'info', 'success', 'warning', 'danger' and 'inverse'.
-	 */
-	public $type;
+	public $buttonType = self::BUTTON_BUTTON;
 
 	/**
 	 * @var string the button size.
@@ -151,38 +152,33 @@ class TbButton extends CWidget
      * @since 2.1.0
      */
     public $tooltipOptions = array();
-
+    
 	/**
 	 *### .init()
 	 *
 	 * Initializes the widget.
 	 */
-	public function init()
-	{
+	public function init() {
+		
 		if (false === $this->visible) {
 			return;
 		}
 
 		$classes = array('btn');
 
-		$validTypes = array(
-			self::TYPE_LINK,
-			self::TYPE_PRIMARY,
-			self::TYPE_INFO,
-			self::TYPE_SUCCESS,
-			self::TYPE_WARNING,
-			self::TYPE_DANGER,
-			self::TYPE_INVERSE
-		);
-
-		if (isset($this->type) && in_array($this->type, $validTypes)) {
-			$classes[] = 'btn-' . $this->type;
+		if ($this->isValidContext()) {
+			$classes[] = 'btn-' . $this->getContextClass();
 		}
 
-		$validSizes = array(self::SIZE_LARGE, self::SIZE_SMALL, self::SIZE_MINI);
+		$validSizes = array(
+			self::SIZE_LARGE, 
+			self::SIZE_DEFAULT,
+			self::SIZE_SMALL, 
+			self::SIZE_EXTRA_SMALL
+		);
 
 		if (isset($this->size) && in_array($this->size, $validSizes)) {
-			$classes[] = 'btn-' . $this->size;
+			$classes[] = self::$sizeClasses[$this->size];
 		}
 
 		if ($this->block) {
@@ -239,12 +235,13 @@ class TbButton extends CWidget
 			}
 		}
 
-		if (isset($this->icon)) {
+		if (isset($this->icon)) { // no need for implode as newglyphicon only supports one icon
 			if (strpos($this->icon, 'icon') === false && strpos($this->icon, 'fa') === false) {
-				$this->icon = 'icon-' . implode(' icon-', explode(' ', $this->icon));
+				$this->icon = 'glyphicon glyphicon-' . $this->icon; // implode(' glyphicon-', explode(' ', $this->icon));
+				$this->label = '<span class="' . $this->icon . '"></span> ' . $this->label;
+			} else { // to support font awesome icons
+				$this->label = '<i class="' . $this->icon . '"></i> ' . $this->label;
 			}
-
-			$this->label = '<i class="' . $this->icon . '"></i> ' . $this->label;
 		}
 
 		if (!isset($this->htmlOptions['id'])) {
@@ -288,17 +285,17 @@ class TbButton extends CWidget
 	 *
 	 * Runs the widget.
 	 */
-	public function run()
-	{
+	public function run() {
 		if (false === $this->visible) {
 			return;
 		}
-
-		echo $this->createButton();
-
+		
 		if ($this->hasDropdown()) {
+			
+			echo $this->createButton();
+		
 			$this->controller->widget(
-				'bootstrap.widgets.TbDropdown',
+				'booster.widgets.TbDropdown',
 				array(
 					'encodeLabel' => $this->encodeLabel,
 					'items' => $this->items,
@@ -306,6 +303,8 @@ class TbButton extends CWidget
 					'id' => isset($this->dropdownOptions['id']) ? $this->dropdownOptions['id'] : null,
 				)
 			);
+		} else {
+			echo $this->createButton();
 		}
 	}
 
@@ -316,11 +315,11 @@ class TbButton extends CWidget
 	 *
 	 * @return string the created button.
 	 */
-	protected function createButton()
-	{
+	protected function createButton() {
+		
 		switch ($this->buttonType) {
-			case self::BUTTON_BUTTON:
-				return CHtml::htmlButton($this->label, $this->htmlOptions);
+			case self::BUTTON_LINK:
+				return CHtml::link($this->label, $this->url, $this->htmlOptions);
 
 			case self::BUTTON_SUBMIT:
 				$this->htmlOptions['type'] = 'submit';
@@ -354,11 +353,27 @@ class TbButton extends CWidget
 			case self::BUTTON_INPUTSUBMIT:
 				$this->htmlOptions['type'] = 'submit';
 				return CHtml::button($this->label, $this->htmlOptions);
-
+				
+			case self::BUTTON_TOGGLE_RADIO:
+				return $this->createToggleButton('radio');
+				
+			case self::BUTTON_TOGGLE_CHECKBOX:
+				return $this->createToggleButton('checkbox');
+				
 			default:
-			case self::BUTTON_LINK:
-				return CHtml::link($this->label, $this->url, $this->htmlOptions);
+			case self::BUTTON_BUTTON:
+				return CHtml::htmlButton($this->label, $this->htmlOptions);
 		}
+	}
+	
+	protected function createToggleButton($toggleType) {
+		
+		$html = '';
+		$html .= CHtml::openTag('label', $this->htmlOptions);
+		$html .= "<input type='{$toggleType}' name='{$this->id}_options' id='option_{$this->id}'> {$this->label}";
+		$html .= CHtml::closeTag('label');
+		
+		return $html;
 	}
 
 	/**
@@ -368,8 +383,8 @@ class TbButton extends CWidget
 	 *
 	 * @return bool the result.
 	 */
-	protected function hasDropdown()
-	{
+	protected function hasDropdown() {
+		
 		return isset($this->items) && !empty($this->items);
 	}
 }

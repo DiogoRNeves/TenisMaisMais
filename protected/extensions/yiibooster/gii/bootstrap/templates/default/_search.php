@@ -4,7 +4,7 @@
  * - $this: the BootCrudCode object
  */
 ?>
-<?php echo "<?php \$form=\$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
+<?php echo "<?php \$form=\$this->beginWidget('booster.widgets.TbActiveForm',array(
 	'action'=>Yii::app()->createUrl(\$this->route),
 	'method'=>'get',
 )); ?>\n"; ?>
@@ -16,13 +16,13 @@
 		continue;
 	}
 	?>
-	<?php echo "<?php echo " . $this->generateActiveRow($this->modelClass, $column) . "; ?>\n"; ?>
+	<?php echo "<?php echo " . $this->generateActiveGroup($this->modelClass, $column) . "; ?>\n"; ?>
 
 <?php endforeach; ?>
 	<div class="form-actions">
-		<?php echo "<?php \$this->widget('bootstrap.widgets.TbButton', array(
+		<?php echo "<?php \$this->widget('booster.widgets.TbButton', array(
 			'buttonType' => 'submit',
-			'type'=>'primary',
+			'context'=>'primary',
 			'label'=>'Search',
 		)); ?>\n"; ?>
 	</div>
