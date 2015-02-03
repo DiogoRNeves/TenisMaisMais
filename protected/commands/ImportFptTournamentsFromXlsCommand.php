@@ -15,22 +15,27 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
     const TOURNAMENT_VARIATIONS_DELIMITER = "; ";
 
     public function run($args) {
+        $fileName = $args[0];
+        $year = $args[1];
+        if (!is_numeric($year)) {
+            echo "The year must be numeric: '$year' given\n";
+            return 3;
+        }
         $this->doCaching();
         try {
-            $this->_excelTournaments = new CExcelTournamentReader(Yii::app()->basePath . '/data/' . $args[0]);
+            $this->_excelTournaments = new CExcelTournamentReader(Yii::app()->basePath . '/data/' . $fileName);
         } catch (Exception $e) {
             echo $e->getMessage() . " on line " . $e->getLine();
             return 2;
         }
 
         //TODO add criteria for current year
-        if (!$this->deleteAllTournamentsInfo()) {
+        if (!$this->deleteTournaments($year)) {
             echo "Unable to delete tournaments. Exiting.\n";
             return 1;
         }
 
         echo "Tournaments deleted.\n";
-        $startTime = new DateTime();
 
         for ($this->_excelTournaments->currentRow = $this->_excelTournaments->getFirstDataRow();
              $this->_excelTournaments->currentRow < $this->_excelTournaments->getMaxRow();
@@ -51,8 +56,6 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
                 }
             }
         }
-        $endTime = new DateTime();
-        echo "Done in " . $endTime->diff($startTime)->format("%s seconds") ."\n";
         return 0;
     }
 
@@ -116,14 +119,25 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
         return $federationClub;
     }
 
-    private function deleteAllTournamentsInfo()
+    private function deleteTournaments($year)
     {
-        FederationTournamentHasAgeBand::model()->deleteAll();
-        $model = FederationTournament::model()->deleteAll();
-        if ($model > 0 || FederationTournament::model()->count() == 0) {
-            return true;
+        //TODO understand why deleteAll($criteria) won't work on FederationTournamentHasAgeBand
+        $startDate = $year . "-01-01";
+        $endDate = $year . "-12-31";
+        $criteria = new CDbCriteria;
+        $criteria->addBetweenCondition('mainDrawStartDate', $startDate, $endDate);
+        $deleted = true;
+        foreach (FederationTournament::model()->findAll($criteria) as $federationTournament) {
+            $criteriaHas = new CDbCriteria;
+            $criteriaHas->compare('federationTournamentID', $federationTournament->primaryKey);
+            $previewDeleted = FederationTournamentHasAgeBand::model()->count($criteriaHas);
+            if ($previewDeleted > 0) {
+                $reallyDeleted = FederationTournamentHasAgeBand::model()->deleteAll($criteriaHas);
+                $deleted = $deleted && ($previewDeleted == $reallyDeleted);
+            }
+            $deleted = $deleted && $federationTournament->delete();
         }
-        return false;
+        return $deleted;
     }
 
     /**
