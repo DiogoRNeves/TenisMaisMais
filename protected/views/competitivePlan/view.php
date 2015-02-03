@@ -1,5 +1,7 @@
 <?php
-/* @var $this CompetitivePlanController */
+/* @var $this CompetitivePlanController
+ * @var $model AthleteGroup
+ */
 
 $this->breadcrumbs=array(
 	'Competitive Plan'=>array('/competitivePlan'),
@@ -7,12 +9,21 @@ $this->breadcrumbs=array(
 );
 
 $this->menu = array(
-	array('label' => 'Adicionar torneio', 'url' => 'javascript: alert("show search tounament modal now");'),
-	array('label' => 'Editar Atletas do Plano', 'url' => 'javascript: alert("show update form modal now");'),
+	array('label' => 'Adicionar torneio', 'url' => '#', 'linkOptions'=>array(
+			'data-toggle' => 'modal',
+			'data-target' => '#searchTournament',
+		)
+	),
+	array('label' => 'Editar Atletas do Plano', 'url' => '#', 'linkOptions'=>array(
+		'data-toggle' => 'modal',
+		'data-target' => '#competitivePlan',
+		)
+	),
+	array('label' => 'Eliminar Plano Competitivo', 'url' => '#'),
 );
 
 ?>
-<h1>Plano Competitivo: <?php echo $this->id . '/' . $this->action->id; ?></h1>
+<h1>Plano Competitivo: <?php echo $model->friendlyName; ?></h1>
 
 <?php
 
@@ -20,17 +31,26 @@ $this->widget(
 	'booster.widgets.TbTabs',
 	array(
 		'type' => 'tabs', // 'tabs' or 'pills'
-		'tabs' => array(
-			'tab1' => array(
+		'tabs' => array(/*
+			array(
 				'label' => 'Calendário',
-				'content' => $this->renderPartial('_calendar', array(), true),
+				'content' => $this->renderPartial('_calendar', array('model' => $model), true),
+				'active' => true
+			),*/
+			array(
+				'label' => 'Lista de Torneios',
+				'content' => $this->renderPartial('_tournamentPlanList', array('model' => $model), true),
 				'active' => true
 			),
-			'tab2' => array(
-				'label' => 'Lista',
-				'content' => $this->renderPartial('_tournamentPlanList', array(), true),
-				//'active' => true
+			array(
+				'label' => 'Atletas Abrangidos',
+				'content' => $this->renderPartial('_athleteList', array('model' => $model), true),
+				//'active' => true),
 			),
 		),
 	)
 );
+
+$this->renderPartial('_searchTournament', array('model' => $model));
+
+$this->renderPartial('_form', array('model' => $model));

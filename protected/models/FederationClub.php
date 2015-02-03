@@ -28,7 +28,7 @@ class FederationClub extends CExtendedActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('federationClubID, name', 'required'),
+            array('name', 'required'),
             array('federationClubID', 'numerical', 'integerOnly' => true),
             array('name, phoneNumber, fax', 'length', 'max' => 45),
             // The following rule is used by search().

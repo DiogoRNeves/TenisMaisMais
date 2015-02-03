@@ -107,7 +107,7 @@ class PlayerLevel extends CExtendedActiveRecord {
      * @return string the text that should come in a dropdownlist.
      */
     public function getCompiledListText() {
-        return $this->generalReference . " - " . $this->levelWithinReference;
+        return $this === null ? null : $this->generalReference . " - " . $this->levelWithinReference;
     }
     
     public function getPlayerLevel() {

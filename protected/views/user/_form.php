@@ -29,11 +29,13 @@
 
     <?php
     //PracticeCancelled
-    echo $form->switchGroup($user, 'male', array(
-        'enabledLabel' => 'M',
-        'disabledLabel' => 'F',
-        'value' => true,
-    )); ?>
+    echo $form->switchGroup($user, 'male', array('widgetOptions' => array(
+        'options' => array(
+            'onText' => 'M',
+            'offText' => 'F',
+            'value' => true,
+        ),
+    ))); ?>
 
     <?php
     if (isset($sponsor) && $sponsor->hasNotNullAttributes()) {

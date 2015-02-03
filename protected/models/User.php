@@ -28,8 +28,8 @@
  * @property PracticeSession[] $athletePracticeSessions
  * @property PracticeSessionHistory[] $practiceSessionHistories
  * @property PracticeSessionHistory[] $practiceSessionHistories1
- * @property Sponsor[] $sponsors
- * @property Sponsor[] $sponsoredAthletes
+ * @property User[] $sponsors
+ * @property User[] $sponsoredAthletes
  * @property Contact $contact
  * @property Home $home
  * @property PlayerLevel $playerLevel
@@ -257,7 +257,7 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * @param Club[] $clubs
+     * @param Club[]|Club $clubs
      * @return boolean
      */
     public function isCoachAt($clubs) {
@@ -925,6 +925,31 @@ class User extends CExtendedActiveRecord {
         /** @var PracticeSessionHistoryHasAthlete[] $data */
         $data = $practiceSessionHistoryHasAthlete->search()->getData();
         return empty($data) ? false : $data[0]->practiceSessionHistory;
+    }
+
+    /**
+     * @param bool $activeOnly whether all athlete groups or active only should be returned. Defaults to true
+     * @return CArrayDataProvider the data provider containing the related athlete groups for this user
+     */
+    public function searchAthleteGroup($activeOnly = true)
+    {
+        $eligibleAthleteGroups = array();
+        foreach (AthleteGroup::model()->findAll() as $athleteGroup) {
+            /** @var AthleteGroup $athleteGroup */
+            if ($athleteGroup->appliesTo($this) && (!$activeOnly || $athleteGroup->active)) {
+                $eligibleAthleteGroups[] = $athleteGroup;
+            }
+        }
+
+        /** @var $sort CSort */
+        $sort = new CSort();
+        $sort->attributes = AthleteGroup::model()->attributeNames();
+        $sort->defaultOrder = array("friendlyName" => CSort::SORT_ASC);
+
+        return new CArrayDataProvider($eligibleAthleteGroups, array(
+            'keyField' => AthleteGroup::model()->tableSchema->primaryKey,
+            'sort' => $sort,
+        ));
     }
 
 }

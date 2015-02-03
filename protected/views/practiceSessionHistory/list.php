@@ -147,4 +147,3 @@ $this->widget('booster.widgets.TbExtendedGridView', array(
         'style' => 'width:420px'
     ),
 ));
-?>

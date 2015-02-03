@@ -6,6 +6,7 @@
 class CHelper extends CApplicationComponent {
 
     const DEFAULT_TIME_FORMAT = 'H:i';
+    const DEFAULT_DATE_FORMAT = 'Y-m-d';
 
     private static $_select2HtmlOptions = array(
         'placeholder' => 'Please Select a Value',
@@ -270,6 +271,62 @@ class CHelper extends CApplicationComponent {
     public static function newDateTime($dateTimeString = null)
     {
         return new DateTime($dateTimeString, self::getTimeZone());
+    }
+
+    /**
+     * @param $age
+     * @return int
+     */
+    public static function ageToYearString($age)
+    {
+        $thisYear = (new DateTime())->format('Y');
+        return $thisYear - $age;
+    }
+
+    /**
+     * @param $string
+     * @return mixed
+     */
+    public static function removeCarriageReturns($string)
+    {
+        return preg_replace( "/\r|\n/", " ", $string);
+    }
+
+    public static function getCriteriaFromAttributes($attributes, $operator = 'AND')
+    {
+        $criteria = new CDbCriteria;
+        foreach ($attributes as $attribute => $value) {
+            $criteria->compare($attribute, $value, false, $operator);
+        }
+        return $criteria;
+    }
+
+    /**
+     * @param $data CActiveRecord[]
+     * @param $keyAttributeName string
+     * @param $valueAttributeName string
+     * @param $forceRefresh bool
+     * @return array
+     */
+    public static function modelsIntoAssociativeArrayInverted($data, $valueAttributeName, $keyAttributeName = 'primaryKey')
+    {
+        return self::modelsIntoAssociativeArray($data, $keyAttributeName, $valueAttributeName);
+    }
+
+    /**
+     * @param $data CActiveRecord[]
+     * @param $valueAttributeName string
+     * @param $keyAttributeName string
+     * @param $forceRefresh bool
+     * @return array
+     */
+    private static function modelsIntoAssociativeArray($data, $valueAttributeName, $keyAttributeName = 'primaryKey')
+    {
+        $result = array();
+        foreach ($data as $model) {
+            $result[$model->$keyAttributeName] = $model->$valueAttributeName;
+        }
+        return $result;
     }
 
 }

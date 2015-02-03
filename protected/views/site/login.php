@@ -17,22 +17,22 @@ $this->breadcrumbs = array(
     <?php
     $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'id' => 'login-form',
-        'type' => 'search'
+        'type' => 'horizontal'
     ));
     ?>
 
-    <?php echo $form->textFieldRow($model, 'username'); ?> <br />
+    <?php echo $form->textFieldGroup($model, 'username'); ?> <br />
 
-    <?php echo $form->passwordFieldRow($model, 'password'); ?> <br />
+    <?php echo $form->passwordFieldGroup($model, 'password'); ?> <br />
 
-    <?php echo $form->checkBoxRow($model, 'rememberMe', array('class' => 'rememberMe')); ?>
+    <?php echo $form->checkboxGroup($model, 'rememberMe', array('class' => 'rememberMe')); ?>
 
     <div class="form-actions">
         <?php
         $form->widget(
                 'booster.widgets.TbButton', array(
             'buttonType' => 'submit',
-            'type' => 'primary',
+            'context' => 'primary',
             'label' => 'Login',
         ));
         ?>

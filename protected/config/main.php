@@ -57,7 +57,7 @@ return array(
          */
         'db' => array(
             'connectionString' => 'mysql:host=localhost;dbname=mytennisapp',
-            'emulatePrepare' => true,
+            //'emulatePrepare' => true,
             'username' => 'myTennisUser',
             'password' => 'Tenis123',
             'charset' => 'utf8',

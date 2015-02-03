@@ -44,8 +44,8 @@ class FederationTournament extends CExtendedActiveRecord {
             array('federationTournamentID, level, mainDrawStartDate, mainDrawEndDate, name, city, surface, federationClubID', 'required'),
             array('federationTournamentID, meals, prizeMoney, federationClubID', 'numerical', 'integerOnly' => true),
             array('level', 'length', 'max' => 2),
-            array('name', 'length', 'max' => 150),
-            array('city, surface, accommodation', 'length', 'max' => 45),
+            array('city, name', 'length', 'max' => 150),
+            array('surface, accommodation', 'length', 'max' => 45),
             array('qualyStartDate, qualyEndDate', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
@@ -73,19 +73,19 @@ class FederationTournament extends CExtendedActiveRecord {
      */
     public function attributeLabels() {
         return array(
-            'federationTournamentID' => 'Federation Tournament',
-            'level' => 'Level',
-            'qualyStartDate' => 'Qualy Start Date',
-            'qualyEndDate' => 'Qualy End Date',
-            'mainDrawStartDate' => 'Main Draw Start Date',
-            'mainDrawEndDate' => 'Main Draw End Date',
-            'name' => 'Name',
-            'city' => 'City',
-            'surface' => 'Surface',
-            'accommodation' => 'Accommodation',
-            'meals' => 'Meals',
+            'federationTournamentID' => 'Torneio FPT',
+            'level' => 'Nível',
+            'qualyStartDate' => 'Data Início Qualy',
+            'qualyEndDate' => 'Data Início Qualy',
+            'mainDrawStartDate' => 'Data Início Quadro',
+            'mainDrawEndDate' => 'Data Fim Quadro',
+            'name' => 'Nome',
+            'city' => 'Cidade',
+            'surface' => 'Piso',
+            'accommodation' => 'Dormida',
+            'meals' => 'Alimentação',
             'prizeMoney' => 'Prize Money',
-            'federationClubID' => 'Federation Club',
+            'federationClubID' => 'Clube',
         );
     }
 
