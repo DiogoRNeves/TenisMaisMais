@@ -1,6 +1,7 @@
 <?php
 /* @var $this CompetitivePlanController
  * @var $model AthleteGroup
+ * @var $federationTournamentSearch FederationTournament
  */
 
 $this->breadcrumbs=array(
@@ -51,6 +52,7 @@ $this->widget(
 	)
 );
 
-$this->renderPartial('_searchTournament', array('model' => $model));
+$this->renderPartial('_searchTournament', array('model' => $model,
+	'federationTournamentSearch' => $federationTournamentSearch));
 
 $this->renderPartial('_form', array('model' => $model));

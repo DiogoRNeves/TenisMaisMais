@@ -23,7 +23,14 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
 
 <div style="display: none">
     <?php echo $form->textFieldGroup($model, 'practiceSessionID'); ?>
-    <?php echo CHelper::select2Row($form, $model, 'coachID', $model->club->getCoachesListData()); ?>
+    <?php
+        //echo CHelper::select2Row($form, $model, 'coachID', $model->club->getCoachesListData());
+        echo $form->textFieldGroup($model, 'coachID', array(
+            'widgetOptions' => array(
+                'htmlOptions' => array('class' => 'ignoreField')
+            )
+        ));
+    ?>
 </div>
 
 <?php echo CHelper::select2Row($form, $model, 'formAthletes', $model->club->getAthletesListData(), true); ?>
@@ -36,7 +43,11 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
 
 <div class="well" style="display: none">
     <?php echo $form->textFieldGroup($model, 'dayOfWeek'); ?>
-    <?php echo $form->textFieldGroup($model, 'clubID', array('class' => 'ignoreField')); ?>
+    <?php echo $form->textFieldGroup($model, 'clubID', array(
+        'widgetOptions' => array(
+            'htmlOptions' => array('class' => 'ignoreField')
+        )
+    )); ?>
 </div>
 
 <?php $this->endWidget(); ?><!-- form -->

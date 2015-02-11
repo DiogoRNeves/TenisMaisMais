@@ -1,7 +1,7 @@
 <?php
 /* @var $model AthleteGroup */
 /* @var $this CompetitivePlanController */
-/* @var $dataProvider CActiveDataProvider */
+/* @var $dataProvider CArrayDataProvider */
 
 $this->breadcrumbs=array(
 	'Competitive Plan',
@@ -26,16 +26,8 @@ $this->menu = array(
 			'type' => 'raw',
 			'value' => 'CHtml::link($data->friendlyName, Yii::app()->createUrl("'.$this->id.'/view",array("id"=>$data->primaryKey)))',
 		),
-		array(
-			'name' => 'minAge',
-			'header' => $labels['minAge'],
-			'value' => '$data->minAge === null ? null : $data->minAge',
-		),
-		array(
-			'name' => 'maxAge',
-			'header' => $labels['minAge'],
-			'value' => '$data->maxAge === null ? null : $data->maxAge',
-		),
+		'minAge::'.$labels['minAge'],
+		'maxAge::'.$labels['maxAge'],
 		array(
 			'name' => 'minPlayerLevelID',
 			'header' => $labels['minPlayerLevelID'],

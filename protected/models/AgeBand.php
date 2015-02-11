@@ -54,11 +54,11 @@ class AgeBand extends CExtendedActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ageBandID' => 'Age Band',
-			'name' => 'Name',
-			'maxAge' => 'Max Age',
-			'minAge' => 'Min Age',
-			'ageBandGroupID' => 'Age Band Group',
+			'ageBandID' => 'Escalão',
+			'name' => 'Nome',
+			'maxAge' => 'Idade máxima',
+			'minAge' => 'Idade mínima',
+			'ageBandGroupID' => 'Grupo',
 		);
 	}
 

@@ -235,4 +235,12 @@ class AthleteGroup extends CExtendedActiveRecord {
         return $result;
     }
 
+    /**
+     * @param $user User
+     * @return bool
+     */
+    public function canBeUpdatedBy($user) {
+        return $user->isCoachAt($this->club) || $user->isSystemAdmin();
+    }
+
 }

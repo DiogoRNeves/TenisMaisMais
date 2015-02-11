@@ -65,7 +65,12 @@ $this->beginWidget(
 </div>
 
 <div class="modal-footer">
-    <?php $this->widget(
+    <?php
+    $redirectURL = $this->createUrl("view", array('id' => "athleteGroupID"));
+    $redirectJavascript = 'window.location.replace("'. $redirectURL . '".replace("athleteGroupID", data.athleteGroupID))';
+    $updateJavascript = '$.fn.yiiGridView.update("athlete-list");';
+    $javascript = $this->getFormAction() === 'create' ? $redirectJavascript : $updateJavascript;
+    $this->widget(
         'booster.widgets.TbButton',
         array(
             'buttonType' => 'ajaxSubmit',
@@ -75,9 +80,7 @@ $this->beginWidget(
             'ajaxOptions' => array(
                 'type' => 'POST',
                 'data'=>'js:$("#' . $form->id . '").serialize()',
-                'success' => 'function(data) {
-                                $.fn.yiiGridView.update("athlete-' . ($this->getFormAction() === 'create' ? 'group-' : '') . 'list");
-                }',
+                'success' => 'function(data) { ' . $javascript . '; }',
             ),
             'htmlOptions' => array('data-dismiss' => 'modal'),
         )

@@ -7,27 +7,19 @@ function convertRequiredFields(eventData, start, end) {
 }
 
 function dSelect(start, end) {
-    var eventData = {};
-    var eventData = convertRequiredFields({start: 0}, start, end);
+    var newSession = {formAthletes: null, groupLevel: null, practiceSessionID: null};
+    var eventData = convertRequiredFields(newSession, start, end);
     showForm(eventData, false);
     $("#calendar").fullCalendar("unselect");
 }
 
 function populateForm(form, event) {
-    var coachIDelement = form.find("[id$='coachID']");
-    var coachID = coachIDelement.select2('val');
-    form.find('form').not('.ignoreField').val('').removeAttr('checked').removeAttr('selected');
-    form.find(':input').not('.ignoreField').each(function() {
-        updateValue($(this), null);
-    });
     for (var key in event) {
-        var obj = event[key];
         if (key.charAt(0) !== '_' && key !== 'className') {
             var field = form.find("[id$='" + key + "']");
-            updateValue(field, obj);
+            updateValue(field, event[key]);
         }
     }
-    updateValue(coachIDelement, coachID);
 }
 
 function updateValue(field, obj) {
@@ -47,7 +39,8 @@ function updateValue(field, obj) {
 function isSelect2(field) {
     var classStart = 'select2';
     try {
-        return field.attr('class').substr(0, classStart.length) === classStart;
+        var classNameOK = field.attr('class').substr(0, classStart.length) === classStart;
+        return classNameOK;
     } catch (err) {
         return false;
     }

@@ -49,7 +49,8 @@ class FederationTournament extends CExtendedActiveRecord {
             array('qualyStartDate, qualyEndDate', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('federationTournamentID, level, qualyStartDate, qualyEndDate, mainDrawStartDate, mainDrawEndDate, name, city, surface, accommodation, meals, prizeMoney, federationClubID', 'safe', 'on' => 'search'),
+            array('federationTournamentID, level, qualyStartDate, qualyEndDate, mainDrawStartDate, mainDrawEndDate, name,
+            city, surface, accommodation, meals, prizeMoney, federationClubID, federationClub', 'safe', 'on' => 'search'),
         );
     }
 
@@ -80,7 +81,7 @@ class FederationTournament extends CExtendedActiveRecord {
             'mainDrawStartDate' => 'Data Início Quadro',
             'mainDrawEndDate' => 'Data Fim Quadro',
             'name' => 'Nome',
-            'city' => 'Cidade',
+            'city' => 'Local', //'Cidade',
             'surface' => 'Piso',
             'accommodation' => 'Dormida',
             'meals' => 'Alimentação',
@@ -106,6 +107,10 @@ class FederationTournament extends CExtendedActiveRecord {
 
         $criteria = new CDbCriteria;
 
+        $criteria->distinct = true;
+        $criteria->together = true;
+        $criteria->with = array('federationClub');
+
         $criteria->compare('federationTournamentID', $this->federationTournamentID);
         $criteria->compare('level', $this->level, true);
         $criteria->compare('qualyStartDate', $this->qualyStartDate, true);
@@ -118,11 +123,18 @@ class FederationTournament extends CExtendedActiveRecord {
         $criteria->compare('accommodation', $this->accommodation, true);
         $criteria->compare('meals', $this->meals);
         $criteria->compare('prizeMoney', $this->prizeMoney);
-        $criteria->compare('federationClubID', $this->federationClubID);
+        if ($this->federationClub !== null) {
+            $criteria->compare('federationClub.name', $this->federationClub->name);
+        }
 
-        return new CActiveDataProvider($this, array(
+        $dataProvider = new CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));
+
+        $dataProvider->pagination->pageSize = 5;
+        $dataProvider->sort->defaultOrder = array("mainDrawStartDate" => CSort::SORT_ASC);
+
+        return $dataProvider;
     }
 
     /**
@@ -135,4 +147,21 @@ class FederationTournament extends CExtendedActiveRecord {
         return parent::model($className);
     }
 
+    public function getAgeBandsString() {
+        $result = array();
+        foreach ($this->ageBands as $ageBand) {
+            $result[] = $ageBand->name;
+        }
+
+        return implode("; ",$result);
+    }
+
+    public function isInAthleteGroup($athleteGroupID) {
+        foreach ($this->athleteGroups as $athleteGroup) {
+            if ($athleteGroup->primaryKey == $athleteGroupID) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

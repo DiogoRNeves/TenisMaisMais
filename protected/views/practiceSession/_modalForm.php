@@ -20,7 +20,7 @@ $this->beginWidget('booster.widgets.TbModal', array(
     $this->widget(
             'booster.widgets.TbButton', array(
         'context' => 'primary',
-        'label' => 'Save',
+        'label' => 'Gravar',
         'htmlOptions' => array(
             'class' => 'submitModal'),
             )
@@ -30,11 +30,16 @@ $this->beginWidget('booster.widgets.TbModal', array(
     $this->widget(
             'booster.widgets.TbButton', array(
         'context' => 'danger',
-        'label' => 'Delete',
+        'label' => 'Apagar',
         'htmlOptions' => array(
             'class' => 'deleteObject',
             'data-toggle' => 'confirmation',
             'data-popout' => 'true',
+            'data-placement' => 'top',
+            'data-btnOkClass' => 'btn btn-sm btn-primary',
+            'data-title' => 'Tem a certeza?',
+            'data-btnOkLabel' => '<i class="icon-ok-sign icon-white"></i> Sim',
+            'data-btnCancelLabel' => '<i class="icon-remove-sign"></i> Não',
             'data-baseUrl' => $this->createUrl('practiceSession/delete'),
         ),
             )
@@ -43,7 +48,7 @@ $this->beginWidget('booster.widgets.TbModal', array(
     <?php
     $this->widget(
             'booster.widgets.TbButton', array(
-        'label' => 'Close',
+        'label' => 'Fechar',
         'url' => '#',
         'htmlOptions' => array('data-dismiss' => 'modal'),
             )

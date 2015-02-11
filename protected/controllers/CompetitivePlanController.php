@@ -27,9 +27,9 @@ class CompetitivePlanController extends Controller
 		$user = User::getLoggedInUser();
 		return array(
 			array('allow', // allow admin user to perform 'admin' actions
-				'actions' => array('create', 'index', 'view', 'update'),
+				'actions' => array('create', 'index', 'view', 'update', 'addTournament', 'removeTournament'),
 				'users' => array('@'),
-				'expression' => array($user, 'isSystemAdmin'),
+				//'expression' => array($user, 'isSystemAdmin'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
 				'actions' => array('index'),
@@ -60,13 +60,13 @@ class CompetitivePlanController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		$result = array('no action');
+		$result = array('error' => 'no action');
 
 		if (isset($_POST['AthleteGroup'])) {
 			$model->attributes = $_POST['AthleteGroup'];
-			$result = array($model->save() ? 'saved' : 'error');
+			$result = $model->save() ? $model : array('error' => $model->getErrorsString());
 		}
-
+		header('Content-Type: application/json');
 		echo CJSON::encode($result);
 		Yii::app()->end();
 	}
@@ -111,7 +111,31 @@ class CompetitivePlanController extends Controller
 	public function actionView($id)
 	{
 		$model = $this->loadModel($id);
-		$this->render('view', array('model' => $model));
+		$federationTournamentSearch = new FederationTournament('search');
+		$temp = Yii::app()->request->getParam('FederationTournament');
+		$federationTournamentSearch->attributes = $temp;
+		$this->render('view', array('model' => $model,
+			'federationTournamentSearch' => $federationTournamentSearch));
+	}
+
+	public function actionAddTournament($federationTournamentID, $athleteGroupID) {
+		$model = new CompetitivePlan;
+		$model->federationTournamentID = $federationTournamentID;
+		$model->athleteGroupID = $athleteGroupID;
+		header('Content-Type: application/json');
+		echo CJSON::encode($model->save() ? FederationTournament::model()->findByPk($federationTournamentID) : array('error' => $model->getErrorsString()));
+		Yii::app()->end();
+	}
+
+	public function actionRemoveTournament($federationTournamentID, $athleteGroupID) {
+		$model = new CompetitivePlan;
+		$model = $model->findByAttributes(array(
+			'federationTournamentID' => $federationTournamentID,
+			'athleteGroupID' => $athleteGroupID,
+		));
+		header('Content-Type: application/json');
+		echo CJSON::encode($model->delete() ? FederationTournament::model()->findByPk($federationTournamentID) : array('error' => $model->getErrorsString()));
+		Yii::app()->end();
 	}
 
 	public function actionList()
