@@ -243,4 +243,40 @@ class AthleteGroup extends CExtendedActiveRecord {
         return $user->isCoachAt($this->club) || $user->isSystemAdmin();
     }
 
+    /**
+     * @return array
+     */
+    public function getAgeBandIDs() {
+        $result = array();
+        foreach ($this->getAgeBands() as $ageBand) {
+            $result[] = $ageBand->primaryKey;
+        }
+        return $result;
+    }
+
+    /**
+     * @return AgeBand[]
+     */
+    public function getAgeBands() {
+        $result = array();
+        foreach (AgeBand::model()->findAll() as $ageBand) {
+            if ($this->hasAgeBand($ageBand)) {
+                $result[] = $ageBand;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $ageBand AgeBand
+     * @return bool
+     */
+    public function hasAgeBand($ageBand) {
+        $ageBandMinAge = $ageBand->minAge === null ? 1 : $ageBand->minAge;
+        $athleteGroupMinAge = $this->minAge === null ? 1 : $this->minAge;
+        $ageBandMaxAge = $ageBand->maxAge === null ? 999 : $ageBand->maxAge;
+        $athleteGroupMaxAge = $this->maxAge === null ? 999 : $this->maxAge;
+        return $ageBandMinAge <= $athleteGroupMinAge && $ageBandMaxAge >= $athleteGroupMaxAge;
+    }
+
 }

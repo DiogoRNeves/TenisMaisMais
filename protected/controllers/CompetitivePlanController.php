@@ -27,7 +27,7 @@ class CompetitivePlanController extends Controller
 		$user = User::getLoggedInUser();
 		return array(
 			array('allow', // allow admin user to perform 'admin' actions
-				'actions' => array('create', 'index', 'view', 'update', 'addTournament', 'removeTournament'),
+				'actions' => array('create', 'index', 'view', 'update', 'addTournament', 'removeTournament', 'deactivate'),
 				'users' => array('@'),
 				//'expression' => array($user, 'isSystemAdmin'),
 			),
@@ -112,8 +112,13 @@ class CompetitivePlanController extends Controller
 	{
 		$model = $this->loadModel($id);
 		$federationTournamentSearch = new FederationTournament('search');
+		$federationTournamentSearch->unsetAttributes();
 		$temp = Yii::app()->request->getParam('FederationTournament');
-		$federationTournamentSearch->attributes = $temp;
+		if ($temp === null) {
+			$federationTournamentSearch->ageBands = $model->getAgeBandIDs();
+		} else {
+			$federationTournamentSearch->attributes = $temp;
+		}
 		$this->render('view', array('model' => $model,
 			'federationTournamentSearch' => $federationTournamentSearch));
 	}
@@ -128,8 +133,8 @@ class CompetitivePlanController extends Controller
 	}
 
 	public function actionRemoveTournament($federationTournamentID, $athleteGroupID) {
-		$model = new CompetitivePlan;
-		$model = $model->findByAttributes(array(
+		/** @var CompetitivePlan $model */
+		$model = CompetitivePlan::model()->findByAttributes(array(
 			'federationTournamentID' => $federationTournamentID,
 			'athleteGroupID' => $athleteGroupID,
 		));
@@ -138,17 +143,30 @@ class CompetitivePlanController extends Controller
 		Yii::app()->end();
 	}
 
+	public function actionDeactivate($id) {
+		/** @var AthleteGroup $model */
+		$model = AthleteGroup::model()->findByPk($id);
+		if ($model === null) { throw new CHttpException(404,"AthleteGroup $id not found.");	}
+		$model->active = false;
+		if ($model->save()) {
+			$this->redirect(array($this->id . '/index'));
+		}
+		throw new CHttpException(500,"AthleteGroup $id could not be deleted.");
+	}
+
 	public function actionList()
 	{
 		$this->render('list');
 	}
 
 
-
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer the ID of the model to be loaded
+	 * @param $id
+	 * @return AthleteGroup
+	 * @throws CHttpException
+	 * @internal param the $integer ID of the model to be loaded
 	 */
 	public function loadModel($id) {
 		$model = AthleteGroup::model()->findByPk($id);

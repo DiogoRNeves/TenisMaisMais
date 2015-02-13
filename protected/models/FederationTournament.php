@@ -17,15 +17,17 @@
  * @property integer $meals
  * @property integer $prizeMoney
  * @property integer $federationClubID
+ * @property string $searchDateRange
  *
  * The followings are the available model relations:
  * @property AthleteGroup[] $athleteGroups
  * @property CompetitiveResultHistory[] $competitiveResultHistories
  * @property FederationClub $federationClub
  * @property AgeBand[] $ageBands
- * @property TournamentType[] $tournamentTypes
  */
 class FederationTournament extends CExtendedActiveRecord {
+
+    public $searchDateRange, $searchDistance;
 
     /**
      * @return string the associated database table name
@@ -50,7 +52,7 @@ class FederationTournament extends CExtendedActiveRecord {
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('federationTournamentID, level, qualyStartDate, qualyEndDate, mainDrawStartDate, mainDrawEndDate, name,
-            city, surface, accommodation, meals, prizeMoney, federationClubID, federationClub', 'safe', 'on' => 'search'),
+            city, surface, accommodation, meals, prizeMoney, federationClubID, federationClub, ageBands, searchDateRange, searchDistance', 'safe', 'on' => 'search'),
         );
     }
 
@@ -65,7 +67,6 @@ class FederationTournament extends CExtendedActiveRecord {
             'competitiveResultHistories' => array(self::HAS_MANY, 'CompetitiveResultHistory', 'federationTournamentID'),
             'federationClub' => array(self::BELONGS_TO, 'FederationClub', 'federationClubID'),
             'ageBands' => array(self::MANY_MANY, 'AgeBand', 'FederationTournamentHasAgeBand(federationTournamentID, ageBandID)'),
-            'tournamentTypes' => array(self::HAS_MANY, 'TournamentType', 'federationTournamentID'),
         );
     }
 
@@ -87,6 +88,8 @@ class FederationTournament extends CExtendedActiveRecord {
             'meals' => 'Alimentação',
             'prizeMoney' => 'Prize Money',
             'federationClubID' => 'Clube',
+            'searchDateRange' => 'Período de tempo',
+            'searchDistance' => 'Distância máxima ao clube',
         );
     }
 
@@ -109,10 +112,10 @@ class FederationTournament extends CExtendedActiveRecord {
 
         $criteria->distinct = true;
         $criteria->together = true;
-        $criteria->with = array('federationClub');
+        $criteria->with = array('federationClub', 'ageBands');
 
         $criteria->compare('federationTournamentID', $this->federationTournamentID);
-        $criteria->compare('level', $this->level, true);
+        $criteria->compare('level', $this->level);
         $criteria->compare('qualyStartDate', $this->qualyStartDate, true);
         $criteria->compare('qualyEndDate', $this->qualyEndDate, true);
         $criteria->compare('mainDrawStartDate', $this->mainDrawStartDate, true);
@@ -123,8 +126,17 @@ class FederationTournament extends CExtendedActiveRecord {
         $criteria->compare('accommodation', $this->accommodation, true);
         $criteria->compare('meals', $this->meals);
         $criteria->compare('prizeMoney', $this->prizeMoney);
+
+        if (!CHelper::isNullOrEmptyString($this->searchDateRange)) {
+            $dates = explode(" a ", $this->searchDateRange);
+            $criteria->addBetweenCondition('IFNULL(qualyStartDate, mainDrawStartDate)',$dates[0], $dates[1]);
+        }
+
         if ($this->federationClub !== null) {
             $criteria->compare('federationClub.name', $this->federationClub->name);
+        }
+        if ($this->ageBands !== null) {
+            $criteria->compare('ageBands.ageBandID', $this->ageBands);
         }
 
         $dataProvider = new CActiveDataProvider($this, array(
@@ -149,11 +161,16 @@ class FederationTournament extends CExtendedActiveRecord {
 
     public function getAgeBandsString() {
         $result = array();
+        $this->refresh();
         foreach ($this->ageBands as $ageBand) {
             $result[] = $ageBand->name;
         }
 
         return implode("; ",$result);
+    }
+
+    public function getFederationSiteLink() {
+        return Yii::app()->params["fptTournamentUrlBase"] . $this->primaryKey;
     }
 
     public function isInAthleteGroup($athleteGroupID) {

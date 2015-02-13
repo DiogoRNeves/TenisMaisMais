@@ -7,6 +7,11 @@
  * @property integer $federationTournamentID
  * @property integer $ageBandID
  * @property integer $tournamentVariationID
+ *
+ * Relations:
+ * @property AgeBand $ageBand
+ * @property FederationTournament $federationTournament
+ * @property TournamentVariation $tournamentVariation
  */
 class FederationTournamentHasAgeBand extends CExtendedActiveRecord
 {
@@ -43,6 +48,8 @@ class FederationTournamentHasAgeBand extends CExtendedActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'federationTournament' => array(self::HAS_ONE, 'FederationTournament', 'federationTournamentID'),
+			'ageBand' => array(self::HAS_ONE, 'AgeBand', 'ageBandID'),
+			'tournamentVariation' => array(self::HAS_ONE, 'TournamentVariation', 'tournamentVariationID'),
 		);
 	}
 

@@ -88,5 +88,6 @@ return array(
         // this is used in contact page
         'adminEmail' => 'admin@tenismaismais.com',
         'playerLevelURL' => 'http://www.tennisplayandstay.com/media/131801/131801.pdf',
+        'fptTournamentUrlBase' => 'http://www.tenis.pt/index.php/competicao/calendario/nacionais/tournement/',
     ),
 );

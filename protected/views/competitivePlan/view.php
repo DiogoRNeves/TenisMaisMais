@@ -10,17 +10,37 @@ $this->breadcrumbs=array(
 );
 
 $this->menu = array(
-	array('label' => 'Adicionar torneio', 'url' => '#', 'linkOptions'=>array(
+	array('label' => 'Adicionar torneio', 'url' => '#', 'linkOptions'=> array(
 			'data-toggle' => 'modal',
 			'data-target' => '#searchTournament',
 		)
 	),
-	array('label' => 'Editar Atletas do Plano', 'url' => '#', 'linkOptions'=>array(
+	array('label' => 'Editar Atletas do Plano', 'url' => '#', 'linkOptions'=> array(
 		'data-toggle' => 'modal',
 		'data-target' => '#competitivePlan',
 		)
 	),
-	array('label' => 'Eliminar Plano Competitivo', 'url' => '#'),
+	array('label' => 'Eliminar Plano Competitivo', 'url' => '#', 'linkOptions'=>array(
+		'onclick' => "js:bootbox.confirm({
+			title: 'Eliminar Plano Competitivo',
+			message: 'Tem a certeza que quer eliminar este Plano Competitivo?',
+			buttons: {
+				'cancel': {
+					label: 'Não eliminar',
+					className: 'btn-default pull-left'
+				},
+				'confirm': {
+					label: 'Sim, eliminar',
+					className: 'btn-danger pull-right'
+				}
+			},
+			callback: function(result) {
+				if (result) {
+					 window.location = '" . $this->createUrl('deactivate', array('id' => $model->athleteGroupID)) . "';
+				}
+			}
+		})",
+	)),
 );
 
 ?>

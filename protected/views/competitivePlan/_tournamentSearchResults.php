@@ -1,53 +1,59 @@
 <?php
 /* @var $this CompetitivePlanController
  * @var $model AthleteGroup
+ * @var $federationTournamentSearch FederationTournament
  */
 
-$gridColumns = array();
-if ($model->canBeUpdatedBy(User::getLoggedInUser())) {
-    $gridColumns[] = array(
-        'class'=>'booster.widgets.TbButtonColumn',
-        'template' => '{delete}',
-        'buttons' => array(
-            'delete' => array (
-                'label' => 'Remover torneio do plano',
-                //'icon' => 'minus',
-                'click' => "function(){
-                                    var element = $('#tournament-list');
+$this->widget('booster.widgets.TbExtendedGridView', array(
+    'id' => 'search-tournament-table',
+    'responsiveTable' => true,
+    //'fixedHeader' => true,
+    //'headerOffset' => 50,
+    'dataProvider' => $federationTournamentSearch->search(),
+    //'type' => 'striped',
+    //'filter' => $federationTournamentSearch,
+    'columns' => array(
+        array(
+            'class'=>'booster.widgets.TbButtonColumn',
+            'template' => '{add}',
+            'buttons' => array(
+                'add' => array (
+                    'label'=>'Adicionar torneio ao plano',
+                    'icon'=>'plus',
+                    'click'=>"function(){
+                                    var element = $('#searchTournament .modal-header');
                                     $.ajax({
                                         url : $(this).attr('href'),
                                     }).success(function(res) {
                                         var tournamentName = res.name;
-                                        element.notify('Torneio \"' + tournamentName + '\" removido do plano!',
+                                        element.notify('Torneio \"' + tournamentName + '\" adicionado ao plano!',
                                         {
                                             className : 'success',
-                                            position : 'top center'
+                                            position : 'bottom center'
                                         });
                                         $.fn.yiiGridView.update('search-tournament-table');
                                         $.fn.yiiGridView.update('tournament-list');
                                     }).fail( function() {
-                                        element.notify('Não foi possível remover o torneio do plano.',
+                                        element.notify('Não foi possível adicionar o torneio ao plano.',
                                         {
                                             className : 'error',
-                                            position : 'top center'
+                                            position : 'bottom center'
                                         });
                                     });
                                     return false;
                                 }
                              ",
-                'url' => 'Yii::app()->createUrl("competitivePlan/removeTournament", array(
+                    'url' => 'Yii::app()->createUrl("competitivePlan/addTournament", array(
                                 "federationTournamentID" => $data->primaryKey,
                                 "athleteGroupID" => ' . $model->primaryKey . '
                             ))',
-                'options'=>array(
-                    'class'=>'btn btn-small',
+                    'options'=>array(
+                        'class'=>'btn btn-small',
+                    ),
+                    'visible' => '!$data->isInAthleteGroup(' . $model->primaryKey . ')',
                 ),
             ),
         ),
-    );
-}
-
-$gridColumns = array_merge($gridColumns, array(
         array(
             'name' => 'mainDrawStartDate',
             'header' => 'Data de início',
@@ -62,30 +68,22 @@ $gridColumns = array_merge($gridColumns, array(
             'name' => 'name',
             'type' => 'raw',
             'value' => 'CHtml::link($data->name, $data->getFederationSiteLink(), array(
-                    "target" => "_blank"
-                ));'
+                        "target" => "_blank",
+                    ));'
         ),
         'surface',
         array(
-            'name' => 'federationClubID',
+            'name' => 'federationClub.name',
             'value' => '$data->federationClub->name',
+            'header' => FederationTournament::model()->getAttributeLabel('federationClubID'),
         ),
-        'city',
         array(
             'name' => 'ageBandsString',
             'header' => AgeBand::model()->getAttributeLabel('ageBandID'),
             'value' => '$data->ageBandsString',
         ),
-    )
-);
-
-$this->widget('booster.widgets.TbExtendedGridView', array(
-    'id' => 'tournament-list',
-    'responsiveTable' => true,
-    'fixedHeader' => true,
-    'headerOffset' => 50,
-    'dataProvider' => $model->searchFederationTournaments(),
-    'type' => 'striped',
-    //'filter' => new FederationTournament,
-    'columns' => $gridColumns,
+    ),
 ));
+/** @var CClientScript $cs */
+$cs = Yii::app()->getClientScript();
+$cs->registerScript('makeLargeModal', new CJavaScriptExpression('$("#searchTournament .modal-dialog").addClass("modal-lg");'));
