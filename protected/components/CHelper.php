@@ -254,9 +254,10 @@ class CHelper extends CApplicationComponent {
         return trim($result);
     }
 
-    public static function getTodayDate()
+    public static function getTodayDate($format = null)
     {
-        return self::getNow()->format('Y-m-d');
+        $format = $format === null ? self::DEFAULT_DATE_FORMAT : $format;
+        return self::getNow()->format($format);
     }
 
     public static function getNow()

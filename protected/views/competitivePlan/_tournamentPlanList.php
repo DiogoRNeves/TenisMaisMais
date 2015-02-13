@@ -3,6 +3,9 @@
  * @var $model AthleteGroup
  */
 
+//TODO: add "show past events" option
+//TODO: add "export to pdf" option
+
 $gridColumns = array();
 if ($model->canBeUpdatedBy(User::getLoggedInUser())) {
     $gridColumns[] = array(

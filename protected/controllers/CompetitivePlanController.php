@@ -116,6 +116,7 @@ class CompetitivePlanController extends Controller
 		$temp = Yii::app()->request->getParam('FederationTournament');
 		if ($temp === null) {
 			$federationTournamentSearch->ageBands = $model->getAgeBandIDs();
+			$federationTournamentSearch->searchDateRange = CHelper::getTodayDate() . " a " . CHelper::getTodayDate("Y-m-t");
 		} else {
 			$federationTournamentSearch->attributes = $temp;
 		}

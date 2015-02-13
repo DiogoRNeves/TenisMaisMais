@@ -16,6 +16,12 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
 <?php //echo $form->textFieldGroup($model, 'friendlyName'); ?>
 
 <?php
+    Yii::app()->clientScript->registerScript('updateSearchResults' , new CJavaScriptExpression(
+        "function updateSearchResults() { $.fn.yiiGridView.update('search-tournament-table', {
+            data: $(\"#" . $form->id . "\").serialize() + '&" . get_class($model) . "_page=1'
+        }); }"
+    ));
+    $updateSearchResultsJS = new CJavaScriptExpression('function() { updateSearchResults(); }');
     echo $form->dateRangeGroup($model, 'searchDateRange', array(
         'widgetOptions' => array(
             'options' => array(
@@ -43,6 +49,8 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
                         new CJavaScriptExpression('moment().add("year", 1).endOf("year")'),
                     ),
                 ),
+                //'startDate' => new CJavaScriptExpression('moment()'),
+                //'endDate' => new CJavaScriptExpression('moment().endOf("year")'),
                 'locale' => array(
                     'fromLabel' => 'De',
                     'toLabel' => 'A',
@@ -51,6 +59,7 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
                     'customRangeLabel' => 'Outras Datas'
                 ),
             ),
+            'callback' => $updateSearchResultsJS,
         ),
     ));
 ?>
@@ -59,8 +68,13 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
     echo $form->select2Group($model, 'ageBands', array(
         'widgetOptions' => array(
             'data' => AgeBand::model()->getListData(),
-            'htmlOptions' => array('multiple' => 'multiple'),
+            'htmlOptions' => array(
+                'multiple' => 'multiple',
+            ),
             'options' => array('placeholder' => $model->getAttributeLabel('ageBands')),
+            'events' => array(
+                'change' => $updateSearchResultsJS,
+            ),
         ),
     ));
 ?>
@@ -72,6 +86,9 @@ echo $form->select2Group($model, 'surface', array(
         'data' => array("Duro" => "Duro", "Terra" => "Terra", "Relva" => "Relva"),
         'htmlOptions' => array('multiple' => 'multiple'),
         'options' => array('placeholder' => $model->getAttributeLabel('surface')),
+        'events' => array(
+            'change' => $updateSearchResultsJS,
+        ),
     ),
     'label' => $model->getAttributeLabel('surface'),
 ));
@@ -83,13 +100,16 @@ echo $form->select2Group($model, 'level', array(
         'data' => array("C" => "Nível C", "B" => "Nível B", "A" => "Nível A", "CR" => "Campeonato Regional", "CN" => "Campeonato Nacional"),
         'htmlOptions' => array('multiple' => 'multiple'),
         'options' => array('placeholder' => $model->getAttributeLabel('level')),
+        'events' => array(
+            'change' => $updateSearchResultsJS,
+        ),
     ),
     'label' => $model->getAttributeLabel('level'),
 ));
 ?>
 
 <?php
-echo $form->textFieldGroup($model, 'searchDistance');
+//echo $form->textFieldGroup($model, 'searchDistance');
 ?>
 
 <div class="form-actions pull-right">
@@ -104,7 +124,7 @@ echo $form->textFieldGroup($model, 'searchDistance');
                 'label' => 'Pesquisar',
                 'htmlOptions' => array(
                     'class' => 'pull-right',
-                    'onclick' => "$.fn.yiiGridView.update('search-tournament-table', { data: $(\"#" . $form->id . "\").serialize() }); return false;"
+                    'onclick' => "updateSearchResults(); return false;"
                 ),
                 /*
                 'ajaxOptions' => array(
