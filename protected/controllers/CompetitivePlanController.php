@@ -129,7 +129,19 @@ class CompetitivePlanController extends Controller
 	}
 
 	public function actionDownloadPdf($id, $showPastEvents) {
-		echo "Im trying ok? id: $id and showPastEvents: $showPastEvents";
+		/** @var AthleteGroup $model */
+		$model = AthleteGroup::model()->findByPk($id);
+		$model->showPastEvents = $showPastEvents;
+
+		/*
+		/** @var HTML2PDF $html2pdf *//*
+		$html2pdf = Yii::app()->ePdf->HTML2PDF();
+		$html2pdf->WriteHTML($this->renderPartial('_plansTournaments', array('model' => $model), true));
+		$html2pdf->Output("Teste.pdf", 'D');
+		*/
+
+		$this->renderPartial('_pdf', array('model' => $model));
+
 	}
 
 	public function actionAddTournament($federationTournamentID, $athleteGroupID) {

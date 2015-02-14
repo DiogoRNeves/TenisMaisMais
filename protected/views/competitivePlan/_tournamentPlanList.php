@@ -68,14 +68,14 @@ echo $form->switchGroup($model, 'showPastEvents', array('widgetOptions' => array
                                 label: 'Sim',
                                 className: 'btn-default',
                                 callback: function() {
-                                    window.open('$showPastEventsLink', '_blank');
+                                    window.location.replace('$showPastEventsLink');
                                 }
                             },
                             no: {
                                 label: 'Não',
                                 className: 'btn-primary',
                                 callback: function() {
-                                    window.open('$notShowPastEventsLink', '_blank');
+                                    window.location.replace('$notShowPastEventsLink');
                                 }
                             }
                         }
@@ -89,92 +89,5 @@ echo $form->switchGroup($model, 'showPastEvents', array('widgetOptions' => array
 <?php $this->endWidget(); //end form ?>
 </div>
 
-<?php
+<?php $this->renderPartial('_plansTournaments', array('model' => $model));
 
-$gridColumns = array();
-if ($model->canBeUpdatedBy(User::getLoggedInUser())) {
-    $gridColumns[] = array(
-        'class'=>'booster.widgets.TbButtonColumn',
-        'template' => '{delete}',
-        'buttons' => array(
-            'delete' => array (
-                'label' => 'Remover torneio do plano',
-                //'icon' => 'minus',
-                'click' => "function(){
-                                    var element = $('#tournament-list');
-                                    $.ajax({
-                                        url : $(this).attr('href'),
-                                    }).success(function(res) {
-                                        var tournamentName = res.name;
-                                        element.notify('Torneio \"' + tournamentName + '\" removido do plano!',
-                                        {
-                                            className : 'success',
-                                            position : 'top center'
-                                        });
-                                        $.fn.yiiGridView.update('search-tournament-table');
-                                        $.fn.yiiGridView.update('tournament-list');
-                                    }).fail( function() {
-                                        element.notify('Não foi possível remover o torneio do plano.',
-                                        {
-                                            className : 'error',
-                                            position : 'top center'
-                                        });
-                                    });
-                                    return false;
-                                }
-                             ",
-                'url' => 'Yii::app()->createUrl("competitivePlan/removeTournament", array(
-                                "federationTournamentID" => $data->primaryKey,
-                                "athleteGroupID" => ' . $model->primaryKey . '
-                            ))',
-                'options'=>array(
-                    'class'=>'btn btn-small',
-                ),
-            ),
-        ),
-    );
-}
-
-$gridColumns = array_merge($gridColumns, array(
-        array(
-            'name' => 'mainDrawStartDate',
-            'header' => 'Datas de realização',
-            'value' => '$data->getDateRange()'
-        ),
-        array(
-            'name' => 'qualyStartDate',
-            'header' => 'Qualifying',
-            'value' => '$data->hasQuali() ? "Sim" : "Não"',
-        ),
-        'level',
-        array(
-            'name' => 'name',
-            'type' => 'raw',
-            'value' => 'CHtml::link($data->name, $data->getFederationSiteLink(), array(
-                    "target" => "_blank"
-                ));'
-        ),
-        'surface',
-        array(
-            'name' => 'federationClubID',
-            'value' => '$data->federationClub->name',
-        ),
-        'city',
-        array(
-            'name' => 'ageBandsString',
-            'header' => AgeBand::model()->getAttributeLabel('ageBandID'),
-            'value' => '$data->ageBandsString',
-        ),
-    )
-);
-
-$this->widget('booster.widgets.TbExtendedGridView', array(
-    'id' => 'tournament-list',
-    'responsiveTable' => true,
-    'fixedHeader' => true,
-    'headerOffset' => 50,
-    'dataProvider' => $model->searchFederationTournaments(),
-    'type' => 'striped',
-    //'filter' => new FederationTournament,
-    'columns' => $gridColumns,
-));

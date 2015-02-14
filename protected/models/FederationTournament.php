@@ -90,6 +90,7 @@ class FederationTournament extends CExtendedActiveRecord {
             'federationClubID' => 'Clube',
             'searchDateRange' => 'Período de tempo',
             'searchDistance' => 'Distância máxima ao clube',
+            'ageBandsString' => 'Escalões',
         );
     }
 
@@ -194,5 +195,78 @@ class FederationTournament extends CExtendedActiveRecord {
 
     private function getStartDate() {
         return CHelper::newDateTime($this->hasQuali() ? $this->qualyStartDate : $this->mainDrawStartDate);
+    }
+
+    public function getCommonColumns($printLinks = true) {
+        return array(
+            array(
+                'name' => 'mainDrawStartDate',
+                'header' => 'Datas de realização',
+                'value' => '$data->getDateRange()'
+            ),
+            array(
+                'name' => 'qualyStartDate',
+                'header' => 'Qualifying',
+                'value' => '$data->hasQuali() ? "Sim" : "Não"',
+            ),
+            'level',
+            array(
+                'name' => 'name',
+                'type' => 'raw',
+                'value' => $printLinks ? 'CHtml::link($data->name, $data->getFederationSiteLink(), array(
+                    "target" => "_blank"
+                ));' : '$data->name',
+            ),
+            'surface',
+            array(
+                'name' => 'federationClubID',
+                'value' => '$data->federationClub->name',
+            ),
+            'city',
+            'ageBandsString',
+        );
+    }
+
+    public function getAdminColumn($ageGroup) {
+        return array(
+            'class'=>'booster.widgets.TbButtonColumn',
+            'template' => '{delete}',
+            'buttons' => array(
+                'delete' => array (
+                    'label' => 'Remover torneio do plano',
+                    //'icon' => 'minus',
+                    'click' => "function(){
+                                    var element = $('#tournament-list');
+                                    $.ajax({
+                                        url : $(this).attr('href'),
+                                    }).success(function(res) {
+                                        var tournamentName = res.name;
+                                        element.notify('Torneio \"' + tournamentName + '\" removido do plano!',
+                                        {
+                                            className : 'success',
+                                            position : 'top center'
+                                        });
+                                        $.fn.yiiGridView.update('search-tournament-table');
+                                        $.fn.yiiGridView.update('tournament-list');
+                                    }).fail( function() {
+                                        element.notify('Não foi possível remover o torneio do plano.',
+                                        {
+                                            className : 'error',
+                                            position : 'top center'
+                                        });
+                                    });
+                                    return false;
+                                }
+                             ",
+                    'url' => 'Yii::app()->createUrl("competitivePlan/removeTournament", array(
+                                "federationTournamentID" => $data->primaryKey,
+                                "athleteGroupID" => ' . $ageGroup->primaryKey . '
+                            ))',
+                    'options'=>array(
+                        'class'=>'btn btn-small',
+                    ),
+                ),
+            ),
+        );
     }
 }
