@@ -181,4 +181,18 @@ class FederationTournament extends CExtendedActiveRecord {
         }
         return false;
     }
+
+    public function getDateRange($includeYear = true) {
+        setlocale(LC_TIME, 'pt_PT');
+        $format = '%e-%h' . ($includeYear ? '-%Y' : '');
+        return strftime($format, $this->getStartDate()->getTimestamp()) . " a " . strftime($format, CHelper::newDateTime($this->mainDrawEndDate)->getTimestamp());
+    }
+
+    public function hasQuali() {
+        return !CHelper::isNullOrEmptyString($this->qualyStartDate);
+    }
+
+    private function getStartDate() {
+        return CHelper::newDateTime($this->hasQuali() ? $this->qualyStartDate : $this->mainDrawStartDate);
+    }
 }

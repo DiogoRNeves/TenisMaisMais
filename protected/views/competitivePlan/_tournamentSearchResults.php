@@ -56,12 +56,13 @@ $this->widget('booster.widgets.TbExtendedGridView', array(
         ),
         array(
             'name' => 'mainDrawStartDate',
-            'header' => 'Data de início',
-            'value' => '$data->qualyStartDate === null ? $data->mainDrawStartDate : $data->qualyStartDate'
+            'header' => 'Datas de realização',
+            'value' => '$data->getDateRange(false)'
         ),
         array(
-            'name' => 'mainDrawEndDate',
-            'header' => 'Data de fim',
+            'name' => 'qualyStartDate',
+            'header' => 'Qualifying',
+            'value' => '$data->hasQuali() ? "Sim" : "Não"',
         ),
         'level',
         array(

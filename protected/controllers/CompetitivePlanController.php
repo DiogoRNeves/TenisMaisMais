@@ -27,7 +27,7 @@ class CompetitivePlanController extends Controller
 		$user = User::getLoggedInUser();
 		return array(
 			array('allow', // allow admin user to perform 'admin' actions
-				'actions' => array('create', 'index', 'view', 'update', 'addTournament', 'removeTournament', 'deactivate'),
+				'actions' => array('create', 'index', 'view', 'update', 'addTournament', 'removeTournament', 'deactivate', 'downloadPDF'),
 				'users' => array('@'),
 				//'expression' => array($user, 'isSystemAdmin'),
 			),
@@ -111,6 +111,10 @@ class CompetitivePlanController extends Controller
 	public function actionView($id)
 	{
 		$model = $this->loadModel($id);
+		$temp = Yii::app()->request->getParam('AthleteGroup');
+		if ($temp !== null) {
+			$model->showPastEvents = $temp['showPastEvents'];
+		}
 		$federationTournamentSearch = new FederationTournament('search');
 		$federationTournamentSearch->unsetAttributes();
 		$temp = Yii::app()->request->getParam('FederationTournament');
@@ -122,6 +126,10 @@ class CompetitivePlanController extends Controller
 		}
 		$this->render('view', array('model' => $model,
 			'federationTournamentSearch' => $federationTournamentSearch));
+	}
+
+	public function actionDownloadPdf($id, $showPastEvents) {
+		echo "Im trying ok? id: $id and showPastEvents: $showPastEvents";
 	}
 
 	public function actionAddTournament($federationTournamentID, $athleteGroupID) {

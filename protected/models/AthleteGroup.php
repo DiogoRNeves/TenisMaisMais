@@ -15,6 +15,8 @@
  * @property boolean $includeFemale
  * @property boolean $active
  *
+ * @property boolean $showPastEvents
+ *
  * The followings are the available model relations:
  * @property Club $club
  * @property FederationTournament[] $federationTournaments
@@ -22,6 +24,8 @@
  * @property PlayerLevel $maxPlayerLevel
  */
 class AthleteGroup extends CExtendedActiveRecord {
+
+    public $showPastEvents;
 
     /**
      * @return string the associated database table name
@@ -41,6 +45,7 @@ class AthleteGroup extends CExtendedActiveRecord {
             array('athleteGroupID, minAge, maxAge, clubID, minPlayerLevelID, maxPlayerLevelID', 'numerical', 'integerOnly' => true),
             array('friendlyName', 'length', 'max' => 60),
             array('includeMale, includeFemale active', 'boolean'),
+            array('showPastEvents', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('athleteGroupID, minAge, maxAge, clubID, minPlayerLevelID, maxPlayerLevelID', 'safe', 'on' => 'search'),
@@ -75,6 +80,7 @@ class AthleteGroup extends CExtendedActiveRecord {
             'includeMale' => 'Masculinos',
             'includeFemale' => 'Femininos',
             'clubID' => 'Clube',
+            'showPastEvents' => 'Mostrar torneios já terminados'
         );
     }
 
@@ -96,16 +102,21 @@ class AthleteGroup extends CExtendedActiveRecord {
         $criteria->with = array('athleteGroups');
         $criteria->together = true; //allows gridview to render properly with pagination
         $criteria->compare('athleteGroups.athleteGroupID', $this->primaryKey);
+        if (!$this->showPastEvents) {
+            $criteria->compare('IFNULL(qualyStartDate, mainDrawStartDate)', ">=" . CHelper::getTodayDate());
+        }
 
         $federationTournament = new FederationTournament('search');
 
         $sort = new CSort(get_class($federationTournament));
         $sort->defaultOrder = array("mainDrawStartDate" => CSort::SORT_ASC);
 
-        return new CActiveDataProvider($federationTournament, array(
+        $dataProvider = new CActiveDataProvider($federationTournament, array(
             'criteria' => $criteria,
             'sort' => $sort,
         ));
+        $dataProvider->pagination->pageSize = 5;
+        return $dataProvider;
     }
 
     public function searchAthletes()

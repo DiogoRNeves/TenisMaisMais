@@ -114,7 +114,6 @@ echo $form->select2Group($model, 'level', array(
 
 <div class="form-actions pull-right">
     <?php
-        $javascript = 'alert("Fazer update aos resultados")';
         $this->widget(
             'booster.widgets.TbButton',
             array(
