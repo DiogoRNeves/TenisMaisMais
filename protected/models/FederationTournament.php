@@ -172,7 +172,7 @@ class FederationTournament extends CExtendedActiveRecord {
     }
 
     public function getFederationSiteLink() {
-        return Yii::app()->params["fptTournamentUrlBase"] . $this->primaryKey;
+        return CPortugueseTennisFederation::getClubSiteLink($this->primaryKey);
     }
 
     public function isInAthleteGroup($athleteGroupID) {
