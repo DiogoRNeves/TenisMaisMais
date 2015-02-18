@@ -91,6 +91,7 @@ class FederationTournament extends CExtendedActiveRecord {
             'searchDateRange' => 'Período de tempo',
             'searchDistance' => 'Distância máxima ao clube',
             'ageBandsString' => 'Escalões',
+            'ageBands' => 'Escalões',
         );
     }
 
@@ -268,5 +269,9 @@ class FederationTournament extends CExtendedActiveRecord {
                 ),
             ),
         );
+    }
+
+    public function isTennisTournament() {
+        return NotTennisTournaments::model()->findByPk($this->primaryKey) === null;
     }
 }

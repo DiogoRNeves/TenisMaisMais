@@ -1,23 +1,19 @@
 <?php
 
 /**
- * This is the model class for table "AgeBand".
+ * This is the model class for table "NotTennisTournaments".
  *
- * The followings are the available columns in table 'AgeBand':
- * @property integer $ageBandID
- * @property string $name
- * @property integer $maxAge
- * @property integer $minAge
- * @property integer $ageBandGroupID
+ * The followings are the available columns in table 'NotTennisTournaments':
+ * @property integer $federationTournamentID
  */
-class AgeBand extends CExtendedActiveRecord
+class NotTennisTournaments extends CExtendedActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'AgeBand';
+		return 'NotTennisTournaments';
 	}
 
 	/**
@@ -28,12 +24,9 @@ class AgeBand extends CExtendedActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, ageBandGroupID', 'required'),
-			array('maxAge, minAge, ageBandGroupID', 'numerical', 'integerOnly'=>true),
-			array('name', 'length', 'max'=>45),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('ageBandID, name, maxAge, minAge, ageBandGroupID', 'safe', 'on'=>'search'),
+			array('federationTournamentID', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -54,11 +47,7 @@ class AgeBand extends CExtendedActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ageBandID' => 'Escalão',
-			'name' => 'Nome',
-			'maxAge' => 'Idade máxima',
-			'minAge' => 'Idade mínima',
-			'ageBandGroupID' => 'Grupo',
+			'federationTournamentID' => 'Federation Tournament',
 		);
 	}
 
@@ -80,11 +69,7 @@ class AgeBand extends CExtendedActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('ageBandID',$this->ageBandID);
-		$criteria->compare('name',$this->name,true);
-		$criteria->compare('maxAge',$this->maxAge);
-		$criteria->compare('minAge',$this->minAge);
-		$criteria->compare('ageBandGroupID',$this->ageBandGroupID);
+		$criteria->compare('federationTournamentID',$this->federationTournamentID);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -95,17 +80,10 @@ class AgeBand extends CExtendedActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return AgeBand the static model class
+	 * @return NotTennisTournaments the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
-
-	public function getListDataTextField()
-	{
-		return 'name';
-	}
-
-
 }

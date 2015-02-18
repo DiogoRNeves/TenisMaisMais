@@ -14,7 +14,7 @@ return array(
     // application components
     'components' => array(
         'db' => array(
-            'connectionString' => 'mysql:host=localhost;dbname=mytennisapp',
+            'connectionString' => 'mysql:host=localhost;dbname=mytennisapp_mtest',
             'emulatePrepare' => true,
             'username' => 'myTennisUser',
             'password' => 'Tenis123',

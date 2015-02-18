@@ -11,6 +11,7 @@
 class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
 
     private $_excelTournaments, $_cachedAgeBand = array(), $_cachedTournamentVariation = array();
+    private $_notTennisTournaments = array();
 
     const TOURNAMENT_VARIATIONS_DELIMITER = "; ";
 
@@ -21,6 +22,7 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
             echo "The year must be numeric: '$year' given\n";
             return 3;
         }
+        $this->defineNotTennisTournaments();
         $this->doCaching();
         try {
             $this->_excelTournaments = new CExcelTournamentReader(Yii::app()->basePath . '/data/' . $fileName);
@@ -29,7 +31,6 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
             return 2;
         }
 
-        //TODO add criteria for current year
         if (!$this->deleteTournaments($year)) {
             echo "Unable to delete tournaments. Exiting.\n";
             return 1;
@@ -47,15 +48,19 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
                 /** @var FederationTournamentHasAgeBand[] $tournamentHasAgeBandWithErrors */
                 /** @var FederationTournament $federationTournament */
                 list($federationTournament, $tournamentHasAgeBandWithErrors) = $this->addTournamentToDb($federationClub->primaryKey);
-                if ($federationClub->isNewRecord) {
-                    echo 'Could not save tournament ' . $federationTournament->primaryKey . ":\n" . $federationTournament->getErrorsString();
-                }
-                foreach ($tournamentHasAgeBandWithErrors as $tournamentHasAgeBand) {
-                    echo 'Something went wrong for tournament ' . $federationTournament->primaryKey . ' ' .
-                        " information, so it is not correct on DB.\n" . $tournamentHasAgeBand->getErrorsString() . "\n";
+                if ($federationTournament !== null) {
+                    //is tennis tournament
+                    if ($federationClub->isNewRecord) {
+                        echo 'Could not save tournament ' . $federationTournament->primaryKey . ":\n" . $federationTournament->getErrorsString();
+                    }
+                    foreach ($tournamentHasAgeBandWithErrors as $tournamentHasAgeBand) {
+                        echo 'Something went wrong for tournament ' . $federationTournament->primaryKey . ' ' .
+                            " information, so it is not correct on DB.\n" . $tournamentHasAgeBand->getErrorsString() . "\n";
+                    }
                 }
             }
         }
+        echo "Done. (" . count($this->_notTennisTournaments) . " not tennis tournaments found)\n";
         return 0;
     }
 
@@ -82,7 +87,10 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
             'prizeMoney' => $this->_excelTournaments->getPrizeMoney(),
         );
         $federationTournamentHasAgeBandWithErrors = array();
-        if ($federationTournament->save()) {
+        if (!$federationTournament->isTennisTournament()) {
+            $this->_notTennisTournaments[] = $federationTournament->primaryKey;
+            $federationTournament = null;
+        } elseif ($federationTournament->save()) {
             foreach ($this->getAgeVariationPairs() as list($ageBandID, $tournamentVariationID)) {
                 $federationTournamentHasAgeBand = new FederationTournamentHasAgeBand;
                 $federationTournamentHasAgeBand->ageBandID = $ageBandID;
@@ -184,5 +192,18 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
             return null;
         }
         return $this->_cachedTournamentVariation[$tournamentVariationStr];
+    }
+
+    private function defineNotTennisTournaments() {
+        echo "Checking non tennis tournaments... ";
+        echo (NotTennisTournaments::model()->deleteAll() ? 'deleted old data' : 'could not delete old data') . "\n";
+        foreach (CPortugueseTennisFederation::getNotTennisTournaments() as $number) {
+            $add = new NotTennisTournaments;
+            $add->federationTournamentID = $number;
+            if (!$add->save()) {
+                echo "Something wrong with $number.\n";
+            }
+        }
+        echo "Found " . NotTennisTournaments::model()->count() . " not tennis tournaments.\n";
     }
 }
