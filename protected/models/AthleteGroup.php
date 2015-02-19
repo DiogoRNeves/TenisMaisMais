@@ -202,12 +202,12 @@ class AthleteGroup extends CExtendedActiveRecord {
     private function isAthleteAgeOK($athlete)
     {
         $result = true;
-        $birthYear = (int)(new DateTime($athlete->birthDate))->format('Y');
+        $birthYear = $athlete->isAttributeBlank('birthDate') ? null : (int)(new DateTime($athlete->birthDate))->format('Y');
         if (!$this->isAttributeBlank('maxAge')) {
-            $result = $result && (int)CHelper::ageToYearString($this->maxAge) >= $birthYear;
+            $result = $birthYear === null ? false : ($result && (int)CHelper::ageToYearString($this->maxAge) <= $birthYear);
         }
         if (!$this->isAttributeBlank('minAge')) {
-            $result = $result && (int)CHelper::ageToYearString($this->minAge) <= $birthYear;
+            $result = $birthYear === null ? false : ($result && (int)CHelper::ageToYearString($this->minAge) >= $birthYear);
         }
         return $result;
     }

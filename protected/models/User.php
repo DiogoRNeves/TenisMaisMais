@@ -54,7 +54,10 @@ class User extends CExtendedActiveRecord {
      */
     public static function getLoggedInUser()
     {
-        return User::model()->findByPk(Yii::app()->user->id);
+        if (Yii::app()->params['loggedInUser'] == null) {
+            Yii::app()->params['loggedInUser'] = User::model()->findByPk(Yii::app()->user->id);
+        }
+        return Yii::app()->params['loggedInUser'];
     }
 
     /**
@@ -952,4 +955,15 @@ class User extends CExtendedActiveRecord {
         ));
     }
 
+    public function canCreateCompetitivePlan() {
+        return $this->isSystemAdmin() || $this->isCoach();
+    }
+
+    /**
+     * @param AthleteGroup $athleteGroup
+     * @return boolean
+     */
+    public function canEditAthleteGroup($athleteGroup) {
+        return $this->isSystemAdmin() || $this->isCoachAt($athleteGroup->club);
+    }
 }

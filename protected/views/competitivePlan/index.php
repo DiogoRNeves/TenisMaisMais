@@ -7,12 +7,13 @@ $this->breadcrumbs=array(
 	'Competitive Plan',
 );
 
-$this->menu = array(
-	array('label' => 'Criar Plano', 'url' => '#', 'linkOptions'=>array(
-		'data-toggle' => 'modal',
-		'data-target' => '#competitivePlan',
-	)),
-);
+$addMenu = array(
+    array('label' => 'Criar Plano', 'url' => '#', 'linkOptions' => array(
+        'data-toggle' => 'modal',
+        'data-target' => '#competitivePlan',
+    )));
+
+$this->menu = User::getLoggedInUser()->canCreateCompetitivePlan() ? $addMenu : null;
 ?>
 <h1>Planos Competitivos</h1>
 

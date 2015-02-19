@@ -9,19 +9,19 @@ $this->breadcrumbs=array(
 	'View',
 );
 
-$this->menu = array(
-	array('label' => 'Adicionar torneio', 'url' => '#', 'linkOptions'=> array(
-			'data-toggle' => 'modal',
-			'data-target' => '#searchTournament',
-		)
-	),
-	array('label' => 'Editar Atletas do Plano', 'url' => '#', 'linkOptions'=> array(
-		'data-toggle' => 'modal',
-		'data-target' => '#competitivePlan',
-		)
-	),
-	array('label' => 'Eliminar Plano Competitivo', 'url' => '#', 'linkOptions'=>array(
-		'onclick' => "js:bootbox.confirm({
+$editMenu = array(
+    array('label' => 'Adicionar torneio', 'url' => '#', 'linkOptions' => array(
+        'data-toggle' => 'modal',
+        'data-target' => '#searchTournament',
+    )
+    ),
+    array('label' => 'Editar Atletas do Plano', 'url' => '#', 'linkOptions' => array(
+        'data-toggle' => 'modal',
+        'data-target' => '#competitivePlan',
+    )
+    ),
+    array('label' => 'Eliminar Plano Competitivo', 'url' => '#', 'linkOptions' => array(
+        'onclick' => "js:bootbox.confirm({
 			title: 'Eliminar Plano Competitivo',
 			message: 'Tem a certeza que quer eliminar este Plano Competitivo?',
 			buttons: {
@@ -40,8 +40,10 @@ $this->menu = array(
 				}
 			}
 		})",
-	)),
+    )),
 );
+
+$this->menu = User::getLoggedInUser()->canEditAthleteGroup($model) ? $editMenu : null;
 
 ?>
 <h1>Plano Competitivo: <?php echo $model->friendlyName; ?></h1>
