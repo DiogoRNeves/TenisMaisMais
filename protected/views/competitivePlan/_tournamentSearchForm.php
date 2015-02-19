@@ -125,12 +125,6 @@ echo $form->select2Group($model, 'level', array(
                     'class' => 'pull-right',
                     'onclick' => "updateSearchResults(); return false;"
                 ),
-                /*
-                'ajaxOptions' => array(
-                    'type' => 'POST',
-                    'data'=>'js:$("#' . $form->id . '").serialize()',
-                    'success' => 'function(data) { $.fn.yiiGridView.update("search-tournament-table"); }',
-                ),*/
             )
         );
     ?>

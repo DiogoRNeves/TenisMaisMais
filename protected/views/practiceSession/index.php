@@ -4,7 +4,7 @@
 /* @var $user User */
 
 $this->breadcrumbs = array(
-    'Practice Sessions',
+    'Horário',
 );
 
 $this->menu = $user->getOtherPracticeSessionUserLinks();

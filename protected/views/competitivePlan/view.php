@@ -5,21 +5,19 @@
  */
 
 $this->breadcrumbs=array(
-	'Competitive Plan'=>array('/competitivePlan'),
-	'View',
+	'Plano Competitivo'=>array('/competitivePlan'),
+	'Ver',
 );
 
 $editMenu = array(
     array('label' => 'Adicionar torneio', 'url' => '#', 'linkOptions' => array(
         'data-toggle' => 'modal',
         'data-target' => '#searchTournament',
-    )
-    ),
+    )),
     array('label' => 'Editar Atletas do Plano', 'url' => '#', 'linkOptions' => array(
         'data-toggle' => 'modal',
         'data-target' => '#competitivePlan',
-    )
-    ),
+    )),
     array('label' => 'Eliminar Plano Competitivo', 'url' => '#', 'linkOptions' => array(
         'onclick' => "js:bootbox.confirm({
 			title: 'Eliminar Plano Competitivo',
@@ -43,7 +41,9 @@ $editMenu = array(
     )),
 );
 
-$this->menu = User::getLoggedInUser()->canEditAthleteGroup($model) ? $editMenu : null;
+$canEditAthleteGroup = User::getLoggedInUser()->canEditAthleteGroup($model);
+
+$this->menu = $canEditAthleteGroup ? $editMenu : null;
 
 ?>
 <h1>Plano Competitivo: <?php echo $model->friendlyName; ?></h1>
@@ -74,7 +74,9 @@ $this->widget(
 	)
 );
 
-$this->renderPartial('_searchTournament', array('model' => $model,
-	'federationTournamentSearch' => $federationTournamentSearch));
+if ($canEditAthleteGroup) {
+    $this->renderPartial('_searchTournament', array('model' => $model,
+        'federationTournamentSearch' => $federationTournamentSearch));
 
-$this->renderPartial('_form', array('model' => $model));
+    $this->renderPartial('_form', array('model' => $model));
+}

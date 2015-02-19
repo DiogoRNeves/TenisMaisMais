@@ -966,4 +966,20 @@ class User extends CExtendedActiveRecord {
     public function canEditAthleteGroup($athleteGroup) {
         return $this->isSystemAdmin() || $this->isCoachAt($athleteGroup->club);
     }
+
+    public function getAgeBandIDs() {
+        if (!($this->isAthlete() || !$this->isCoach())) {
+            return $this->isSponsor() ? $this->sponsoredAthletes[0]->getAgeBandIDs() : array();
+        }
+        //reuse AthleteGroup method to avoid code duplication
+        $test = new AthleteGroup;
+        $test->maxAge = $this->getAge();
+        $test->minAge = $test->maxAge;
+        return $test->getAgeBandIDs();
+    }
+
+    public function getAge() {
+        $birthDate = new DateTime($this->birthDate);
+        return $birthDate->diff(new DateTime())->y;
+    }
 }

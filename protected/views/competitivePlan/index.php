@@ -1,19 +1,29 @@
 <?php
 /* @var $model AthleteGroup */
-/* @var $this CompetitivePlanController */
+/* @var $this CompetitivePlanController
+ * @var $federationTournamentSearch FederationTournament */
 /* @var $dataProvider CArrayDataProvider */
 
 $this->breadcrumbs=array(
-	'Competitive Plan',
+	'Plano Competitivo',
 );
 
 $addMenu = array(
     array('label' => 'Criar Plano', 'url' => '#', 'linkOptions' => array(
         'data-toggle' => 'modal',
         'data-target' => '#competitivePlan',
-    )));
+    ))
+);
 
-$this->menu = User::getLoggedInUser()->canCreateCompetitivePlan() ? $addMenu : null;
+$searchTournamentMenu = array(
+    array('label' => 'Pesquisar torneio', 'url' => '#', 'linkOptions' => array(
+        'data-toggle' => 'modal',
+        'data-target' => '#searchTournament',
+    ))
+);
+
+$canCreateCompetitivePlan = User::getLoggedInUser()->canCreateCompetitivePlan();
+$this->menu = array_merge($canCreateCompetitivePlan ? $addMenu : array(), $searchTournamentMenu);
 ?>
 <h1>Planos Competitivos</h1>
 
@@ -72,4 +82,12 @@ $this->menu = User::getLoggedInUser()->canCreateCompetitivePlan() ? $addMenu : n
 	?>
 </p>
 
-<?php $this->renderPartial('_form', array('model' => $model)); ?>
+<?php
+
+$this->renderPartial('_searchTournament', array('model' => $model,
+    'federationTournamentSearch' => $federationTournamentSearch));
+
+if ($canCreateCompetitivePlan) {
+    $this->renderPartial('_form', array('model' => $model));
+}
+

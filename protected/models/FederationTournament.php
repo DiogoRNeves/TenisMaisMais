@@ -112,7 +112,6 @@ class FederationTournament extends CExtendedActiveRecord {
 
         $criteria = new CDbCriteria;
 
-        $criteria->distinct = true;
         $criteria->together = true;
         $criteria->with = array('federationClub', 'ageBands');
 
@@ -140,6 +139,7 @@ class FederationTournament extends CExtendedActiveRecord {
         if ($this->ageBands !== null) {
             $criteria->compare('ageBands.ageBandID', $this->ageBands);
         }
+        $criteria->group = 't.' . $this->getTableSchema()->primaryKey;
 
         $dataProvider = new CActiveDataProvider($this, array(
             'criteria' => $criteria,

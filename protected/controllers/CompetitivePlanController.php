@@ -98,14 +98,27 @@ class CompetitivePlanController extends Controller
 		if (count($loggedUser->coachClubs) === 1) {
 			$model->clubID = $loggedUser->coachClubs[0];
 		}
+        $federationTournamentSearch = new FederationTournament('search');
+        $federationTournamentSearch->unsetAttributes();
+        $temp = Yii::app()->request->getParam('FederationTournament');
+        if ($temp === null) {
+            $federationTournamentSearch->ageBands = $loggedUser->getAgeBandIDs();
+            $federationTournamentSearch->searchDateRange = CHelper::getTodayDate() . " a " . CHelper::getTodayDate("Y-m-t");
+        } else {
+            $federationTournamentSearch->attributes = $temp;
+        }
 
 		$dataProvider = $loggedUser->searchAthleteGroup();
 
 		$model->friendlyName = 'Plano Competitivo #' . ($dataProvider->getTotalItemCount() + 1);
 		$model->includeMale = true;
 		$model->includeFemale = true;
-        //TODO make search return only this users' plans
-		$this->render('index', array('model' => $model, 'dataProvider' => $dataProvider));
+
+		$this->render('index', array(
+            'model' => $model,
+            'dataProvider' => $dataProvider,
+            'federationTournamentSearch' => $federationTournamentSearch
+        ));
 	}
 
 	public function actionUpdate($id)

@@ -14,7 +14,6 @@ if ($mailMessage !== NULL) {
 }
 
 $this->breadcrumbs = array(
-    'Users' => array('index'),
     $model->name,
 );
 

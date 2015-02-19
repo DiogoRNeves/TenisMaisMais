@@ -4,9 +4,8 @@
 /* @var $contact Contact */
 
 $this->breadcrumbs = array(
-    'Users' => array('index'),
     $user->name => array('view', 'id' => $user->userID),
-    'Update',
+    'Editar',
 );
 
 //Side menu populated by controller

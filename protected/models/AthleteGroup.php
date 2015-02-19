@@ -270,6 +270,7 @@ class AthleteGroup extends CExtendedActiveRecord {
      */
     public function getAgeBands() {
         $result = array();
+        /** @var AgeBand $ageBand */
         foreach (AgeBand::model()->findAll() as $ageBand) {
             if ($this->hasAgeBand($ageBand)) {
                 $result[] = $ageBand;

@@ -6,8 +6,7 @@
 /* @var $clubHasUser ClubHasUser */
 
 $this->breadcrumbs = array(
-    'Users' => array('index'),
-    'Create',
+    'Criar ' . ($clubHasUser->isAttributeBlank('clubID') ? 'Patrocinador' : UserType::model()->findByPk($clubHasUser->userTypeID)->name),
 );
 
 //Side menu populated by controller
