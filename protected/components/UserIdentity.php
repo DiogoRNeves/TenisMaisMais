@@ -10,8 +10,11 @@ class UserIdentity extends CUserIdentity {
     private $_id;
 
     /**
-     * 
-     * @param User $user
+     *
+     * @param string $username
+     * @param string $password
+     * @param int $id
+     * @internal param User $user
      */
     public function __construct($username, $password, $id = 0) {
         parent::__construct($username, $password);
@@ -41,10 +44,10 @@ class UserIdentity extends CUserIdentity {
 
     /**
      * Logs a user in for 30 minutes
-     * 
+     * @param null $duration
      */
-    public function login() {
-        $duration = 3600 / 2; // 30 minutes
+    public function login($duration  = null) {
+        $duration = $duration === null ? 3600 / 2 : $duration; // 30 minutes or given duration
         Yii::app()->user->login($this, $duration);
     }
 

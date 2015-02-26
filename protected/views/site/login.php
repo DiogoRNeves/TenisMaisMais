@@ -21,9 +21,9 @@ $this->breadcrumbs = array(
     ));
     ?>
 
-    <?php echo $form->textFieldGroup($model, 'username'); ?> <br />
+    <?php echo $form->textFieldGroup($model, 'username', array('label' => $model->getAttributeLabel('username'))); ?> <br />
 
-    <?php echo $form->passwordFieldGroup($model, 'password'); ?> <br />
+    <?php echo $form->passwordFieldGroup($model, 'password', array('label' => $model->getAttributeLabel('password'))); ?> <br />
 
     <?php echo $form->checkboxGroup($model, 'rememberMe', array('class' => 'rememberMe')); ?>
 

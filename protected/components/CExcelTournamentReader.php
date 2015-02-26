@@ -23,9 +23,13 @@ class CExcelTournamentReader  {
     public function __construct($filePath) {
         $objReader = new PHPExcel_Reader_Excel2007;
         $objPHPExcel = $objReader->load($filePath);
-        $this->_worksheet = $objPHPExcel->getSheetByName('FederationTournament');
-        $this->assignColumnNames();
-        $this->_maxRow = $this->_worksheet->getHighestRow();
+            $sheetName = 'FederationTournament';
+            $this->_worksheet = $objPHPExcel->getSheetByName($sheetName);
+            if ($this->_worksheet === null) {
+                throw new CException("Sheet '$sheetName' not found!'");
+            }
+            $this->assignColumnNames();
+            $this->_maxRow = $this->_worksheet->getHighestRow();
     }
 
     /**
@@ -57,6 +61,9 @@ class CExcelTournamentReader  {
      */
     private function assignColumnNames()
     {
+        if ($this->_worksheet === null) {
+            throw new CException("Tournaments worksheet not found!");
+        }
         $headerRow = 1;
         $column = 0;
         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($this->_worksheet->getHighestColumn());

@@ -47,7 +47,7 @@ class LoginForm extends CFormModel {
         if (!$this->hasErrors()) {
             $this->_identity = new UserIdentity($this->username, $this->password);
             if (!$this->_identity->authenticate())
-                $this->addError('password', 'Incorrect username or password.');
+                $this->addError('password', 'Autenticação inválida.');
         }
     }
 
@@ -61,8 +61,9 @@ class LoginForm extends CFormModel {
             $this->_identity->authenticate();
         }
         if ($this->_identity->errorCode === UserIdentity::ERROR_NONE) {
-            $duration = $this->rememberMe ? 3600 * 24 * 30 : 0; // 30 days
-            Yii::app()->user->login($this->_identity, $duration);
+            $duration = $this->rememberMe ? 3600 * 24 * 30 : null; // 30 days
+            //Yii::app()->user->login($this->_identity, $duration);
+            $this->_identity->login($duration);
             return true;
         } else
             return false;
