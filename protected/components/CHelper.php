@@ -8,11 +8,6 @@ class CHelper extends CApplicationComponent {
     const DEFAULT_TIME_FORMAT = 'H:i';
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
 
-    private static $_select2HtmlOptions = array(
-        'placeholder' => 'Please Select a Value',
-        'select2Options' => array('allowClear' => true)
-    );
-
     /**
      * Checks if the arrays have at least one value that is the same. If one og the arrays has no elements
      * returns true.
@@ -29,29 +24,10 @@ class CHelper extends CApplicationComponent {
     }
 
     /**
-     * Wrapper for Select2 extension activeDropDownList.
-     * @param CActiveRecord $model
-     * @param string $attribute
-     * @param array $data
-     */
-    public static function activeDropDownList($model, $attribute, $data) {
-        echo Select2::activeDropDownList($model, $attribute, $data, self::$_select2HtmlOptions);
-    }
-
-    /**
-     * Wrapper for Select2 extension activeDropDownList.
-     * @param CActiveRecord $model
-     * @param string $attribute
-     * @param array $data
-     */
-    public static function activeMultiSelect($model, $attribute, $data) {
-        echo Select2::activeMultiSelect($model, $attribute, $data, self::$_select2HtmlOptions);
-    }
-
-    /**
      * Returns an array containing only an attribute of the objects in another array.
      * @param CExtendedActiveRecord[] $models The array of objects
      * @param string $attributeName the attribute name
+     * @param bool $linkToObject
      * @return array an array containing only the specified attribute for all the elements of the given array
      */
     public static function getArrayOfAttribute($models, $attributeName, $linkToObject = false) {
@@ -60,7 +36,7 @@ class CHelper extends CApplicationComponent {
         return array_map($function, $models);
     }
 
-    public static function getObjectsLinks($models, $attributeName, $label = '', $linkToObject = true) {
+    public static function getObjectsLinks($models, $attributeName, $label = '') {
         $models = is_array($models) ? $models : array($models);
         return array(
             'name' => $label = '' ? $attributeName : $label,
@@ -81,8 +57,8 @@ class CHelper extends CApplicationComponent {
      * @param string $data the data. 
      * @param bool $multiSelect whether this is a multiSelect. Defaults to false.
      * @param string $hint Hint to be rendered.
-     * @param type $hintOptions The hint htmlOptions to be renderer into the wrapping tag
-     * @param bool $enabled Wether this selection is enabled or not
+     * @param array $hintOptions The hint htmlOptions to be renderer into the wrapping tag
+     * @param bool $enabled Whether this selection is enabled or not
      * @param array $defaultVal array indexed by id and text
      * @return string the HTML to be echoed.
      */
@@ -117,6 +93,10 @@ class CHelper extends CApplicationComponent {
         return $form->select2Group($model, $attribute, $options);
     }
 
+    /**
+     * @param $form TbActiveForm
+     * @param $model
+     */
     public static function echoSubmitButton($form, $model) {
         $form->widget(
                 'booster.widgets.TbButton', array(
@@ -124,24 +104,6 @@ class CHelper extends CApplicationComponent {
             'context' => 'primary',
             'label' => $model->isNewRecord ? 'Criar' : 'Gravar',
         ));
-    }
-
-
-
-    public static function timepickerRow($form, $model, $attribute) {
-        return $form->timepickerRow(
-                        $model, $attribute, array(
-                    'htmlOptions' => array(
-                        'class' => 'input-small',
-                    ),
-                    'options' => array(
-                        'defaultTime' => false,
-                        'showMeridian' => false,
-                        'showInputs' => false,
-                    ),
-                    'noAppend' => true,
-                        )
-        );
     }
 
     public static function timeToString($time, $format = self::DEFAULT_TIME_FORMAT) {
@@ -173,9 +135,11 @@ class CHelper extends CApplicationComponent {
     }
 
     /**
-     * 
+     *
      * @param string $string
      * @param string $searchValue
+     * @param bool $splitWords
+     * @param bool $caseSensitive
      * @return bool whether $searchValue is in $string or not
      */
     public static function stringContains($string, $searchValue, $splitWords = false, $caseSensitive = false) {
@@ -306,7 +270,6 @@ class CHelper extends CApplicationComponent {
      * @param $data CActiveRecord[]
      * @param $keyAttributeName string
      * @param $valueAttributeName string
-     * @param $forceRefresh bool
      * @return array
      */
     public static function modelsIntoAssociativeArrayInverted($data, $valueAttributeName, $keyAttributeName = 'primaryKey')
@@ -318,7 +281,6 @@ class CHelper extends CApplicationComponent {
      * @param $data CActiveRecord[]
      * @param $valueAttributeName string
      * @param $keyAttributeName string
-     * @param $forceRefresh bool
      * @return array
      */
     private static function modelsIntoAssociativeArray($data, $valueAttributeName, $keyAttributeName = 'primaryKey')
@@ -328,6 +290,80 @@ class CHelper extends CApplicationComponent {
             $result[$model->$keyAttributeName] = $model->$valueAttributeName;
         }
         return $result;
+    }
+
+
+    /**
+     * Remove diacritic characters
+     *
+     * @param $str
+     * @return mixed
+     * @link http://myshadowself.com/coding/php-function-to-convert-accented-characters-to-their-non-accented-equivalant/
+     */
+    public static function removeDiacritic($str) {
+        $a = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ', 'Ά', 'ά', 'Έ', 'έ', 'Ό', 'ό', 'Ώ', 'ώ', 'Ί', 'ί', 'ϊ', 'ΐ', 'Ύ', 'ύ', 'ϋ', 'ΰ', 'Ή', 'ή');
+        $b = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι', 'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η');
+        return str_replace($a, $b, $str);
+    }
+
+    /**
+     * @param $geocodingString
+     * @return array
+     * @throws CException if geocoding process fails
+     */
+    public static function geocode($geocodingString) {
+        //200 ms delay between requests in order to avoid exceeding limits
+        usleep(200 * 1000);
+        $googleResult = self::getGoogleGeocodeApiResult($geocodingString);
+        if ($googleResult['status'] != 'OK') {
+            throw new CException("could not geocode $geocodingString. Error: {$googleResult['status']}");
+        }
+        //results[0].geometry.location.lat
+        $coordinates = $googleResult['results'][0]['geometry']['location'];
+        return array(
+            $coordinates['lat'],
+            $coordinates['lng'],
+        );
+    }
+
+    /**
+     * Based on http://jslim.net/blog/2013/09/12/get-json-using-php-curl-from-web-service/
+     * @param $geocodingString
+     * @return mixed
+     */
+    private static function getGoogleGeocodeApiResult($geocodingString) {
+        // set HTTP header
+        $headers = array(
+            'Content-Type: application/json',
+        );
+
+        // query string
+        $fields = array(
+            'sensor' => false,
+	 		'region' => 'pt',
+            'address' => $geocodingString,
+        );
+        $url = 'http://maps.googleapis.com/maps/api/geocode/json?' . http_build_query($fields);
+
+        // Open connection
+        $ch = curl_init();
+
+        // Set the url, number of GET vars, GET data
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        // Execute request
+        $result = curl_exec($ch);
+
+        // Close connection
+        curl_close($ch);
+
+        // get the result and parse to JSON
+        return json_decode($result, true);
     }
 
 }

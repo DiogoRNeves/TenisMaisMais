@@ -97,4 +97,19 @@ class FederationClub extends CExtendedActiveRecord {
         return parent::model($className);
     }
 
+    public function getLandPhoneAreaString() {
+        $testNumber = $this->isAttributeBlank('fax') ?
+            ($this->isAttributeBlank('phoneNumber') ? '999' : $this->phoneNumber)
+            : $this->fax;
+        $testPrefix = substr($testNumber, 0, 3);
+        if ($testPrefix > 400) { return null; } //mobile phone or no info
+        /** @var LandPhonePrefixes $result */
+        $result = LandPhonePrefixes::searchPrefix($testPrefix);
+        $result = $result === null ? LandPhonePrefixes::searchPrefix(substr($testPrefix, 0, 2)) : $result;
+        if ($result === null) {
+            echo 'error: ' . $testNumber;
+        }
+        return $result === null ? null : $result->zone;
+    }
+
 }

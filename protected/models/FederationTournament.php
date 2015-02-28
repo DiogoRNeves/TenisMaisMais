@@ -18,12 +18,14 @@
  * @property integer $prizeMoney
  * @property integer $federationClubID
  * @property string $searchDateRange
+ * @property string $localCoordinateCacheID
  *
  * The followings are the available model relations:
  * @property AthleteGroup[] $athleteGroups
  * @property CompetitiveResultHistory[] $competitiveResultHistories
  * @property FederationClub $federationClub
  * @property AgeBand[] $ageBands
+ * @property LocalCoordinateCache[] $localCoordinateCache
  */
 class FederationTournament extends CExtendedActiveRecord {
 
@@ -43,8 +45,8 @@ class FederationTournament extends CExtendedActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('federationTournamentID, level, mainDrawStartDate, mainDrawEndDate, name, city, surface, federationClubID', 'required'),
-            array('federationTournamentID, meals, prizeMoney, federationClubID', 'numerical', 'integerOnly' => true),
+            array('federationTournamentID, level, mainDrawStartDate, mainDrawEndDate, name, city, surface, federationClubID, localCoordinateCacheID', 'required'),
+            array('federationTournamentID, meals, prizeMoney, federationClubID, localCoordinateCacheID', 'numerical', 'integerOnly' => true),
             array('level', 'length', 'max' => 2),
             array('city, name', 'length', 'max' => 150),
             array('surface, accommodation', 'length', 'max' => 45),
@@ -67,6 +69,7 @@ class FederationTournament extends CExtendedActiveRecord {
             'competitiveResultHistories' => array(self::HAS_MANY, 'CompetitiveResultHistory', 'federationTournamentID'),
             'federationClub' => array(self::BELONGS_TO, 'FederationClub', 'federationClubID'),
             'ageBands' => array(self::MANY_MANY, 'AgeBand', 'FederationTournamentHasAgeBand(federationTournamentID, ageBandID)'),
+            'localCoordinateCache' => array(self::BELONGS_TO, 'LocalCoordinateCache', 'localCoordinateCacheID'),
         );
     }
 
@@ -149,6 +152,14 @@ class FederationTournament extends CExtendedActiveRecord {
         $dataProvider->sort->defaultOrder = array("mainDrawStartDate" => CSort::SORT_ASC);
 
         return $dataProvider;
+    }
+
+    protected function beforeValidate()
+    {
+        if ($this->isAttributeBlank('localCoordinateCacheID') && $this->canAssignLocalCoordinateCache()) {
+            $this->setLocalCoordinateCache();
+        }
+        return parent::beforeValidate();
     }
 
     /**
@@ -273,5 +284,33 @@ class FederationTournament extends CExtendedActiveRecord {
 
     public function isTennisTournament() {
         return NotTennisTournaments::model()->findByPk($this->primaryKey) === null;
+    }
+
+    protected function canAssignLocalCoordinateCache() {
+        return !$this->isAttributeBlank('city') && !$this->isAttributeBlank('federationClubID');
+    }
+
+    protected function setLocalCoordinateCache() {
+        $geocodingString = $this->getGeocodingSearchString();
+        $localCoordinateCache = LocalCoordinateCache::model()->findByAttributes(array(
+            'coordinatesSearchString' => $geocodingString,
+        ));
+        $localCoordinateCache = $localCoordinateCache === null ?
+            LocalCoordinateCache::geocode($geocodingString) : $localCoordinateCache;
+        $this->localCoordinateCacheID = $localCoordinateCache->primaryKey;
+    }
+
+    protected function getGeocodingSearchString() {
+        if (!$this->canAssignLocalCoordinateCache()) {
+            throw new CException("Not able to compile search string for geocoding FederationTournament {$this->primaryKey}");
+        }
+        /** @var FederationClub $federationClub */
+        $federationClub = $this->federationClub == null ?
+            FederationClub::model()->findByPk($this->federationClubID) : $this->federationClub;
+        if ($federationClub == null) {
+            throw new CException("Invalid FederationClubID {$federationClub->primaryKey}");
+        }
+        $clubPhoneArea = $federationClub->getLandPhoneAreaString();
+        return CHelper::removeDiacritic($this->city . ($clubPhoneArea === null ? "" : ", $clubPhoneArea") . ", PT");
     }
 }
