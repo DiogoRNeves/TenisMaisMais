@@ -19,6 +19,18 @@ class LandPhonePrefixes extends CExtendedActiveRecord
         ));
     }
 
+    public static function getZoneString($testNumber) {
+        $testPrefix = substr($testNumber, 0, 3);
+        if ($testPrefix > 400) { return null; } //mobile phone
+        /** @var LandPhonePrefixes $result */
+        $result = LandPhonePrefixes::searchPrefix($testPrefix);
+        $result = $result === null ? LandPhonePrefixes::searchPrefix(substr($testPrefix, 0, 2)) : $result;
+        if ($result === null) {
+            throw new CException('Error finding area code for number: ' . $testNumber);
+        }
+        return $result === null ? null : $result->zone;
+    }
+
     /**
 	 * @return string the associated database table name
 	 */

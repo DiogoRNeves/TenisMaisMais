@@ -104,4 +104,8 @@ class Home extends CExtendedActiveRecord {
         return parent::model($className);
     }
 
+    public function getLandPhoneAreaString() {
+        return $this->isAttributeBlank('phoneNumber') ? null : LandPhonePrefixes::getZoneString($this->phoneNumber);
+    }
+
 }

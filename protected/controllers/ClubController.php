@@ -116,6 +116,9 @@ class ClubController extends Controller {
                 $club->homeID = $home->homeID;
                 $club->contactID = $contact->contactID;
             }
+        } else {
+            $home->save();
+            $contact->save();
         }
         if ($club->save()) {
             if (!$club->adminUser->isCoachAt($club)) {

@@ -9,6 +9,7 @@
  * @property integer $homeID
  * @property integer $contactID
  * @property integer $adminUserID
+ * @property integer localCoordinateCacheID
  *
  * The followings are the available model relations:
  * @property AthleteGroup[] $athleteGroups
@@ -83,6 +84,13 @@ class Club extends CExtendedActiveRecord {
             'contactID' => 'Contacto',
             'adminUserID' => 'Administrador',
         );
+    }
+
+    protected function beforeValidate() {
+        if ($this->isAttributeBlank('localCoordinateCacheID') && $this->canAssignLocalCoordinateCache()) {
+            $this->setLocalCoordinateCache();
+        }
+        return parent::beforeValidate();
     }
 
     /**
@@ -284,6 +292,34 @@ class Club extends CExtendedActiveRecord {
             }
         }
         return $results;
+    }
+
+    private function canAssignLocalCoordinateCache() {
+        return !$this->isAttributeBlank('homeID') && !$this->home->isAttributeBlank('city');
+    }
+
+    protected function setLocalCoordinateCache() {
+        $geocodingString = $this->getGeocodingSearchString();
+        $localCoordinateCache = LocalCoordinateCache::model()->findByAttributes(array(
+            'coordinatesSearchString' => $geocodingString,
+        ));
+        $localCoordinateCache = $localCoordinateCache === null ?
+            LocalCoordinateCache::geocode($geocodingString) : $localCoordinateCache;
+        $this->localCoordinateCacheID = $localCoordinateCache->primaryKey;
+    }
+
+    protected function getGeocodingSearchString() {
+        if (!$this->canAssignLocalCoordinateCache()) {
+            throw new CException("Not able to compile search string for geocoding FederationTournament {$this->primaryKey}");
+        }
+        /** @var Home $home */
+        $home = $this->home == null ?
+            FederationClub::model()->findByPk($this->homeID) : $this->home;
+        if ($home == null) {
+            throw new CException("Invalid HomeID {$home->primaryKey}");
+        }
+        $clubPhoneArea = $home->getLandPhoneAreaString();
+        return CHelper::removeDiacritic($this->home->city . ($clubPhoneArea === null ? "" : ", $clubPhoneArea") . ", PT");
     }
 
 }

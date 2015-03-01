@@ -228,6 +228,10 @@ class m150226_180224_search_by_tournament_distance extends CDbMigration
 		$federationTournament = 'FederationTournament';
 		$this->addColumn($federationTournament, 'localCoordinateCacheID', 'integer');
 		$this->addForeignKey('idx_fk_LocalCoordinateCache',$federationTournament, 'localCoordinateCacheID', $localCoordinateCache, 'localCoordinateCacheID');
+
+        $club = 'Club';
+        $this->addColumn($club, 'localCoordinateCacheID', 'integer');
+        $this->addForeignKey('idx_fk_LocalCoordinateCache',$club, 'localCoordinateCacheID', $localCoordinateCache, 'localCoordinateCacheID');
     }
  
     public function down()
@@ -237,6 +241,9 @@ class m150226_180224_search_by_tournament_distance extends CDbMigration
 		
 		$this->dropForeignKey('idx_fk_LocalCoordinateCache','FederationTournament');
 		$this->dropColumn('FederationTournament', 'localCoordinateCacheID');
+
+        $this->dropForeignKey('idx_fk_LocalCoordinateCache','Club');
+        $this->dropColumn('Club', 'localCoordinateCacheID');
     }
  
     /*
