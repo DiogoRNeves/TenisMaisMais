@@ -22,6 +22,7 @@
  * @property PracticeSessionHistory[] $practiceSessionHistories
  * @property User[] $coaches
  * @property User[] $athletes
+ * @property LocalCoordinateCache $localCoordinateCache
  */
 class Club extends CExtendedActiveRecord {
 
@@ -70,6 +71,7 @@ class Club extends CExtendedActiveRecord {
             'mainCoaches' => array(self::HAS_MANY, 'MainCoach', 'clubID'),
             'practiceSessions' => array(self::HAS_MANY, 'PracticeSession', 'clubID', 'order' => 'startTime'),
             'practiceSessionHistories' => array(self::HAS_MANY, 'PracticeSessionHistory', 'clubID'),
+            'localCoordinateCache' => array(self::BELONGS_TO, 'LocalCoordinateCache', 'localCoordinateCacheID'),
         );
     }
 
@@ -87,7 +89,7 @@ class Club extends CExtendedActiveRecord {
     }
 
     protected function beforeValidate() {
-        if ($this->isAttributeBlank('localCoordinateCacheID') && $this->canAssignLocalCoordinateCache()) {
+        if ($this->isAttributeBlank('localCoordinateCacheID')) {
             $this->setLocalCoordinateCache();
         }
         return parent::beforeValidate();
@@ -298,17 +300,24 @@ class Club extends CExtendedActiveRecord {
         return !$this->isAttributeBlank('homeID') && !$this->home->isAttributeBlank('city');
     }
 
-    protected function setLocalCoordinateCache() {
+    /**
+     * @return LocalCoordinateCache|null
+     * @throws CException
+     */
+    public function setLocalCoordinateCache() {
+        if (!$this->canAssignLocalCoordinateCache()) { return null; }
         $geocodingString = $this->getGeocodingSearchString();
         $localCoordinateCache = LocalCoordinateCache::model()->findByAttributes(array(
             'coordinatesSearchString' => $geocodingString,
         ));
-        $localCoordinateCache = $localCoordinateCache === null ?
+        $refreshLocal = $localCoordinateCache === null || $localCoordinateCache->primaryKey !== $this->localCoordinateCacheID;
+        $localCoordinateCache = $refreshLocal ?
             LocalCoordinateCache::geocode($geocodingString) : $localCoordinateCache;
         $this->localCoordinateCacheID = $localCoordinateCache->primaryKey;
+        return $this->localCoordinateCache;
     }
 
-    protected function getGeocodingSearchString() {
+    public function getGeocodingSearchString() {
         if (!$this->canAssignLocalCoordinateCache()) {
             throw new CException("Not able to compile search string for geocoding FederationTournament {$this->primaryKey}");
         }

@@ -23,7 +23,6 @@ class CompetitivePlanController extends Controller
 	 * @return array access control rules
 	 */
 	public function accessRules() {
-		$user = User::getLoggedInUser();
 		return array(
 			array('allow', // allow admin user
 				'actions' => array('index'),
@@ -231,7 +230,7 @@ class CompetitivePlanController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param CModel the model to be validated
+	 * @param CModel $model the model to be validated
 	 */
 	protected function performAjaxValidation($model) {
 		if (isset($_POST['ajax']) && $_POST['ajax'] === 'athlete-group-form') {

@@ -28,7 +28,7 @@
     <?php echo $form->textFieldGroup($user, 'name', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php
-    //PracticeCancelled
+
     echo $form->switchGroup($user, 'male', array('widgetOptions' => array(
         'options' => array(
             'onText' => 'M',
@@ -56,7 +56,7 @@
     <?php echo $form->textFieldGroup($user, 'federationNumber', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php 
-    if ($user->isNewRecord || ($user->scenario == 'activation' ? false : User::model()->findByPk(Yii::app()->user->id)->canUpdateUserLevels($user))): ?>
+    if ($user->isNewRecord || ($user->scenario == 'activation' ? false : User::getLoggedInUser()->canUpdateUserLevels($user))): ?>
         <?php echo CHelper::select2Row($form, $user, 'coachLevelID', CoachLevel::model()->getListData()); ?>
 
         <?php
@@ -90,7 +90,7 @@
     <?php endif; ?>
 
     <!-- hidden fields from the create user action -->
-    <div hidden="true">
+    <div hidden>
         <?php if (isset($clubHasUser) && $clubHasUser->hasNotNullAttributes()): ?>
             <?php echo $form->textField($clubHasUser, 'clubID') ?>
             <?php echo $form->textField($clubHasUser, 'userTypeID') ?>
@@ -103,7 +103,7 @@
     <!-- end of hidden fields from the create user action -->
 
     <div class="form-actions">
-        <?php CHelper::echoSubmitButton($this, $user); ?>
+        <?php CHelper::echoSubmitButton($form, $user); ?>
     </div>
 
     <?php $this->endWidget(); ?>

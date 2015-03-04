@@ -106,4 +106,18 @@ class LocalCoordinateCache extends CExtendedActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    /**
+     * @param $destination LocalCoordinateCache
+     * @return float
+     */
+    public function calculateDistanceTo($destination) {
+        $dLat = deg2rad($this->lat - $destination->lat);
+        $dLon = deg2rad($this->lng - $destination->lng);
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($destination->lat)) * cos(deg2rad($this->lat)) * sin($dLon / 2) * sin($dLon / 2);
+        //var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        $c = 2 * asin(sqrt($a));
+        $R = 6351; //earth radius in Km
+        return $R * $c;
+    }
 }

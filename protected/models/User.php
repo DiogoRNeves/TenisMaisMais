@@ -46,7 +46,6 @@
  */
 class User extends CExtendedActiveRecord {
 
-    //TODO: handle save for password changing
     public $newPassword, $oldPassword, $newPasswordRepeated;
 
     /**
@@ -304,6 +303,7 @@ class User extends CExtendedActiveRecord {
     public function getUserTypes() {
         $result = array();
         $allUserTypes = UserType::model()->findAll();
+        /** @var UserType $userType */
         foreach ($allUserTypes as $userType) {
             if ($this->isUserType($userType)) {
                 array_push($result, $userType);
@@ -355,7 +355,7 @@ class User extends CExtendedActiveRecord {
 
     /**
      *
-     * @param Club[] $clubs
+     * @param Club|Club[] $clubs
      * @return boolean
      */
     public function isClubAdminOf($clubs) {
@@ -406,12 +406,11 @@ class User extends CExtendedActiveRecord {
     /**
      * Returns all practice session events related with this user to be fed to FullCalendar plugin
      * @param string $start
-     * @param string $end
      * @return PracticeSession[]
      */
     public function getFullCalendarPracticeSessionEvents($start) {
         $results = array();
-        $loggedUser = User::model()->findByPk(Yii::app()->user->id);
+        $loggedUser = User::getLoggedInUser();
         /* @var $practiceSession PracticeSession */
         $sessions = array_merge($this->coachPracticeSessions, $this->athletePracticeSessions);
         foreach ($sessions as $practiceSession) {
@@ -454,9 +453,7 @@ class User extends CExtendedActiveRecord {
      */
     public function getRelatedUsers($userType, array $filter = null) {
         //TODO remove hardcoded strings and check this first if statement (i think it's useless)
-        if ($userType == null) {
-            $result = $this->getRelatedAthletes($filter);
-        }
+        if ($userType == null) { return $this->getRelatedAthletes($filter); }
         switch ($userType->name) {
             case 'atleta':
                 $result = $this->getRelatedAthletes($filter);
@@ -514,7 +511,7 @@ class User extends CExtendedActiveRecord {
      * @return User[] the related Sponsors
      */
     public function getRelatedSponsors(array $filter = null) {
-        //TODO: write proper code
+        //TODO implement method
         return User::model()->findAll();
     }
 
@@ -567,6 +564,7 @@ class User extends CExtendedActiveRecord {
      * @return boolean
      */
     public function canViewUser() {
+        /** @var User $user */
         $user = User::model()->findByPk($this->getSuperglobalUserID());
         return $this->canUpdateUser() || $user->isSponsorOf($this);
     }
@@ -586,10 +584,13 @@ class User extends CExtendedActiveRecord {
 
     /**
      *
-     * @return boolean
+     * @param int $userID
+     * @return bool
+     * @throws CException
      */
     public function canUpdateUser($userID = null) {
         $userID = $userID == null || $userID instanceof CWebUser ? $this->getSuperglobalUserID() : $userID;
+        /** @var User $user */
         $user = User::model()->findByPk($userID);
         return $this->isUser($user) || $this->isSponsorOf($user) ||
         $this->isCoachOf($user) || $this->coachesInSameClubOf($user) ||
@@ -597,18 +598,22 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     *
-     * @return boolean
+     * @return bool
+     * @throws CHttpException
      */
     public function canCreateUsers() {
         if (!isset($_REQUEST['ClubHasUser'], $_REQUEST['ClubHasUser']['clubID']) &&
             !isset($_REQUEST['Sponsor'], $_REQUEST['Sponsor']['athleteID'])) {
             return false;
-        } elseif (isset($_REQUEST['ClubHasUser']['clubID'])) {
+        }
+        if (isset($_REQUEST['ClubHasUser']['clubID'])) {
             $club = Club::model()->findByPk($_REQUEST['ClubHasUser']['clubID']);
         } elseif (isset($_REQUEST['Sponsor']['athleteID'])) {
+            /** @var User $athlete */
             $athlete = User::model()->findByPk($_REQUEST['Sponsor']['athleteID']);
             $club = $athlete->athleteClubs;
+        } else {
+            throw new CHttpException('303', 'Invalid request');
         }
         return $this->isClubAdminOf($club) || $this->isCoachAt($club);
     }
@@ -695,7 +700,7 @@ class User extends CExtendedActiveRecord {
         if ($this->scenario == 'activation') {
             return true;
         }
-        return !$this->isNewRecord && ($this->isUser(User::model()->findByPk(Yii::app()->user->id)) || $this->isSystemAdmin());
+        return !$this->isNewRecord && ($this->isUser(User::getLoggedInUser()) || $this->isSystemAdmin());
     }
 
     public function isPasswordChangeOK() {
@@ -716,8 +721,9 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
-     * @return boolean
+     *
+     * @param User $user
+     * @return bool
      */
     public function canUpdateUserLevels($user) {
         return $this->canUpdateUser($user->primaryKey) && !$this->isUser($user) && !$this->isSponsorOf($user);
@@ -791,9 +797,10 @@ class User extends CExtendedActiveRecord {
     }
 
     /**
-     * 
-     * @param User $updater
-     * @return boolean
+     *
+     * @param User $coach
+     * @return bool
+     * @internal param User $updater
      */
     public function isAdminOfCoach($coach) {
         foreach ($coach->coachClubs as $club) {
@@ -968,7 +975,7 @@ class User extends CExtendedActiveRecord {
     }
 
     public function getAgeBandIDs() {
-        if (!($this->isAthlete() || !$this->isCoach())) {
+        if (!($this->isAthlete() || $this->isCoach())) {
             return $this->isSponsor() ? $this->sponsoredAthletes[0]->getAgeBandIDs() : array();
         }
         //reuse AthleteGroup method to avoid code duplication

@@ -59,15 +59,22 @@ $commonColumns = array(
         'header' => 'Qualifying',
         'value' => '$data->hasQuali() ? "Sim" : "Não"',
     ),
-    'level',
+    array(
+        'name' => 'level',
+        'header' => FederationTournament::model()->getAttributeLabel('level'),
+    ),
     array(
         'name' => 'name',
         'type' => 'raw',
         'value' => 'CHtml::link($data->name, $data->getFederationSiteLink(), array(
                         "target" => "_blank",
-                    ));'
+                    ));',
+        'header' => FederationTournament::model()->getAttributeLabel('name'),
     ),
-    'surface',
+    array(
+        'name' => 'surface',
+        'header' => FederationTournament::model()->getAttributeLabel('surface'),
+    ),
     array(
         'name' => 'federationClub.name',
         'value' => '$data->federationClub->name',
@@ -77,6 +84,10 @@ $commonColumns = array(
         'name' => 'ageBandsString',
         'header' => AgeBand::model()->getAttributeLabel('ageBandID'),
         'value' => '$data->ageBandsString',
+    ),
+    array(
+        'name' => 'distance',
+        'header' => FederationTournament::model()->getAttributeLabel('cachedDistance'),
     ),
 );
 

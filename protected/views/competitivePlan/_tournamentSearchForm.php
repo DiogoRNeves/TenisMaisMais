@@ -108,9 +108,13 @@ echo $form->select2Group($model, 'level', array(
 ));
 ?>
 
-<?php
-//echo $form->textFieldGroup($model, 'searchDistance');
-?>
+<?php echo $form->textFieldGroup($model, 'searchDistance'); ?>
+
+<?php $this->widget('booster.widgets.TbLabel', array(
+        'context' => 'info',
+        'label' => 'Distância aproximada em linha reta a "' . User::getLoggedInUser()->clubs[0]->getGeocodingSearchString() . '"',
+    )
+); ?>
 
 <div class="form-actions pull-right">
     <?php

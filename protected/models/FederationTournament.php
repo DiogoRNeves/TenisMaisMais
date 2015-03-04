@@ -18,18 +18,18 @@
  * @property integer $prizeMoney
  * @property integer $federationClubID
  * @property string $searchDateRange
- * @property string $localCoordinateCacheID
+ * @property integer $localCoordinateCacheID
  *
  * The followings are the available model relations:
  * @property AthleteGroup[] $athleteGroups
  * @property CompetitiveResultHistory[] $competitiveResultHistories
  * @property FederationClub $federationClub
  * @property AgeBand[] $ageBands
- * @property LocalCoordinateCache[] $localCoordinateCache
+ * @property LocalCoordinateCache $localCoordinateCache
  */
 class FederationTournament extends CExtendedActiveRecord {
 
-    public $searchDateRange, $searchDistance;
+    public $searchDateRange, $searchDistance = null, $cachedDistance = null;
 
     /**
      * @return string the associated database table name
@@ -52,7 +52,6 @@ class FederationTournament extends CExtendedActiveRecord {
             array('surface, accommodation', 'length', 'max' => 45),
             array('qualyStartDate, qualyEndDate', 'safe'),
             // The following rule is used by search().
-            // @todo Please remove those attributes that should not be searched.
             array('federationTournamentID, level, qualyStartDate, qualyEndDate, mainDrawStartDate, mainDrawEndDate, name,
             city, surface, accommodation, meals, prizeMoney, federationClubID, federationClub, ageBands, searchDateRange, searchDistance', 'safe', 'on' => 'search'),
         );
@@ -95,6 +94,7 @@ class FederationTournament extends CExtendedActiveRecord {
             'searchDistance' => 'Distância máxima ao clube',
             'ageBandsString' => 'Escalões',
             'ageBands' => 'Escalões',
+            'cachedDistance' => 'Distância',
         );
     }
 
@@ -111,8 +111,6 @@ class FederationTournament extends CExtendedActiveRecord {
      * based on the search/filter conditions.
      */
     public function search() {
-        // @todo Please modify the following code to remove attributes that should not be searched.
-
         $criteria = new CDbCriteria;
 
         $criteria->together = true;
@@ -148,10 +146,56 @@ class FederationTournament extends CExtendedActiveRecord {
             'criteria' => $criteria,
         ));
 
-        $dataProvider->pagination->pageSize = 5;
-        $dataProvider->sort->defaultOrder = array("mainDrawStartDate" => CSort::SORT_ASC);
 
-        return $dataProvider;
+        if (!$this->isDistanceToBeCalculated()) {
+            $dataProvider->pagination->pageSize = 5;
+            $dataProvider->sort->defaultOrder = array("mainDrawStartDate" => CSort::SORT_ASC);
+            return $dataProvider;
+        }
+
+        $club = User::getLoggedInUser()->clubs[0];
+        $dataProvider->criteria->with[] = 'localCoordinateCache';
+        $k = 111.044736; //69 miles, translated to km
+        $deltaLat = (float)$this->searchDistance / $k;
+        $deltaLng = $deltaLat / abs(cos($club->localCoordinateCache->lat));
+        $limits = array(
+            'lat' => array(
+                'min' => (float)$club->localCoordinateCache->lat - $deltaLat,
+                'max' => (float)$club->localCoordinateCache->lat + $deltaLat,
+            ),
+            'lng' => array(
+                'min' => (float)$club->localCoordinateCache->lng - $deltaLng,
+                'max' => (float)$club->localCoordinateCache->lng + $deltaLng,
+            ),
+        );
+        $dataProvider->criteria->addBetweenCondition('localCoordinateCache.lat', $limits['lat']['min'], $limits['lat']['max']);
+        $dataProvider->criteria->addBetweenCondition('localCoordinateCache.lng', $limits['lng']['min'], $limits['lng']['max']);
+        $dataProvider->pagination = false;
+        $results = array();
+        /** @var FederationTournament $federationTournament */
+        foreach ($dataProvider->getData() as $federationTournament) {
+            if ($federationTournament->getDistance() <= $this->searchDistance) {
+                $results[] = $federationTournament;
+            }
+        }
+
+        return new CArrayDataProvider($results, array(
+            'pagination' => array('pageSize' => 5),
+            'sort' => array(
+                'attributes' => array(
+                    'mainDrawStartDate',
+                    'qualyStartDate',
+                    'name',
+                    //'federationClub.name',
+                    //'ageBandsString',
+                    //'distance',
+                    'level',
+                    'surface',
+                ),
+                'defaultOrder' => array("mainDrawStartDate" => CSort::SORT_ASC),
+            ),
+        ));
+
     }
 
     protected function beforeValidate()
@@ -198,7 +242,8 @@ class FederationTournament extends CExtendedActiveRecord {
     public function getDateRange($includeYear = true) {
         setlocale(LC_TIME, 'pt_PT');
         $format = '%e-%h' . ($includeYear ? '-%Y' : '');
-        return strftime($format, $this->getStartDate()->getTimestamp()) . " a " . strftime($format, CHelper::newDateTime($this->mainDrawEndDate)->getTimestamp());
+        return strftime($format, $this->getStartDate()->getTimestamp()) . " a " .
+            strftime($format, CHelper::newDateTime($this->mainDrawEndDate)->getTimestamp());
     }
 
     public function hasQuali() {
@@ -312,5 +357,32 @@ class FederationTournament extends CExtendedActiveRecord {
         }
         $clubPhoneArea = $federationClub->getLandPhoneAreaString();
         return CHelper::removeDiacritic($this->city . ($clubPhoneArea === null ? "" : ", $clubPhoneArea") . ", PT");
+    }
+
+    /**
+     * @return bool
+     */
+    private function isDistanceToBeCalculated() {
+        return $this->searchDistance !== null && $this->searchDistance > 0;
+    }
+
+    /**
+     * @param $club Club
+     */
+    public function calculateDistanceTo($club) {
+        if ($club->isAttributeBlank('localCoordinateCacheID')) { $club->setLocalCoordinateCache(); }
+        $this->cachedDistance = $this->localCoordinateCache->calculateDistanceTo($club->localCoordinateCache);
+    }
+
+    /**
+     * @param Club|null $club
+     * @return float
+     */
+    public function getDistance($club = null) {
+        if ($this->cachedDistance === null) {
+            $club = $club === null ? User::getLoggedInUser()->clubs[0] : $club;
+            $this->calculateDistanceTo($club);
+        }
+        return round($this->cachedDistance, 2);
     }
 }
