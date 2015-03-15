@@ -135,6 +135,7 @@ class CompetitivePlanController extends Controller
 			$result = array($model->save() ? 'saved' : 'error');
 		}
 
+        header('Content-Type: application/json');
 		echo CJSON::encode($result);
 		Yii::app()->end();
 	}

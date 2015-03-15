@@ -216,6 +216,7 @@ class User extends CExtendedActiveRecord {
      */
     public function activate() {
         $this->activated = 1;
+        $this->generateActivationHash();
     }
 
     /**
@@ -380,7 +381,7 @@ class User extends CExtendedActiveRecord {
      * @return bool whether the user can be activated or not
      */
     public function canBeActivated($hash) {
-        return $this->isActivationHash($hash) && !$this->isActivated();
+        return $this->isActivationHash($hash) && ($this->isRecoveringPassword() || !$this->isActivated());
     }
 
     /**
@@ -988,5 +989,24 @@ class User extends CExtendedActiveRecord {
     public function getAge() {
         $birthDate = new DateTime($this->birthDate);
         return $birthDate->diff(new DateTime())->y;
+    }
+
+    public function recoverPassword() {
+        $this->generateActivationHash();
+        return $this->save() ? $this->sendMail($this->getRecoverPasswordMessage(), 'Recuperação da password') : false;
+    }
+
+    private function getRecoverPasswordMessage() {
+        $link = Yii::app()->createAbsoluteUrl("user/activate", array(
+            'activationHash' => $this->activationHash,
+            'userID' => $this->primaryKey,
+        ));
+        $htmlLink = CHtml::link($link, $link, array('target' => '_blank'));
+        return "Para escolher uma nova password visite "
+        . CHtml::tag('p', array(), $htmlLink);
+    }
+
+    public function isRecoveringPassword() {
+        return $this->scenario === 'activation' && !$this->isAttributeBlank('password');
     }
 }

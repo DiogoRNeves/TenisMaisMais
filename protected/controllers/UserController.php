@@ -26,7 +26,7 @@ class UserController extends Controller {
         $user = User::getLoggedInUser();
         return array(
             array('allow', //allow guest users to activate an account
-                'actions' => array('activate'),
+                'actions' => array('activate', 'recoverPassword'),
                 'users' => array('Guest')
             ),
             array('allow', // allow system admin to perform all actions
@@ -96,15 +96,32 @@ class UserController extends Controller {
         $this->render('create', $models);
     }
 
+    public function actionRecoverPassword() {
+        $loginForm = Yii::app()->request->getParam('LoginForm');
+        $email = $loginForm === null ? null : (isset($loginForm['username']) ? $loginForm['username'] : null);
+        $user = $email === null ? null : User::findByContactInfo($email);
+        $found = $user !== null;
+        $sent = $found ? $user->recoverPassword() : false;
+
+        header('Content-Type: application/json');
+        echo CJSON::encode(array(
+            'status' => $found ? ($sent ? "OK" : "EMAIL_NOT_SENT") : "EMAIL_NOT_FOUND",
+            'email' => $email,
+            'notificationText' => $found && $sent ?
+                $this->getMailSentText($email) : $this->getMailNotSentText($email),
+        ));
+        Yii::app()->end();
+    }
+
     /**
-     * Loads the models from the post/get superglobals and saves them to persitence, then
-     * redirects to 'view' page if successfull. If activation, logs in and redirects to home.
+     * Loads the models from the post/get superglobals and saves them to persistence, then
+     * redirects to 'view' page if successful. If activation, logs in and redirects to home.
      * 
      * @param array $models
      */
     protected function loadValidateAndSave($models) {
-        /**
-         * Must use $_REQUEST beacuse this arrays can come from GET (link to create action)
+        /*
+         * Must use $_REQUEST because this arrays can come from GET (link to create action)
          * or POST (form submitting)
          */
         if (isset($_REQUEST['ClubHasUser'])) {
@@ -312,7 +329,7 @@ class UserController extends Controller {
 
         /** @var User $user */
         $user = $models['user'];
-        if ($user->isActivated()) {
+        if (!$user->isRecoveringPassword() && $user->isActivated()) {
             throw new CHttpException(403, "O utilizador " . $user->name . " já foi ativado.");
         }
         if (!$user->isActivationHash($activationHash)) {
@@ -321,6 +338,7 @@ class UserController extends Controller {
         if ($user->canBeActivated($activationHash)) {
             $this->renderUpdate($models);
         }
+        throw new CHttpException(500, "Couldn't apply action. Please contact the site administrator.");
     }
 
     public function actionRemoveFromClub($userID, $clubID) {
@@ -534,6 +552,18 @@ class UserController extends Controller {
         $mailActivator = new MailActivation();
         $mailActivator->user = $user;
         $mailActivator->allowActivation();
+    }
+
+    /**
+     * @param $email
+     * @return string
+     */
+    private function getMailSentText($email) {
+        return "Foi enviado um email para o endereço '$email' com instruções para recuperar a sua password.";
+    }
+
+    private function getMailNotSentText($email) {
+        return "Não foi possível recuperar a sua password. Verifique que introduziu o endereço de email corretamente.";
     }
 
 }

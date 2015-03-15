@@ -25,6 +25,8 @@
 
     <?php echo $form->errorSummary($user); ?>
 
+    <div <?php echo $user->isRecoveringPassword() ? "hidden" : ""; ?>>
+
     <?php echo $form->textFieldGroup($user, 'name', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php
@@ -74,6 +76,8 @@
     <?php echo $form->textFieldGroup($contact, 'fax', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
 
     <?php echo $form->textFieldGroup($contact, 'website', array('size' => 45, 'maxlength' => 45, 'class' => 'span5')); ?>
+
+    </div>
 
     <?php if ($user->canChangePassword()): ?>
         <p class="note"><?php echo 'Mudar a password:' ?></p>
