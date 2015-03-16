@@ -31,19 +31,31 @@ class BootstrapRssReader extends CWidget {
     }
 
     public function getBoosterCarouselItemsFromRSS() {
-        /* @var $items rss_php[] */
-        $items = $this->getItems();
         $result = array();
-        for ($n = 0; $n < $this->maxCount; $n++) {
-            $item = $items[$n];
+        try {
+            set_error_handler(create_function('', "throw new Exception(); return true;"));
+            /* @var $items rss_php[] */
+            $items = $this->getItems();
+            for ($n = 0; $n < $this->maxCount; $n++) {
+                $item = $items[$n];
+                $result[] = array(
+                    'image' => $this->generateImageLink($n),
+                    'label' => $item['title'],
+                    'caption' => $this->getCaption($item),
+                    'link' => $item['link'],
+                    'linkOptions' => $this->linkOptions,
+                );
+            }
+        } catch (Exception $e) {
             $result[] = array(
-                'image' => $this->generateImageLink($n),
-                'label' => $item['title'],
-                'caption' => $this->getCaption($item),
-                'link' => $item['link'],
+                'image' => $this->generateImageLink(0),
+                'label' => "Não foi possível carregar as notícias",
+                'caption' => "Não foi possível carregar as notícias",
+                'link' => null,
                 'linkOptions' => $this->linkOptions,
             );
         }
+        restore_error_handler();
         return $result;
     }
 
