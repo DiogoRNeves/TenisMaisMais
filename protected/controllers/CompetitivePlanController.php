@@ -33,10 +33,15 @@ class CompetitivePlanController extends Controller
                 'users' => array('@'),
                 'expression' => array($this, 'canLoggedUserViewPlan'),
             ),
-			array('allow', // allow authenticated user
-				'actions' => array('create', 'update', 'addTournament', 'removeTournament', 'deactivate'),
-				'users' => array('@'),
+            array('allow', // allow authenticated user
+                'actions' => array('update', 'addTournament', 'removeTournament', 'deactivate'),
+                'users' => array('@'),
                 'expression' => array($this, 'canLoggedUserEditPlan'),
+            ),
+			array('allow', // allow authenticated user
+				'actions' => array('create'),
+				'users' => array('@'),
+                'expression' => array($this, 'canLoggedUserCreatePlan'),
 			),
 			array('deny', // deny all users
 				'users' => array('*'),
@@ -48,7 +53,8 @@ class CompetitivePlanController extends Controller
      * @return AthleteGroup|null
      */
     public function getAthleteGroup() {
-        $athleteGroupID = Yii::app()->request->getParam('id');
+        $athleteGroupID = Yii::app()->request->getParam('athleteGroupID');
+        $athleteGroupID = $athleteGroupID === null ? Yii::app()->request->getParam('id') : $athleteGroupID;
         if ($athleteGroupID === null) { return null; }
         /** @var AthleteGroup $athleteGroup */
         return AthleteGroup::model()->findByPk($athleteGroupID);
@@ -68,6 +74,17 @@ class CompetitivePlanController extends Controller
     public function canLoggedUserEditPlan() {
         $athleteGroup = $this->getAthleteGroup();
         return $athleteGroup === null ? false : $athleteGroup->canBeUpdatedBy(User::getLoggedInUser());
+    }
+
+    /**
+     * @return bool
+     */
+    public function canLoggedUserCreatePlan() {
+        $athleteGroup = Yii::app()->request->getParam('AthleteGroup');
+        $clubID = $athleteGroup === null ? null : $athleteGroup['clubID'];
+        /** @var Club $club */
+        $club = $clubID === null ? null : Club::model()->findByPk($clubID);
+        return $club === null ? false : User::getLoggedInUser()->isCoachAt($club);
     }
 
 	public function actionCreate()
@@ -97,15 +114,6 @@ class CompetitivePlanController extends Controller
 		if (count($loggedUser->coachClubs) === 1) {
 			$model->clubID = $loggedUser->coachClubs[0];
 		}
-        $federationTournamentSearch = new FederationTournament('search');
-        $federationTournamentSearch->unsetAttributes();
-        $temp = Yii::app()->request->getParam('FederationTournament');
-        if ($temp === null) {
-            $federationTournamentSearch->ageBands = $loggedUser->getAgeBandIDs();
-            $federationTournamentSearch->searchDateRange = CHelper::getTodayDate() . " a " . CHelper::getTodayDate("Y-m-t");
-        } else {
-            $federationTournamentSearch->attributes = $temp;
-        }
 
 		$dataProvider = $loggedUser->searchAthleteGroup();
 
@@ -116,7 +124,7 @@ class CompetitivePlanController extends Controller
 		$this->render('index', array(
             'model' => $model,
             'dataProvider' => $dataProvider,
-            'federationTournamentSearch' => $federationTournamentSearch
+            'federationTournamentSearch' => $this->getFederationTournamentSearch($loggedUser->getAgeBandIDs())
         ));
 	}
 
@@ -147,17 +155,8 @@ class CompetitivePlanController extends Controller
 		if ($temp !== null) {
 			$model->showPastEvents = $temp['showPastEvents'];
 		}
-		$federationTournamentSearch = new FederationTournament('search');
-		$federationTournamentSearch->unsetAttributes();
-		$temp = Yii::app()->request->getParam('FederationTournament');
-		if ($temp === null) {
-			$federationTournamentSearch->ageBands = $model->getAgeBandIDs();
-			$federationTournamentSearch->searchDateRange = CHelper::getTodayDate() . " a " . CHelper::getTodayDate("Y-m-t");
-		} else {
-			$federationTournamentSearch->attributes = $temp;
-		}
 		$this->render('view', array('model' => $model,
-			'federationTournamentSearch' => $federationTournamentSearch));
+			'federationTournamentSearch' => $this->getFederationTournamentSearch($model->getAgeBandIDs())));
 	}
 
 	public function actionDownloadPdf($id, $showPastEvents) {
@@ -245,4 +244,26 @@ class CompetitivePlanController extends Controller
 		$test = $this->action->id === 'view' ? 'update' : 'create';
 		return $test;
 	}
+
+    /**
+     * @param $ageBandIDs int[]
+     * @return FederationTournament
+     * @internal param AthleteGroup $model
+     */
+    private function getFederationTournamentSearch($ageBandIDs) {
+        $federationTournamentSearch = new FederationTournament('search');
+        $federationTournamentSearch->unsetAttributes();
+        $temp = Yii::app()->request->getParam('FederationTournament');
+        if ($temp === null) {
+            $federationTournamentSearch->ageBands = $ageBandIDs;
+            $federationTournamentSearch->searchDateRange = CHelper::getTodayDate() . " a " . CHelper::getTodayDate("Y-m-t");
+            //TODO make the following dynamic
+            $federationTournamentSearch->surface = array("Relva", "Terra", "Duro");
+            $federationTournamentSearch->level = array("A", "B", "C", "CR", "CN");
+            return $federationTournamentSearch;
+        } else {
+            $federationTournamentSearch->attributes = $temp;
+            return $federationTournamentSearch;
+        }
+    }
 }

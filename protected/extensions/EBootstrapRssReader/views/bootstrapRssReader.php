@@ -14,8 +14,8 @@ Yii::app()->clientScript->registerCss("carousselCenterImage", '
   .carousel-inner .item a img {
     min-height: 100%;
     min-width: 100%;
-    max-width: 300%;
-    max-height: 300%;
+    max-width: 500%;
+    max-height: 500%;
 }');
 ?>
 <div id="rss">

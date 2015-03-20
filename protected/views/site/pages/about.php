@@ -56,7 +56,7 @@ $this->breadcrumbs = array(
                     </li>
                     <li>
                         Notificações perto de eventos importantes 
-                        <span class="label label-danger">Depende de 10</span>
+                        <span class="label label-danger">Aguarda desenvolvimento</span>
                     </li>
                     <li>
                         Sistema de ranking 
@@ -68,7 +68,7 @@ $this->breadcrumbs = array(
                     </li>
                     <li>
                         Criar e ajustar os planeamentos competitivos para os vários grupos de atletas
-                        <span class="label label-warning">Em desenvolvimento</span>
+                        <span class="label label-success">OK</span>
                     </li>
                     <li>
                         Sistema de controlo de assiduidade aos treinos e de contabilização 

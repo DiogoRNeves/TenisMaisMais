@@ -80,7 +80,7 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
 ?>
 
 <?php
-//echo $form->textFieldGroup($model, 'username',array('label'=>Yii::t('model','Username')));
+//TODO change list population to dynamic data
 echo $form->select2Group($model, 'surface', array(
     'widgetOptions' => array(
         'data' => array("Duro" => "Duro", "Terra" => "Terra", "Relva" => "Relva"),
@@ -95,6 +95,7 @@ echo $form->select2Group($model, 'surface', array(
 ?>
 
 <?php
+//TODO change list population to dynamic data
 echo $form->select2Group($model, 'level', array(
     'widgetOptions' => array(
         'data' => array("C" => "Nível C", "B" => "Nível B", "A" => "Nível A", "CR" => "Campeonato Regional", "CN" => "Campeonato Nacional"),
@@ -112,7 +113,7 @@ echo $form->select2Group($model, 'level', array(
 
 <?php $this->widget('booster.widgets.TbLabel', array(
         'context' => 'info',
-        'label' => 'Distância aproximada em linha reta a "' . User::getLoggedInUser()->clubs[0]->getGeocodingSearchString() . '"',
+        'label' => 'Distância aproximada em linha reta (em quilómetros) a "' . User::getLoggedInUser()->clubs[0]->getGeocodingSearchString() . '"',
     )
 ); ?>
 

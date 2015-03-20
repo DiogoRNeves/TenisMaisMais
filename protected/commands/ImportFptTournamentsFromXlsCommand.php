@@ -22,10 +22,11 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
             echo "The year must be numeric: '$year' given\n";
             return 3;
         }
+        //TODO make command to find NotTennisTournaments html and write them to json on server using the existing methods.
         $this->defineNotTennisTournaments();
         $this->doCaching();
         try {
-            $this->_excelTournaments = new CExcelTournamentReader(Yii::app()->basePath . '/data/' . $fileName);
+            $this->_excelTournaments = new CExcelTournamentReader(Yii::app()->basePath . '/data/' . $fileName . '.xlsx');
         } catch (Exception $e) {
             echo $e->getMessage() . " on line " . $e->getLine();
             return 2;
@@ -129,7 +130,6 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
 
     private function deleteTournaments($year)
     {
-        //TODO understand why deleteAll($criteria) won't work on FederationTournamentHasAgeBand
         $startDate = $year . "-01-01";
         $endDate = $year . "-12-31";
         $criteria = new CDbCriteria;

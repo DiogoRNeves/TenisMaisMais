@@ -1,3 +1,15 @@
 #!/usr/bin/env php
 <?php
+//workaround so that the cgi version can run yiic
+$cmdApp = false;
+if (!isset($_SERVER['argv'])) {
+    $cmdApp = true;
+    $argv = array();
+    foreach ($_GET as $param => $garbage) {
+        $argv[] = $param;
+    }
+    $_SERVER['argv'] = $argv;
+    ob_end_flush();
+    ob_implicit_flush();
+}
 require_once(dirname(__FILE__) . '/yiic.php');

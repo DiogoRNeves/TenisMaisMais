@@ -14,15 +14,15 @@ $addColumn =  array(
             'label'=>'Adicionar torneio ao plano',
             'icon'=>'plus',
             'click'=>"function(){
-                                    var element = $('#searchTournament .modal-header');
+                                    var element = $('#search-tournament-table');
                                     $.ajax({
-                                        url : $(this).attr('href'),
+                                        url : $(this).attr('href')
                                     }).success(function(res) {
                                         var tournamentName = res.name;
                                         element.notify('Torneio \"' + tournamentName + '\" adicionado ao plano!',
                                         {
                                             className : 'success',
-                                            position : 'bottom center'
+                                            position : 'top center'
                                         });
                                         $.fn.yiiGridView.update('search-tournament-table');
                                         $.fn.yiiGridView.update('tournament-list');
@@ -30,7 +30,7 @@ $addColumn =  array(
                                         element.notify('Não foi possível adicionar o torneio ao plano.',
                                         {
                                             className : 'error',
-                                            position : 'bottom center'
+                                            position : 'top center'
                                         });
                                     });
                                     return false;

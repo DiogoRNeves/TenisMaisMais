@@ -50,8 +50,8 @@ class BootstrapRssReader extends CWidget {
             $result[] = array(
                 'image' => $this->generateImageLink(0),
                 'label' => "Não foi possível carregar as notícias",
-                'caption' => "Não foi possível carregar as notícias",
-                'link' => null,
+                'caption' => "Clique para ver as notícias numa nova janela",
+                'link' => $this->poweredByUrl,
                 'linkOptions' => $this->linkOptions,
             );
         }
