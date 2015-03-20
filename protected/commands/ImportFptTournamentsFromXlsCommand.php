@@ -22,7 +22,6 @@ class ImportFptTournamentsFromXlsCommand extends CConsoleCommand {
             echo "The year must be numeric: '$year' given\n";
             return 3;
         }
-        //TODO make command to find NotTennisTournaments html and write them to json on server using the existing methods.
         $this->defineNotTennisTournaments();
         $this->doCaching();
         try {

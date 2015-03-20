@@ -337,8 +337,9 @@ class UserController extends Controller {
         }
         if ($user->canBeActivated($activationHash)) {
             $this->renderUpdate($models);
+        } else {
+            throw new CHttpException(500, "Couldn't apply action. Please contact the site administrator.");
         }
-        throw new CHttpException(500, "Couldn't apply action. Please contact the site administrator.");
     }
 
     public function actionRemoveFromClub($userID, $clubID) {
@@ -562,7 +563,7 @@ class UserController extends Controller {
         return "Foi enviado um email para o endereço '$email' com instruções para recuperar a sua password.";
     }
 
-    private function getMailNotSentText($email) {
+    private function getMailNotSentText() {
         return "Não foi possível recuperar a sua password. Verifique que introduziu o endereço de email corretamente.";
     }
 
